@@ -1,0 +1,221 @@
+[
+    {
+        "name": "chillerlan/php-qrcode",
+        "version": "4.1.0",
+        "version_normalized": "4.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/chillerlan/php-qrcode.git",
+            "reference": "2cecb32cf618319dd01d9bc1fa64dc6bb683df85"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/chillerlan/php-qrcode/zipball/2cecb32cf618319dd01d9bc1fa64dc6bb683df85",
+            "reference": "2cecb32cf618319dd01d9bc1fa64dc6bb683df85",
+            "shasum": ""
+        },
+        "require": {
+            "chillerlan/php-settings-container": "^2.0",
+            "ext-mbstring": "*",
+            "php": "^7.4"
+        },
+        "require-dev": {
+            "phan/phan": "^2.7",
+            "phpunit/phpunit": "^9.1",
+            "setasign/fpdf": "^1.8.2"
+        },
+        "suggest": {
+            "chillerlan/php-authenticator": "Yet another Google authenticator! Also creates URIs for mobile apps.",
+            "setasign/fpdf": "Required to use the QR FPDF output."
+        },
+        "time": "2020-06-04T17:07:12+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "chillerlan\\QRCode\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Kazuhiko Arase",
+                "homepage": "https://github.com/kazuhikoarase"
+            },
+            {
+                "name": "Smiley",
+                "email": "smiley@chillerlan.net",
+                "homepage": "https://github.com/codemasher"
+            },
+            {
+                "name": "Contributors",
+                "homepage": "https://github.com/chillerlan/php-qrcode/graphs/contributors"
+            }
+        ],
+        "description": "A QR code generator. PHP 7.4+",
+        "homepage": "https://github.com/chillerlan/php-qrcode",
+        "keywords": [
+            "phpqrcode",
+            "qr",
+            "qr code",
+            "qrcode",
+            "qrcode-generator"
+        ]
+    },
+    {
+        "name": "chillerlan/php-settings-container",
+        "version": "2.0.0",
+        "version_normalized": "2.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/chillerlan/php-settings-container.git",
+            "reference": "75888345532373074fba482a6642c0f8cda996f0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/chillerlan/php-settings-container/zipball/75888345532373074fba482a6642c0f8cda996f0",
+            "reference": "75888345532373074fba482a6642c0f8cda996f0",
+            "shasum": ""
+        },
+        "require": {
+            "ext-json": "*",
+            "php": "^7.4"
+        },
+        "require-dev": {
+            "phan/phan": "^2.6",
+            "phpunit/phpunit": "^9.1"
+        },
+        "time": "2020-04-16T16:56:44+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "chillerlan\\Settings\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Smiley",
+                "email": "smiley@chillerlan.net",
+                "homepage": "https://github.com/codemasher"
+            }
+        ],
+        "description": "A container class for immutable settings objects. Not a DI container. PHP 7.4+",
+        "homepage": "https://github.com/chillerlan/php-settings-container",
+        "keywords": [
+            "PHP7",
+            "Settings",
+            "container",
+            "helper"
+        ]
+    },
+    {
+        "name": "mike42/escpos-php",
+        "version": "v3.0",
+        "version_normalized": "3.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/mike42/escpos-php.git",
+            "reference": "dcb569a123d75f9f6a4a927aae7625ca6b7fdcf3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/mike42/escpos-php/zipball/dcb569a123d75f9f6a4a927aae7625ca6b7fdcf3",
+            "reference": "dcb569a123d75f9f6a4a927aae7625ca6b7fdcf3",
+            "shasum": ""
+        },
+        "require": {
+            "ext-intl": "*",
+            "ext-json": "*",
+            "ext-zlib": "*",
+            "mike42/gfx-php": "^0.6",
+            "php": ">=7.0.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^6.5",
+            "squizlabs/php_codesniffer": "^3.3"
+        },
+        "suggest": {
+            "ext-gd": "Used for image printing if present.",
+            "ext-imagick": "Will be used for image printing if present. Required for PDF printing or use of custom fonts."
+        },
+        "time": "2019-10-13T06:27:43+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Mike42\\": "src/Mike42"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Michael Billington",
+                "email": "michael.billington@gmail.com"
+            }
+        ],
+        "description": "PHP receipt printer library for use with ESC/POS-compatible thermal and impact printers",
+        "homepage": "https://github.com/mike42/escpos-php",
+        "keywords": [
+            "Epson",
+            "barcode",
+            "escpos",
+            "printer",
+            "receipt-printer"
+        ]
+    },
+    {
+        "name": "mike42/gfx-php",
+        "version": "v0.6",
+        "version_normalized": "0.6.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/mike42/gfx-php.git",
+            "reference": "ed9ded2a9298e4084a9c557ab74a89b71e43dbdb"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/mike42/gfx-php/zipball/ed9ded2a9298e4084a9c557ab74a89b71e43dbdb",
+            "reference": "ed9ded2a9298e4084a9c557ab74a89b71e43dbdb",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=7.0.0"
+        },
+        "require-dev": {
+            "phpbench/phpbench": "@dev",
+            "phpunit/phpunit": "^6.5",
+            "squizlabs/php_codesniffer": "^3.3.1"
+        },
+        "time": "2019-10-05T02:44:33+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Mike42\\": "src/Mike42"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1-or-later"
+        ],
+        "authors": [
+            {
+                "name": "Michael Billington",
+                "email": "michael.billington@gmail.com"
+            }
+        ],
+        "description": "The pure PHP graphics library",
+        "homepage": "https://github.com/mike42/gfx-php"
+    }
+]
