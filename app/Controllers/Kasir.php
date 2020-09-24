@@ -6,7 +6,7 @@ use App\Models\Mejamodel;
 use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
-require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
