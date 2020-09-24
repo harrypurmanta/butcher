@@ -8,7 +8,8 @@ use App\Models\Discountmodel;
 use App\Models\Membermodel;
 require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
-use Mike42\Escpos\PrintConnectors\DummyPrintConnector;
+use Mike42\Escpos\EscposImage;
+use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
 use Mike42\Escpos\CapabilityProfile;
 
 class Kasir extends BaseController
@@ -17,8 +18,15 @@ class Kasir extends BaseController
 	protected $billingmodel;
 	protected $discountmodel;
 	protected $membermodel;
+	protected $connector;
+	protected $profile;
+	protected $printer;
 	protected $session;
+	private $name;
+	private $price;
+	private $dollarSign;
 	public function __construct(){
+		
 		$this->mejamodel = new Mejamodel();
 		$this->billingmodel = new Billingmodel();
 		$this->discountmodel = new Discountmodel();
@@ -34,6 +42,7 @@ class Kasir extends BaseController
 			'meja' => $this->mejamodel->getbyNormal()
 		];
 		return view('backend/kasir', $data);
+
 	}
 
 	public function getbymejaidkasir() {
@@ -286,23 +295,99 @@ class Kasir extends BaseController
 	}
 
 	public function cetakmenu() {
+		$this->profile = CapabilityProfile::load("POS-5890");
+		$this->connector = new RawbtPrintConnector();
+		$this->printer = new Printer($this->connector, $this->profile);
+		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
 		// Make sure you load a Star print connector or you may get gibberish.
-		$connector = new DummyPrintConnector();
-		$profile = CapabilityProfile::load("TSP600");
-		$printer = new Printer($connector);
-		$printer -> text("Hello world!\n");
-		$printer -> cut();
+		try {
 
-		// Get the data out as a string
-		$data = $connector -> getData();
+		    /* Information for the receipt */
+		    $subtotal = 'Subtotal';
+		    $tax = 'A local tax';
+		    $total = 'Total';
+		    /* Date is kept the same for testing */
+		// $date = date('l jS \of F Y h:i:s A');
+		    $date = "Monday 6th of April 2015 02:56:25 PM";
 
-		// Return it, check the manual for specifics.
-		header('Content-type: application/octet-stream');
-		header('Content-Length: '.strlen($data));
-		echo $data;
+		    /* Start the printer */
+		    $logo = EscposImage::load("images/rawbtlogo.png", false);
+		    $this->printer = new Printer($this->connector, $this->profile);
 
-		// Close the printer when done.
-		$printer -> close();
+
+		    /* Print top logo */
+		    if ($this->profile->getSupportsGraphics()) {
+		        $this->printer->graphics($logo);
+		    }
+		    if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
+		        $this->printer->bitImage($logo);
+		    }
+
+		    /* Name of shop */
+		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+		    $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		    $this->printer->text("ExampleMart Ltd.\n");
+		    $this->printer->selectPrintMode();
+		    $this->printer->text("Shop No. 42.\n");
+		    $this->printer->feed();
+
+
+		    /* Title of receipt */
+		    $this->printer->setEmphasis(true);
+		    $this->printer->text("SALES INVOICE\n");
+		    $this->printer->setEmphasis(false);
+
+		    /* Items */
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    $this->printer->setEmphasis(true);
+		    $this->printer->text('','','$');
+		    $this->printer->setEmphasis(false);
+		    $this->printer->setEmphasis(true);
+		    $this->printer->text($subtotal);
+		    $this->printer->setEmphasis(false);
+		    $this->printer->feed();
+
+		    /* Tax and total */
+		    $this->printer->text($tax);
+		    $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		    $this->printer->text($total);
+		    $this->printer->selectPrintMode();
+
+		    /* Footer */
+		    $this->printer->feed(2);
+		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+		    $this->printer->text("Thank you for shopping\n");
+		    $this->printer->text("at ExampleMart\n");
+		    $this->printer->text("For trading hours,\n");
+		    $this->printer->text("please visit example.com\n");
+		    $this->printer->feed(2);
+		    $this->printer->text($date . "\n");
+
+		    /* Barcode Default look */
+
+		    $this->printer->barcode("ABC", Printer::BARCODE_CODE39);
+		    $this->printer->feed();
+		    $this->printer->feed();
+
+
+		// Demo that alignment QRcode is the same as text
+		    
+		    $this->printer2->setJustification(Printer::JUSTIFY_CENTER);
+		    $this->printer2->qrCode("https://rawbt.ru/mike42", Printer::QR_ECLEVEL_M, 8);
+		    $this->printer2->text("rawbt.ru/mike42\n");
+		    $this->printer2->setJustification();
+		    $this->printer2->feed();
+
+
+		    /* Cut the receipt and open the cash drawer */
+		    $this->printer->cut();
+		    $this->printer->pulse();
+
+		} catch (Exception $e) {
+		    echo $e->getMessage();
+		} finally {
+		    $this->printer->close();
+		}
+		
 	}
-
 }

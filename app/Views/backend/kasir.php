@@ -50,7 +50,7 @@
 <script type="text/javascript">
 function showbillingbymeja(id) {
     $.ajax({
-     url : "<?= base_url('kasir/getbymejaidkasir') ?>",
+     url : "<?= base_url('index.php/kasir/getbymejaidkasir') ?>",
      type: "post",
      data : {'id':id},
      success:function(data){
@@ -242,7 +242,7 @@ function cetakmenu(id) {
      url : "<?= base_url('kasir/cetakmenu') ?>",
      type: "post",
      success:function(data){
-      alert(data);
+      window.location.href = data;
     },
     error:function(){
         Swal.fire({
