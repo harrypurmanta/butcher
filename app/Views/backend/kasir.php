@@ -237,12 +237,16 @@ function removedc(id,di) {
   });
 }
 
-function cetakmenu(id) {
+function cetakmenu(id,btn) {
+  b = $(btn);
+  b.attr('data-old', b.text());
+  b.text('wait');
   $.ajax({
      url : "<?= base_url('kasir/cetakmenu') ?>",
      type: "post",
      success:function(data){
-      window.location.href = data;
+      // window.location.href = data;
+      b.text(b.attr('data-old'));
     },
     error:function(){
         Swal.fire({

@@ -181,7 +181,7 @@ class Kasir extends BaseController
 						</table>
 						<hr style='border: 1px solid red;margin-bottom:20px;'>";
 
-				$ret .= "<div align='center'><button onclick='cetakmenu($id)' class='btn btn-info' style='font-size:30px;'>Cetak Menu</button> <button onclick='cetakbilling($id)' class='btn btn-info' style='font-size:30px;'>Cetak Billing</button> </div>";
+				$ret .= "<div align='center'><button onclick='cetakmenu($id,this)' class='btn btn-info' style='font-size:30px;'>Cetak Menu</button> <button onclick='cetakbilling($id,this)' class='btn btn-info' style='font-size:30px;'>Cetak Billing</button> </div>";
 				$ret .= "<div class='m-t-20' align='center'><button onclick='checkout($id)' class='btn btn-info' style='font-size:40px;'>Checkout</button></div>";
 		} else {
 			$ret = "<div align='center'><h3>TIDAK ADA PESANAN !!</h3> <button class='meja-button' type='button' onclick='backtowaiters()'>Kembali</button></div>";
