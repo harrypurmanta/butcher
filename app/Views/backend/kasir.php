@@ -50,7 +50,7 @@
 <script type="text/javascript">
 function showbillingbymeja(id) {
     $.ajax({
-     url : "<?= base_url('index.php/kasir/getbymejaidkasir') ?>",
+     url : "<?= base_url('kasir/getbymejaidkasir') ?>",
      type: "post",
      data : {'id':id},
      success:function(data){
