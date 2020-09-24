@@ -245,7 +245,7 @@ function cetakmenu(id,btn) {
      url : "<?= base_url('kasir/cetakmenu') ?>",
      type: "post",
      success:function(data){
-      // window.location.href = data;
+      window.location.href = data;
       b.text(b.attr('data-old'));
     },
     error:function(){
