@@ -41,6 +41,20 @@ class BaseController extends Controller
 		//--------------------------------------------------------------------
 		// E.g.:
 		// $this->session = \Config\Services::session();
+		$this->session = \Config\Services::session();
+		$this->session->start();
+
+		
+		function panjang($date) {
+			$BulanIndo = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");
+
+			$tahun = substr($date, 0, 4);
+			$bulan = substr($date, 5, 2);
+			$tgl   = substr($date, 8, 2);
+
+			$result = $tgl . " " . $BulanIndo[(int)$bulan - 1] . " " . $tahun;
+			return ($result);
+		}
 	}
 
 }

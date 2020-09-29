@@ -7,12 +7,9 @@ use chillerlan\QRCode\{QRCode, QROptions};
 class Meja extends BaseController {
 	protected $mejamodel;
 	protected $billingmodel;
-	protected $session;
 	public function __construct(){
 		$this->mejamodel = new Mejamodel();
 		$this->billingmodel = new Billingmodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
 	}
 
 	public function index() {
@@ -240,7 +237,7 @@ class Meja extends BaseController {
 			$mejaid = $this->mejamodel->simpan($data);
 			if ($mejaid) {
 				require_once APPPATH.'/Libraries/vendor/autoload.php';
-				$url = 'https://butcher.cliniccoding.id/produk/listmenu/'.$mejaid;
+				$url = 'https://butcher.cliniccoding.id/produk/listmenu/'.$mejaid.'/$datenow';
 		        $options = new QROptions([
 					'version'      => 7,
 					'outputType'   => QRCode::OUTPUT_IMAGE_PNG,

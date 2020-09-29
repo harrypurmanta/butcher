@@ -204,6 +204,38 @@ function addmember(id,di){
     }
     });
 }
+
+function removedcmember(id,di) {
+  $.ajax({
+     url : "<?= base_url('kasir/removedcmember') ?>",
+     type: "post",
+     data: {id:id,di:di},
+     success:function(data){
+      if (data == 'true') {
+        showbillingbymeja(id);
+      } else {
+        Swal.fire({
+            title:"Error!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+      }
+    },
+    error:function(){
+        Swal.fire({
+            title:"Error!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
     
 function removedc(id,di) {
   $.ajax({
@@ -244,8 +276,59 @@ function cetakmenu(id,btn) {
   $.ajax({
      url : "<?= base_url('kasir/cetakmenu') ?>",
      type: "post",
+     data: {id:id},
      success:function(data){
-      window.location.href = data;
+      // window.location.href = data;
+      b.text(b.attr('data-old'));
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function cetakbilling(id,btn) {
+  b = $(btn);
+  b.attr('data-old', b.text());
+  b.text('wait');
+  $.ajax({
+     url : "<?= base_url('kasir/cetakbilling') ?>",
+     type: "post",
+     data: {id:id},
+     success:function(data){
+      // window.location.href = data;
+      b.text(b.attr('data-old'));
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function checkout(id,btn) {
+  b = $(btn);
+  b.attr('data-old', b.text());
+  b.text('wait');
+  $.ajax({
+     url : "<?= base_url('kasir/cetakcheckout') ?>",
+     type: "post",
+     data: {id:id},
+     success:function(data){
+      // window.location.href = data;
       b.text(b.attr('data-old'));
     },
     error:function(){

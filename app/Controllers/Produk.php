@@ -22,6 +22,8 @@ class Produk extends BaseController
 	}
 
 	public function index() {
+		$agent = $this->request->getUserAgent();
+		echo json_encode($agent);exit;
 		$data = [
 			'title' => 'Produk',
 			'subtitle' => 'Produk',
@@ -42,22 +44,28 @@ class Produk extends BaseController
 
 	public function listmenu(){
 		$meja_id = $this->request->uri->getSegment(3);
-		$res = $this->billingmodel->getbyMejaidcustomer($meja_id)->getResult();
-		if (count($res)>0) {
-			$data = [
-			'title' => 'Your Bill',
-			'subtitle' => 'Your Bill',
-			'billing' => $res
-			];
-			return view('frontend/billing', $data);
+		if ($meja_id == "") {
+			return redirect('dashboard');
 		} else {
-			$data = [
-			'title' => 'Menu',
-			'subtitle' => 'Menu',
-			'kategori' => $this->kategorimodel->getbyNormal()->getResult()
-			];
-			return view('frontend/listmenu2', $data);
+			$res = $this->billingmodel->getbyMejaidcustomer($meja_id)->getResult();
+			if (count($res)>0) {
+				$data = [
+				'title' => 'Your Bill',
+				'subtitle' => 'Your Bill',
+				'billing' => $res
+				];
+				return view('frontend/billing', $data);
+			} else {
+				$data = [
+				'title' => 'Menu',
+				'subtitle' => 'Menu',
+				'kategori' => $this->kategorimodel->getbyNormal()->getResult()
+				];
+				return view('frontend/listmenu2', $data);
+			}
 		}
+		
+		
 	}
 
 	public function menu() {
@@ -263,44 +271,41 @@ class Produk extends BaseController
 		$qty = $this->request->getVar('qty');
 		$produk_id = $this->request->getVar('produk_id');
 		$meja_id 	= $this->request->getVar('meja_id');
-		$count = count($qty);
-		$date = date('Y-m-d H:i:s');
-		$data = [
-		  'meja_id' => $meja_id,
-		  'status_cd' => 'normal',
-		  'created_dttm' => $date,
-		  'created_user' => $meja_id
-		];
-		$billing_id = $this->billingmodel->simpanbilling($data);
-
-		if ($billing_id != "") {
-			for ($i=0; $i < $count; $i++) { 
-				$produk = $this->produkmodel->getbyId($produk_id[$i])->getResult();
-				$harga = $produk[0]->produk_harga * $qty[$i];
-				$dataitem = [
-					'billing_id' => $billing_id,
-					'item_dttm'  => $date,
-					'produk_id'  => $produk_id[$i],
-					'produk_nm'  => $produk[0]->produk_nm,
-					'qty' 		 => $qty[$i],
-					'price'		 => $harga,
-					'status_cd' => 'normal',
-					'created_dttm' => $date,
-					'created_user' => $meja_id
-				];
-				$bil_item = $this->billingmodel->simpanbillitem($dataitem);
-			}
-			return 'true';
+		if ($qty == "") {
+			return "belumorder";
 		} else {
-			return 'false';
+			$count = count($qty);
+			$date = date('Y-m-d H:i:s');
+			$data = [
+			  'meja_id' => $meja_id,
+			  'status_cd' => 'normal',
+			  'created_dttm' => $date,
+			  'created_user' => $meja_id
+			];
+			$billing_id = $this->billingmodel->simpanbilling($data);
+
+			if ($billing_id != "") {
+				for ($i=0; $i < $count; $i++) { 
+					$produk = $this->produkmodel->getbyId($produk_id[$i])->getResult();
+					$harga = $produk[0]->produk_harga * $qty[$i];
+					$dataitem = [
+						'billing_id' => $billing_id,
+						'item_dttm'  => $date,
+						'produk_id'  => $produk_id[$i],
+						'produk_nm'  => $produk[0]->produk_nm,
+						'qty' 		 => $qty[$i],
+						'price'		 => $harga,
+						'status_cd' => 'normal',
+						'created_dttm' => $date,
+						'created_user' => $meja_id
+					];
+					$bil_item = $this->billingmodel->simpanbillitem($dataitem);
+				}
+				return 'true';
+			} else {
+				return 'false';
+			}
 		}
-		
-		
-
-
-		// echo json_encode($produk_id);
-		// return $qty;
-		
 	}
 
 	public function update(){

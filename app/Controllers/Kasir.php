@@ -6,11 +6,15 @@ use App\Models\Mejamodel;
 use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
-use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
+// use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
 use Mike42\Escpos\CapabilityProfile;
+use Mike42\Escpos\PrintConnectors\CupsPrintConnector;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+// use Mike42\Escpos\Printer;
 
 class Kasir extends BaseController
 {
@@ -49,7 +53,10 @@ class Kasir extends BaseController
 		$id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
 		$resdc = $this->discountmodel->getbybillid($id)->getResult();
-		
+		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
+		$discount_nmx = "";	 
+		$discount_valuex = "";
+		$discount = "";
 		if (count($res)>0) {
 			$discount_nm = "";
 			$subtotal = 0;
@@ -65,16 +72,16 @@ class Kasir extends BaseController
 					</div>";
 			$ret .= "<table width='100%' style='margin-top: 20px;font-size: 20px;'>
 				        <tr>
-				          <td align='left'>Tanggal</td>
-				          <td align='right'>".$res[0]->created_dttm."</td>
+				          <td align='left'>".panjang($dt)."</td>
+				          <td align='right'>".$tm."</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Bill Name</td>
-				          <td align='right'>Pendy</td>
+				          <td align='right'>".$res[0]->member_nm."</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Collected By</td>
-				          <td align='right'>Fita PS</td>
+				          <td align='right'>".$res[0]->collected_nm."</td>
 				        </tr>
 				      </table>
 				      <hr style='border: 1px solid red'>
@@ -86,47 +93,25 @@ class Kasir extends BaseController
 					if ($symb == "%") {
 						$percentega = str_replace("%", "", $dc->value);
 						$ptotal = ($percentega/100) * $total;
-						$discount = "<span>(".number_format($ptotal).")</span> <a href='#' onclick='removedc($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
+						$discount = "<span>(".number_format($ptotal).")</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
 						$afterdc = $total - $ptotal;
 						$subtotal = $subtotal + $afterdc;
 						$discount_nmx = $dc->discount_nm;
 						$discount_valuex = $dc->value;
 					} else {
-						$discount = "";
-						$discount_nmx = $dc->discount_nm;
-						$discount_valuex = $dc->value;
-					}
-				}
-
-				if ($key->statusbilling == 'verified') {
-					if ($key->status_cd == "nullified") {
-						$buttonproduk = "";
-						$style = "style='text-decoration: line-through;'";
-					} else {
-						// $subtotal = $subtotal + $total;
-						$buttonproduk = "";
-						$style = "";
-					}
-				} else {
-					if ($key->status_cd == "nullified") {
-						$buttonproduk = "<button onclick='enableproduk($key->billing_item_id)' type='button' class='btn btn-success'>Enable</button>";
-						$style = "style='text-decoration: line-through;'";
-					} else {
-						// $subtotal = $subtotal + $total;
-						$buttonproduk = "<button onclick='disableproduk($key->billing_item_id)' type='button' class='btn btn-danger'>Disable</button>";
-						$style = "";
+						$subtotal = $subtotal + $total;
 					}
 				}
 
 				$ret .= "<tr>
 				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
-				            <span ".$style.">$key->produk_nm</span> ".$buttonproduk."
+				            <span>$key->produk_nm</span>
 				          </td>
 				        </tr>
 				        <tr style='font-size: 20px;'>
-				          <td align='left' width='180'><span ".$style.">$key->qty X</span><br>$discount_nmx $discount_valuex</td>
-				          <td align='center'><span ".$style.">@".number_format($key->produk_harga)."</span></td>
-				          <td align='right'><span ".$style.">".number_format($total)."<br>$discount</span></td>
+				          <td align='left' width='180'><span>$key->qty X</span><br>$discount_nmx $discount_valuex</td>
+				          <td align='center'><span>@".number_format($key->produk_harga)."</span></td>
+				          <td align='right'><span>".number_format($total)."<br>$discount</span></td>
 				        </tr>
 				        <tr style='line-height:20px;'>
 				        <td>&nbsp </td>
@@ -285,99 +270,136 @@ class Kasir extends BaseController
 			'nullified_dttm' => date('Y-m-d H:i:s'),
 			'nullified_user' => $this->session->user_id
 		];
-		$removedc = $this->discountmodel->removedckasir($di,$data);
+		$removedc = $this->billingmodel->removedckasir($di,$data);
 		if ($removedc) {
 			return "true";
 		} else {
 			return "false";
 		}
-		
+	}
+
+	public function removedcmember() {
+		$id = $this->request->getPost('id');
+		$di = $this->request->getPost('di');
+
+		$data = [
+			'status_cd' => 'nullified',
+			'nullified_dttm' => date('Y-m-d H:i:s'),
+			'nullified_user' => $this->session->user_id
+		];
+		$removedc = $this->billingmodel->removedckasir($di,$data);
+
+		$databill = [
+			'member_id' => 0,
+		];
+		$updatemember = $this->billingmodel->removemember($id,$databill);
+		if ($removedc) {
+			return "true";
+		} else {
+			return "false";
+		}
 	}
 
 	public function cetakmenu() {
+		$this->_getDrinksmenu($this->request->getPost('id')); 
+		$this->_getFoodsmenu($this->request->getPost('id'));
+	}
+
+	private function _getFoodsmenu($id) {
+		$data = $this->billingmodel->getfoodmenu($id)->getResult();
+		$resdc = $this->discountmodel->getbybillid($id)->getResult();
+		$subtotal = 0;
+		$discount_nmx = "";
+		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
-		$this->connector = new RawbtPrintConnector();
-		$this->printer = new Printer($this->connector, $this->profile);
+		// $this->connector = new RawbtPrintConnector();
+		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+
+
+		$this->printer = new Printer($this->connector);
 		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
 		// Make sure you load a Star print connector or you may get gibberish.
 		try {
 
 		    /* Information for the receipt */
-		    $subtotal = 'Subtotal';
-		    $tax = 'A local tax';
-		    $total = 'Total';
 		    /* Date is kept the same for testing */
-		// $date = date('l jS \of F Y h:i:s A');
-		    $date = "Monday 6th of April 2015 02:56:25 PM";
+		$date = date('l jS \of F Y h:i:s A');
+		   
 
 		    /* Start the printer */
-		    $logo = EscposImage::load("images/rawbtlogo.png", false);
-		    $this->printer = new Printer($this->connector, $this->profile);
+		    // $logo = EscposImage::load("images/lib/logoa.png", false);
+		    // $this->printer = new Printer($this->connector, $this->profile);
 
 
 		    /* Print top logo */
-		    if ($this->profile->getSupportsGraphics()) {
-		        $this->printer->graphics($logo);
-		    }
-		    if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
-		        $this->printer->bitImage($logo);
-		    }
+		    // if ($this->profile->getSupportsGraphics()) {
+		    //     $this->printer->graphics($logo);
+		    // }
+		    // if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
+		    //     $this->printer->bitImage($logo);
+		    // }
 
 		    /* Name of shop */
 		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
-		    $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-		    $this->printer->text("ExampleMart Ltd.\n");
+		    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		    $this->printer->text("Butcher Steak & Pasta Palembang\n");
+		    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
+		    $this->printer->text("Sumatera Selatan, 30114, 07115626366\n");
 		    $this->printer->selectPrintMode();
-		    $this->printer->text("Shop No. 42.\n");
 		    $this->printer->feed();
-
-
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    $this->printer->text($this->getAsString(32,panjang($dt),"",$tm));
 		    /* Title of receipt */
 		    $this->printer->setEmphasis(true);
-		    $this->printer->text("SALES INVOICE\n");
-		    $this->printer->setEmphasis(false);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->feed(1);
+		    
 
 		    /* Items */
+		    
 		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
-		    $this->printer->setEmphasis(true);
-		    $this->printer->text('','','$');
-		    $this->printer->setEmphasis(false);
-		    $this->printer->setEmphasis(true);
-		    $this->printer->text($subtotal);
-		    $this->printer->setEmphasis(false);
-		    $this->printer->feed();
+		    foreach ($data as $item) {
+		    	$this->printer->setEmphasis(true);
+				$total = $item->produk_harga * $item->qty;
+				foreach ($resdc as $dc) {
+					$symb = substr($dc->value, -1);
+					if ($symb == "%") {
+						$percentega = str_replace("%", "", $dc->value);
+						$valuedc = ($percentega/100) * $total;
+						$ptotal = "(".number_format(($percentega/100) * $total).")";
+						$afterdc = $total - $valuedc;
+						$subtotal = $subtotal + $afterdc;
+						$discount_nmx = $dc->discount_nm;
+						$discount_valuex = $dc->value;
+					} else {
+						$discount = "";
+						$discount_nmx = "";
+						$discount_valuex = "";
+						$ptotal = "";
+						$subtotal = $subtotal + $total;
+					}
+				}
+		        $this->printer->text($item->produk_nm."\n");
+		        $this->printer->setEmphasis(false);
+		        $this->printer->text($this->getAsString(32,$item->qty."x","@".number_format($item->produk_harga),number_format($total))); // for 58mm Font A
+		        $this->printer->text($this->getAsString(32,$discount_nmx."".$discount_valuex," ",$ptotal)."\n");
+		    }
 
-		    /* Tax and total */
-		    $this->printer->text($tax);
-		    $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-		    $this->printer->text($total);
-		    $this->printer->selectPrintMode();
-
-		    /* Footer */
-		    $this->printer->feed(2);
-		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
-		    $this->printer->text("Thank you for shopping\n");
-		    $this->printer->text("at ExampleMart\n");
-		    $this->printer->text("For trading hours,\n");
-		    $this->printer->text("please visit example.com\n");
+		    foreach ($resdc as $dc) {
+				$symb = substr($dc->value, -1);
+				if ($symb != "%") {
+					$discount_nm = $dc->discount_nm;
+					$discount_value = $dc->value;
+		        $this->printer->text($this->getAsString(32,$discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
+				$subtotal = $subtotal - $dc->value;
+				} 
+			}
+		    $this->printer->setEmphasis(false);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->setEmphasis(false);
+		    /*footer */
 		    $this->printer->feed(2);
 		    $this->printer->text($date . "\n");
-
-		    /* Barcode Default look */
-
-		    $this->printer->barcode("ABC", Printer::BARCODE_CODE39);
-		    $this->printer->feed();
-		    $this->printer->feed();
-
-
-		// Demo that alignment QRcode is the same as text
-		    
-		    $this->printer2->setJustification(Printer::JUSTIFY_CENTER);
-		    $this->printer2->qrCode("https://rawbt.ru/mike42", Printer::QR_ECLEVEL_M, 8);
-		    $this->printer2->text("rawbt.ru/mike42\n");
-		    $this->printer2->setJustification();
-		    $this->printer2->feed();
-
 
 		    /* Cut the receipt and open the cash drawer */
 		    $this->printer->cut();
@@ -388,6 +410,373 @@ class Kasir extends BaseController
 		} finally {
 		    $this->printer->close();
 		}
-		
 	}
+
+	private function _getDrinksmenu($id) {
+
+		$data = $this->billingmodel->getdrinkmenu($id)->getResult();
+		$resdc = $this->discountmodel->getbybillid($id)->getResult();
+		$subtotal = 0;
+		$discount_nmx = "";
+		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
+		$this->profile = CapabilityProfile::load("POS-5890");
+		// $this->connector = new RawbtPrintConnector();
+		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+
+
+		$this->printer = new Printer($this->connector);
+		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+		// Make sure you load a Star print connector or you may get gibberish.
+		try {
+
+		    /* Information for the receipt */
+		    /* Date is kept the same for testing */
+		$date = date('l jS \of F Y h:i:s A');
+		   
+
+		    /* Start the printer */
+		    // $logo = EscposImage::load("images/lib/logoa.png", false);
+		    // $this->printer = new Printer($this->connector, $this->profile);
+
+
+		    /* Print top logo */
+		    // if ($this->profile->getSupportsGraphics()) {
+		    //     $this->printer->graphics($logo);
+		    // }
+		    // if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
+		    //     $this->printer->bitImage($logo);
+		    // }
+
+		    /* Name of shop */
+		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+		    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		    $this->printer->text("Butcher Steak & Pasta Palembang\n");
+		    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
+		    $this->printer->text("Sumatera Selatan, 30114, 07115626366\n");
+		    $this->printer->selectPrintMode();
+		    $this->printer->feed();
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    $this->printer->text($this->getAsString(32,panjang($dt),"",$tm));
+		    /* Title of receipt */
+		    $this->printer->setEmphasis(true);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->feed(1);
+		    
+
+		    /* Items */
+		    
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    foreach ($data as $item) {
+		    	$this->printer->setEmphasis(true);
+				$total = $item->produk_harga * $item->qty;
+				foreach ($resdc as $dc) {
+					$symb = substr($dc->value, -1);
+					if ($symb == "%") {
+						$percentega = str_replace("%", "", $dc->value);
+						$valuedc = ($percentega/100) * $total;
+						$ptotal = "(".number_format(($percentega/100) * $total).")";
+						$afterdc = $total - $valuedc;
+						$subtotal = $subtotal + $afterdc;
+						$discount_nmx = $dc->discount_nm;
+						$discount_valuex = $dc->value;
+					} else {
+						$discount = "";
+						$discount_nmx = "";
+						$discount_valuex = "";
+						$ptotal = "";
+						$subtotal = $subtotal + $total;
+					}
+				}
+		        $this->printer->text($item->produk_nm."\n");
+		        $this->printer->setEmphasis(false);
+		        $this->printer->text($this->getAsString(32,$item->qty."x","@".number_format($item->produk_harga),number_format($total))); // for 58mm Font A
+		        $this->printer->text($this->getAsString(32,$discount_nmx."".$discount_valuex," ",$ptotal)."\n");
+		    }
+
+		    foreach ($resdc as $dc) {
+				$symb = substr($dc->value, -1);
+				if ($symb != "%") {
+					$discount_nm = $dc->discount_nm;
+					$discount_value = $dc->value;
+		        $this->printer->text($this->getAsString(32,$discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
+				$subtotal = $subtotal - $dc->value;
+				} 
+			}
+		    $this->printer->setEmphasis(false);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->setEmphasis(false);
+		    
+		    /*footer */
+		    $this->printer->feed(2);
+		    $this->printer->text($date . "\n");
+
+		    /* Cut the receipt and open the cash drawer */
+		    $this->printer->cut();
+		    $this->printer->pulse();
+
+		} catch (Exception $e) {
+		    echo $e->getMessage();
+		} finally {
+		    $this->printer->close();
+		}
+	}
+
+	public function cetakbilling() {
+		$id = $this->request->getPost('id');
+		$data = $this->billingmodel->getbyMejaidkasir($id)->getResult();
+		$resdc = $this->discountmodel->getbybillid($id)->getResult();
+		$subtotal = 0;
+		$discount_nmx = "";
+		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
+		$this->profile = CapabilityProfile::load("POS-5890");
+		// $this->connector = new RawbtPrintConnector();
+		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+
+
+		$this->printer = new Printer($this->connector);
+		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+		// Make sure you load a Star print connector or you may get gibberish.
+		try {
+
+		    /* Information for the receipt */
+		    /* Date is kept the same for testing */
+		$date = date('l jS \of F Y h:i:s A');
+		   
+
+		    /* Start the printer */
+		    // $logo = EscposImage::load("images/lib/logoa.png", false);
+		    // $this->printer = new Printer($this->connector, $this->profile);
+
+
+		    /* Print top logo */
+		    // if ($this->profile->getSupportsGraphics()) {
+		    //     $this->printer->graphics($logo);
+		    // }
+		    // if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
+		    //     $this->printer->bitImage($logo);
+		    // }
+
+		    /* Name of shop */
+		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+		    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		    $this->printer->text("Butcher Steak & Pasta Palembang\n");
+		    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
+		    $this->printer->text("Sumatera Selatan, 30114, 07115626366\n");
+		    $this->printer->selectPrintMode();
+		    $this->printer->feed();
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    $this->printer->text($this->getAsString(32,panjang($dt),"",$tm));
+		    $this->printer->text($this->getAsString(32,"Bill Name","",substr($data[0]->member_nm, 0,7)));
+		    $this->printer->text($this->getAsString(32,"Collected by","",$data[0]->collected_nm)."\n");
+		    /* Title of receipt */
+		    $this->printer->setEmphasis(true);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->feed(1);
+		    
+
+		    /* Items */
+		    
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    foreach ($data as $item) {
+		    	$this->printer->setEmphasis(true);
+				$total = $item->produk_harga * $item->qty;
+				foreach ($resdc as $dc) {
+					$symb = substr($dc->value, -1);
+					if ($symb == "%") {
+						$percentega = str_replace("%", "", $dc->value);
+						$valuedc = ($percentega/100) * $total;
+						$ptotal = "(".number_format(($percentega/100) * $total).")";
+						$afterdc = $total - $valuedc;
+						$subtotal = $subtotal + $afterdc;
+						$discount_nmx = $dc->discount_nm;
+						$discount_valuex = $dc->value;
+					} else {
+						$discount = "";
+						$discount_nmx = "";
+						$discount_valuex = "";
+						$ptotal = "";
+						$subtotal = $subtotal + $total;
+					}
+				}
+		        $this->printer->text($item->produk_nm."\n");
+		        $this->printer->setEmphasis(false);
+		        $this->printer->text($this->getAsString(32,$item->qty."x","@".number_format($item->produk_harga),number_format($total))); // for 58mm Font A
+		        $this->printer->text($this->getAsString(32,$discount_nmx."".$discount_valuex," ",$ptotal)."\n");
+		    }
+
+		    foreach ($resdc as $dc) {
+				$symb = substr($dc->value, -1);
+				if ($symb != "%") {
+					$discount_nm = $dc->discount_nm;
+					$discount_value = $dc->value;
+		        $this->printer->text($this->getAsString(32,$discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
+				$subtotal = $subtotal - $dc->value;
+				} 
+			}
+		    $this->printer->setEmphasis(false);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->setEmphasis(false);
+		    $this->printer->feed();
+		    $tax = $subtotal * 0.10;
+			$service = $subtotal * 0.05;
+			$grandtotal = $subtotal + $tax + $service;
+		    $this->printer->setEmphasis(false);
+			$this->printer->text($this->getAsString(32,"Subtotal","","Rp ".number_format($subtotal))); 
+			$this->printer->text($this->getAsString(32,"Tax","","Rp ".number_format($tax))); 
+			$this->printer->text($this->getAsString(32,"Service","","Rp ".number_format($service))); 
+			$this->printer->text($this->getAsString(32,"Rounding Amount","","Rp "."masih proses")); 
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->setEmphasis(true);
+			$this->printer->text($this->getAsString(32,"Total","","Rp ".number_format($grandtotal))); 
+		    $this->printer->setEmphasis(false);
+		    /*footer */
+		    $this->printer->feed(2);
+		    $this->printer->text($date . "\n");
+
+		    /* Cut the receipt and open the cash drawer */
+		    $this->printer->cut();
+		    $this->printer->pulse();
+
+		} catch (Exception $e) {
+		    echo $e->getMessage();
+		} finally {
+		    $this->printer->close();
+		}
+	}
+
+	public function cetakcheckout() {
+		$id = $this->request->getPost('id');
+		$data = $this->billingmodel->getbyMejaidkasir($id)->getResult();
+		$resdc = $this->discountmodel->getbybillid($id)->getResult();
+		$subtotal = 0;
+		$discount_nmx = "";
+		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
+		$this->profile = CapabilityProfile::load("POS-5890");
+		// $this->connector = new RawbtPrintConnector();
+		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+
+
+		$this->printer = new Printer($this->connector);
+		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+		// Make sure you load a Star print connector or you may get gibberish.
+		try {
+
+		    /* Information for the receipt */
+		    /* Date is kept the same for testing */
+		$date = date('l jS \of F Y h:i:s A');
+		   
+
+		    /* Start the printer */
+		    $logo = EscposImage::load("images/lib/logo.png", false);
+		    // $this->printer = new Printer($this->connector, $this->profile);
+
+
+		    /* Print top logo */
+		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+		    
+		    if ($this->profile->getSupportsGraphics()) {
+		        $this->printer->graphics($logo);
+		    }
+		    if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
+		        $this->printer->bitImage($logo);
+		    }
+
+		    /* Name of shop */
+		    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+		    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+		    $this->printer->text("Butcher Steak & Pasta Palembang\n");
+		    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
+		    $this->printer->text("Sumatera Selatan, 30114, 07115626366\n");
+		    $this->printer->selectPrintMode();
+		    $this->printer->feed();
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    $this->printer->text($this->getAsString(32,panjang($dt),"",$tm));
+		    $this->printer->text($this->getAsString(32,"Bill Name","",substr($data[0]->member_nm, 0,7)));
+		    $this->printer->text($this->getAsString(32,"Collected by","",$data[0]->collected_nm)."\n");
+		    /* Title of receipt */
+		    $this->printer->setEmphasis(true);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->feed(1);
+		    
+
+		    /* Items */
+		    
+		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+		    foreach ($data as $item) {
+		    	$this->printer->setEmphasis(true);
+				$total = $item->produk_harga * $item->qty;
+				foreach ($resdc as $dc) {
+					$symb = substr($dc->value, -1);
+					if ($symb == "%") {
+						$percentega = str_replace("%", "", $dc->value);
+						$valuedc = ($percentega/100) * $total;
+						$ptotal = "(".number_format(($percentega/100) * $total).")";
+						$afterdc = $total - $valuedc;
+						$subtotal = $subtotal + $afterdc;
+						$discount_nmx = $dc->discount_nm;
+						$discount_valuex = $dc->value;
+					} else {
+						$discount = "";
+						$discount_nmx = "";
+						$discount_valuex = "";
+						$ptotal = "";
+						$subtotal = $subtotal + $total;
+					}
+				}
+		        $this->printer->text($item->produk_nm."\n");
+		        $this->printer->setEmphasis(false);
+		        $this->printer->text($this->getAsString(32,$item->qty."x","@".number_format($item->produk_harga),number_format($total))); // for 58mm Font A
+		        $this->printer->text($this->getAsString(32,$discount_nmx."".$discount_valuex," ",$ptotal)."\n");
+		    }
+
+		    foreach ($resdc as $dc) {
+				$symb = substr($dc->value, -1);
+				if ($symb != "%") {
+					$discount_nm = $dc->discount_nm;
+					$discount_value = $dc->value;
+		        $this->printer->text($this->getAsString(32,$discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
+				$subtotal = $subtotal - $dc->value;
+				} 
+			}
+		    $this->printer->setEmphasis(false);
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->setEmphasis(false);
+		    $this->printer->feed();
+		    $tax = $subtotal * 0.10;
+			$service = $subtotal * 0.05;
+			$grandtotal = $subtotal + $tax + $service;
+		    $this->printer->setEmphasis(false);
+			$this->printer->text($this->getAsString(32,"Subtotal","","Rp ".number_format($subtotal))); 
+			$this->printer->text($this->getAsString(32,"Tax","","Rp ".number_format($tax))); 
+			$this->printer->text($this->getAsString(32,"Service","","Rp ".number_format($service))); 
+			$this->printer->text($this->getAsString(32,"Rounding Amount","","Rp "."masih proses")); 
+		    $this->printer->text("-------------------------------------\n");
+		    $this->printer->setEmphasis(true);
+			$this->printer->text($this->getAsString(32,"Total","","Rp ".number_format($grandtotal))); 
+		    $this->printer->setEmphasis(false);
+		    /*footer */
+		    $this->printer->feed(2);
+		    $this->printer->text($date . "\n");
+
+		    /* Cut the receipt and open the cash drawer */
+		    $this->printer->cut();
+		    $this->printer->pulse();
+
+		} catch (Exception $e) {
+		    echo $e->getMessage();
+		} finally {
+		    $this->printer->close();
+		}
+	}
+
+	public function getAsString($width = 48,$produk_nm,$produk_harga,$total)
+    {
+        $rightCols = 15;
+        $centerCols = 10;
+        $leftCols = 10;
+        $left = str_pad($produk_nm, $leftCols);
+        $center = str_pad($produk_harga,$centerCols, ' ', STR_PAD_LEFT);
+        $right = str_pad($total, $rightCols, ' ', STR_PAD_LEFT);
+        return "$left$center$right\n";
+    }
 }

@@ -135,16 +135,35 @@ function simpanorder(){
    beforeSend: function () { 
       $("#loader-wrapper").removeClass("d-none")
    },
-   success:function(){
+   success:function(data){
       setTimeout(function(){ 
         $("#loader-wrapper").addClass("d-none");
-        Swal.fire({
-          title: "Terima Kasih!",
-          text: "Pesanan anda sudah terkirim.",
-          type:"success",
-          timer: 1000,
-          showConfirmButton: false
-        });
+        if (data == "belumorder") {
+          Swal.fire({
+            title: "Anda belum memilih produk !",
+            text: "Pesanan anda belum terkirim.",
+            type:"warning",
+            timer: 5000,
+            showConfirmButton: true
+          });
+        } else if (data == "false") {
+          Swal.fire({
+            title: "Terjadi kesalahan!",
+            text: "Silahkan hubungi petugas.",
+            type:"danger",
+            timer: 5000,
+            showConfirmButton: true
+          });
+        } else if (data == "true") {
+          Swal.fire({
+            title: "Terima Kasih!",
+            text: "Pesanan anda sudah terkirim.",
+            type:"success",
+            timer: 2000,
+            showConfirmButton: false
+          });
+        }
+        
       }, 3000);   
         
     },

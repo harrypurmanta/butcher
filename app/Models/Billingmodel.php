@@ -43,11 +43,12 @@ class Billingmodel extends Model
 
     public function getbyMejaidkasir($id){
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm');
+        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
         $query->join('member e','e.member_id=a.member_id','left');
+        $query->join('person i','i.person_id=e.person_id','left');
         $query->join('meja f','f.meja_id=a.meja_id','left');
         $query->join('person g','g.person_id=e.person_id','left');
         $query->join('person h','h.person_id=a.verified_user','left');
@@ -64,6 +65,34 @@ class Billingmodel extends Model
     	$query->where('a.status_cd','normal');
     	$query->where('a.billing_id',$id);
     	return $query->get();
+    }
+
+    public function getdrinkmenu($id) {
+        $query = $this->db->table('billing a');
+        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm');
+        $query->join('billing_item b','b.billing_id=a.billing_id','left');
+        $query->join('produk c','c.produk_id=b.produk_id','left');
+        $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
+        $query->join('meja f','f.meja_id=a.meja_id','left');
+        $query->where('a.status_cd','verified');
+        $query->where('b.status_cd','normal');
+        $query->whereIn('d.kategori_id',[7,8,9,10,11]);
+        $query->where('a.meja_id',$id);
+        return $query->get();
+    }
+
+    public function getfoodmenu($id) {
+        $query = $this->db->table('billing a');
+        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm');
+        $query->join('billing_item b','b.billing_id=a.billing_id','left');
+        $query->join('produk c','c.produk_id=b.produk_id','left');
+        $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
+        $query->join('meja f','f.meja_id=a.meja_id','left');
+        $query->where('a.status_cd','verified');
+        $query->where('b.status_cd','normal');
+        $query->whereIn('d.kategori_id',[1,2,3,4,5,6]);
+        $query->where('a.meja_id',$id);
+        return $query->get();
     }
 
     public function simpanbilling($data) {
@@ -123,6 +152,20 @@ class Billingmodel extends Model
     }
 
     public function insertbillmember($id,$data) {
+        return $this->db->table('billing')
+                        ->set($data)
+                        ->where('billing_id',$id)
+                        ->update();
+    }
+
+    public function removedckasir($id,$data){
+        return $this->db->table('billing_discount')
+                    ->set($data)
+                    ->where('billing_discount_id',$id)
+                    ->update();
+    }
+
+    public function removemember($id,$data) {
         return $this->db->table('billing')
                         ->set($data)
                         ->where('billing_id',$id)
