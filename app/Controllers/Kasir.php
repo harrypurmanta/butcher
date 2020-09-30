@@ -312,8 +312,8 @@ class Kasir extends BaseController
 		$discount_nmx = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
-		// $this->connector = new RawbtPrintConnector();
-		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+		$this->connector = new RawbtPrintConnector();
+		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
 
 
 		$this->printer = new Printer($this->connector);
@@ -420,8 +420,8 @@ class Kasir extends BaseController
 		$discount_nmx = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
-		// $this->connector = new RawbtPrintConnector();
-		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+		$this->connector = new RawbtPrintConnector();
+		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
 
 
 		$this->printer = new Printer($this->connector);
@@ -529,8 +529,8 @@ class Kasir extends BaseController
 		$discount_nmx = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
-		// $this->connector = new RawbtPrintConnector();
-		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+		$this->connector = new RawbtPrintConnector();
+		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
 
 
 		$this->printer = new Printer($this->connector);
@@ -652,8 +652,8 @@ class Kasir extends BaseController
 		$discount_nmx = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
-		// $this->connector = new RawbtPrintConnector();
-		$this->connector = new FilePrintConnector("/dev/usb/lp0");
+		$this->connector = new RawbtPrintConnector();
+		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
 
 
 		$this->printer = new Printer($this->connector);

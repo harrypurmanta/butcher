@@ -22,8 +22,6 @@ class Produk extends BaseController
 	}
 
 	public function index() {
-		$agent = $this->request->getUserAgent();
-		echo json_encode($agent);exit;
 		$data = [
 			'title' => 'Produk',
 			'subtitle' => 'Produk',
@@ -64,7 +62,6 @@ class Produk extends BaseController
 				return view('frontend/listmenu2', $data);
 			}
 		}
-		
 		
 	}
 
