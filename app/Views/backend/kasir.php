@@ -278,7 +278,7 @@ function cetakmenu(id,btn) {
      type: "post",
      data: {id:id},
      success:function(data){
-      // window.location.href = data;
+      window.location.href = data;
       b.text(b.attr('data-old'));
     },
     error:function(){
@@ -303,7 +303,7 @@ function cetakbilling(id,btn) {
      type: "post",
      data: {id:id},
      success:function(data){
-      // window.location.href = data;
+      window.location.href = data;
       b.text(b.attr('data-old'));
     },
     error:function(){
@@ -328,7 +328,7 @@ function checkout(id,btn) {
      type: "post",
      data: {id:id},
      success:function(data){
-      // window.location.href = data;
+      window.location.href = data;
       b.text(b.attr('data-old'));
     },
     error:function(){
