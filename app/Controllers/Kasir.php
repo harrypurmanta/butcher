@@ -6,8 +6,8 @@ use App\Models\Mejamodel;
 use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -60,7 +60,6 @@ class Kasir extends BaseController
 		$discount = "";
 		if (count($res)>0) {
 		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
-			
 			$discount_nm = "";
 			$subtotal = 0;
 			$ret = "<div align='center' id='div-item'>
