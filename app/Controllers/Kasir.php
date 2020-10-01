@@ -6,14 +6,14 @@ use App\Models\Mejamodel;
 use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
-// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
-// use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
+use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
 use Mike42\Escpos\CapabilityProfile;
-use Mike42\Escpos\PrintConnectors\CupsPrintConnector;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+// use Mike42\Escpos\PrintConnectors\CupsPrintConnector;
+// use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 // use Mike42\Escpos\Printer;
 
 class Kasir extends BaseController
