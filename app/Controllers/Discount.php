@@ -15,12 +15,14 @@ class Discount extends BaseController
 
 		$this->discountmodel = new Discountmodel();
 		$this->billingmodel = new Billingmodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
 
 	}
 
 	public function index() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'discount',
 			'subtitle' => 'discount',
@@ -30,6 +32,10 @@ class Discount extends BaseController
 	}
 
 	public function tambahdata(){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Tambah Data discount',
 			'subtitle' => 'Tambah Data discount'

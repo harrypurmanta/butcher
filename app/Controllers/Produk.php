@@ -17,11 +17,13 @@ class Produk extends BaseController
 		$this->kategorimodel = new Kategorimodel();
 		$this->imagesmodel = new Imagesmodel();
 		$this->billingmodel = new Billingmodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
 	}
 
 	public function index() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Produk',
 			'subtitle' => 'Produk',
@@ -31,6 +33,10 @@ class Produk extends BaseController
 	}
 
 	public function listmenu2(){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$meja_id = $this->request->uri->getSegment(3);
 			$data = [
 			'title' => 'Menu',
@@ -41,6 +47,10 @@ class Produk extends BaseController
 	}
 
 	public function listmenu(){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$meja_id = $this->request->uri->getSegment(3);
 		if ($meja_id == "") {
 			return redirect('dashboard');

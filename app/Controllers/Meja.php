@@ -13,6 +13,10 @@ class Meja extends BaseController {
 	}
 
 	public function index() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'meja',
 			'subtitle' => 'meja',
@@ -22,6 +26,10 @@ class Meja extends BaseController {
 	}
 
 	public function billing(){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Billing',
 			'subtitle' => 'Billing'		
@@ -30,6 +38,10 @@ class Meja extends BaseController {
 	}
 
 	public function viewbilling(){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Billing',
 			'subtitle' => 'Billing'		

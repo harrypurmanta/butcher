@@ -7,6 +7,10 @@ class Dashboard extends BaseController
 {
 
 	public function index() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Admin Dashboard'
 		];
@@ -14,6 +18,21 @@ class Dashboard extends BaseController
 	}
 
 	public function waiters() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
+		$data = [
+			'title' => 'Waiters Dashboard'
+		];
+		return view('backend/waitersdashboard', $data);
+	}
+
+	public function kasir() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Waiters Dashboard'
 		];
@@ -21,6 +40,10 @@ class Dashboard extends BaseController
 	}
 
 	public function error() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Error Dashboard'
 		];

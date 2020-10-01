@@ -19,6 +19,10 @@ class Karyawan extends BaseController
 	}
 
 	public function index() {
+        if (session()->get('user_nm') == "") {
+            session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+            return redirect()->to(base_url('/'));
+        }
 		$data = [
 			'title' => 'Karyawan',
 			'subtitle' => 'Karyawan',
@@ -28,7 +32,10 @@ class Karyawan extends BaseController
 	}
 
 	public function formdaftarkaryawan() {
-		
+		if (session()->get('user_nm') == "") {
+            session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+            return redirect()->to(base_url('/'));
+        }
 
 		$data = [
 			'title' => 'Karyawan',
@@ -77,8 +84,6 @@ class Karyawan extends BaseController
 		$addr_txt 		= $this->request->getVar('addr_txt');
 		$ext_idx 		= $this->karyawanmodel->getbyext_id($ext_id);
 		
-			$session = \Config\Services::session();
-			$session->start();
 			$datenow = date('Y-m-d H:i:s');
 			
 			if ($person_id=='') {
@@ -94,7 +99,6 @@ class Karyawan extends BaseController
 					'created_user' => $session->user_id
 					];
 				$person_id = $this->karyawanmodel->simpan($data);
-			// echo $person_id;exit;
 				if ($person_id !='') {
 					$dataemployee = [
 					'person_id' => $person_id,
@@ -381,39 +385,5 @@ class Karyawan extends BaseController
          return $ret;
         
 	}
-
-	// public function update(){
-	// 	$id = $this->request->getVar('id');
-	// 	$Karyawan_nm = $this->request->getVar('Karyawan_nm');
-	// 	$bykatnm = $this->karyawanmodel->getbyKatnm($Karyawan_nm);
-
-	// 	if (count($bykatnm)>0) {
-	// 		return 'already';
-	// 	} else {
-	// 		$session = \Config\Services::session();
-	// 		$session->start();
-	// 		$datenow = date('Y-m-d H:i:s');
-	// 		$data = [
-	// 		'Karyawan_nm' => $Karyawan_nm,
-	// 		'updated_dttm' => $datenow,
-	// 		'updated_user' => $session->user_id
-	// 		];
-
-	// 		$save = $this->karyawanmodel->update($id,$data);
-	// 		if ($save) {
-	// 			return true;
-	// 		} else {
-	// 			return false;
-	// 		}
-	// 	}
-	// }
-
-	// public function formdaftarkaryawan(){
-	// 	return view('backend/formdaftarkaryawan');
-	// }
-
-
-
-	
 
 }

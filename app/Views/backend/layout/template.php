@@ -1,3 +1,7 @@
+<?php
+$this->session = \Config\Services::session();
+$this->session->start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,105 +56,8 @@
         <!-- ============================================================== -->
         <!-- Topbar header - style you can find in pages.scss -->
         <!-- ============================================================== -->
-        <header class="topbar">
-            <nav class="navbar top-navbar navbar-expand-md navbar-light">
-                <!-- ============================================================== -->
-                <!-- Logo -->
-                <!-- ============================================================== -->
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="index.html">
-                        <!-- Logo icon --><b>
-                            <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                            <!-- Dark Logo icon -->
-                            <img src="<?=base_url() ?>/assets/images/logo-icon.png" alt="homepage" class="dark-logo" />
-                            <!-- Light Logo icon -->
-                            <img src="<?=base_url() ?>/assets/images/logo-light-icon.png" alt="homepage" class="light-logo" />
-                        </b>
-                        <!--End Logo icon -->
-                        <!-- Logo text --><span>
-                         <!-- dark Logo text -->
-                         <img src="<?=base_url() ?>/assets/images/logo-text.png" alt="homepage" class="dark-logo" />
-                         <!-- Light Logo text -->    
-                         <img src="<?=base_url() ?>/assets/images/logo-light-text.png" class="light-logo" alt="homepage" /></span> </a>
-                </div>
-                <!-- ============================================================== -->
-                <!-- End Logo -->
-                <!-- ============================================================== -->
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-                   		<li class="nav-item"> 
-	                   		<a class="nav-link" href="#">
-	                   			<span class="hide-menu">Home </span>
-	                   		</a>
-                        </li>
-                        <li class="nav-item dropdown"> 
-	                   		<a class="nav-link dropdown-toggle nav-item" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-	                   			Pengaturan
-	                   		</a>
-	                   		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="<?=base_url() ?>/kategori">Kategori Produk</a>
-                                <a class="dropdown-item" href="<?=base_url() ?>/subkat">Sub Kategori Produk</a>
-                                <a class="dropdown-item" href="<?=base_url() ?>/kategori/option">Kategori Options</a>
-                                <a class="dropdown-item" href="<?=base_url() ?>/produk">Produk</a>
-                            	<a class="dropdown-item" href="<?=base_url() ?>/discount">Diskon</a>
-                            	<a class="dropdown-item" href="<?=base_url() ?>/payplan">Cara Bayar</a>
-                            	<a class="dropdown-item" href="<?=base_url() ?>/membertype">Tipe Member</a>
-                            	<a class="dropdown-item" href="<?=base_url() ?>/meja">Meja</a>
-                                <a class="dropdown-item" href="<?=base_url() ?>/karyawan">Karyawan</a>
-                        	</div>
-                        </li>
-                        <li class="nav-item"> 
-                            <a class="nav-link" href="<?=base_url() ?>/produk/listmenu">
-                                <span class="hide-menu">Menu Item </span>
-                            </a>
-                        </li>
-                        <li class="nav-item"> 
-	                   		<a class="nav-link" href="<?=base_url() ?>/member">
-	                   			<span class="hide-menu">Member </span>
-	                   		</a>
-                        </li>
-                        <li class="nav-item"> 
-                            <a class="nav-link" href="<?=base_url() ?>/kasir">
-                                <span class="hide-menu">Kasir </span>
-                            </a>
-                        </li>
-                        <li class="nav-item"> 
-                            <a class="nav-link" href="#">
-                                <span class="hide-menu">Laporan </span>
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav my-lg-0">
-                        <!-- ============================================================== -->
-                        <!-- Profile -->
-                        <!-- ============================================================== -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle waves-effect waves-dark" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="<?=base_url() ?>/assets/images/users/1.jpg" alt="user" class="profile-pic" /></a>
-                            <div class="dropdown-menu dropdown-menu-right animated flipInY">
-                                <ul class="dropdown-user">
-                                    <li>
-                                        <div class="dw-user-box">
-                                            <div class="u-img"><img src="<?=base_url() ?>/assets/images/users/1.jpg" alt="user"></div>
-                                            <div class="u-text">
-                                                <h4>Steave Jobs</h4>
-                                                <p class="text-muted"><a href="https://www.wrappixel.com/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6f190e1d1a012f08020e0603410c0002">[email&#160;protected]</a></p><a href="pages-profile.html" class="btn btn-rounded btn-danger btn-sm">View Profile</a></div>
-                                        </div>
-                                    </li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="#"><i class="ti-user"></i> My Profile</a></li>
-                                    <li><a href="#"><i class="ti-wallet"></i> My Balance</a></li>
-                                    <li><a href="#"><i class="ti-email"></i> Inbox</a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="#"><i class="ti-settings"></i> Account Setting</a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="#"><i class="fa fa-power-off"></i> Logout</a></li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
+           
+        
         <!-- ============================================================== -->
         <!-- End Topbar header -->
         <!-- ============================================================== -->

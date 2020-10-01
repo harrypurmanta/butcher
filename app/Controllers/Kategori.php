@@ -15,12 +15,13 @@ class Kategori extends BaseController
 
 		$this->kategorimodel = new Kategorimodel();
 		$this->imagesmodel = new Imagesmodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
-
 	}
 
 	public function index() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Kategori',
 			'subtitle' => 'Kategori',
@@ -30,6 +31,10 @@ class Kategori extends BaseController
 	}
 
 	public function getChildbyparent($id){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$id = $this->request->uri->getSegments('3');
 		$res = $this->kategorimodel->getChildbyprntid($id)->getResult();
 		return $res;
@@ -44,6 +49,10 @@ class Kategori extends BaseController
 	}
 
 	public function option () {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$child_nm = array();
 		$options = $this->kategorimodel->getOptionbynormal()->getResult();
 		

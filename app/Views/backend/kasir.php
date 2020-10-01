@@ -6,38 +6,36 @@
         <!-- ============================================================== -->
         <!-- Page wrapper  -->
         <!-- ============================================================== -->
-        <div class="page-wrapper">
+        <div class="page-wrapper" style="padding-top: 0px;">
             
             <!-- ============================================================== -->
             <!-- Container fluid  -->
             <!-- ============================================================== -->
             <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-7 col-md-12">
-                        <div class="card" style="display: inline-block;" align="center">
-                            <div class="card-body">
-                            <?php
-                              foreach ($meja->getResult() as $key) {
-                            ?>
-                            <div style="display: inline-block; margin: 10px;">
-                              <button onclick="showbillingbymeja(<?= $key->meja_id ?>)" class="btn btn-info font-weight-bold" style="font-size: 30px; padding: 20px;"><?= $key->meja_nm ?></button>
-                            </div>
-                            <?php } ?>
-                            </div>
-                            <hr>
-                             <button style="font-size: 30px; width: 40%;" type="button" onclick="diskon()" class="btn btn-rounded btn-warning">Diskon</button>
-                             <button style="font-size: 30px; width: 40%;" type="button" onclick="member()" class="btn btn-rounded btn-primary">Member</button>
-                        </div>
-                    </div>
-                    <div class="col-lg-5 col-md-12">
-                        <div class="card">
-                            <div class="card-body" id="cardbody"> 
-                                
+                      <div class="row">
+                        <div class="col-md-7 col-sm-6">
+                            <div class="card" style="display: inline-block;" align="center">
+                                <div class="card-body">
+                                <?php
+                                  foreach ($meja->getResult() as $key) {
+                                ?>
+                                <div style="display: inline-block; margin: 10px;">
+                                  <button onclick="showbillingbymeja(<?= $key->meja_id ?>)" class="btn btn-info font-weight-bold" style="font-size: 20px; padding: 10px;"><?= $key->meja_nm ?></button>
+                                </div>
+                                <?php } ?>
+                                </div>
+                                <hr>
+                                 <button style="font-size: 20px; width: 40%;" type="button" onclick="diskon()" class="btn btn-rounded btn-warning">Diskon</button>
+                                 <button style="font-size: 20px; width: 40%;" type="button" onclick="member()" class="btn btn-rounded btn-primary">Member</button>
                             </div>
                         </div>
-                    </div>
-                    
-                </div>
+                        <div class="col-md-5 col-sm-6">
+                            <div class="card">
+                                <div class="card-body" id="cardbody"> 
+                                </div>
+                            </div>
+                        </div>
+                      </div>
             </div>
             <div id="modaledit" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
                               

@@ -44,6 +44,13 @@ class BaseController extends Controller
 		$this->session = \Config\Services::session();
 		$this->session->start();
 
+		function _squrity(){
+			if (session()->get('user_nm') == "") {
+	            session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	            return redirect()->to(base_url('/'));
+	        }
+		}
+
 		
 		function panjang($date) {
 			$BulanIndo = array("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des");

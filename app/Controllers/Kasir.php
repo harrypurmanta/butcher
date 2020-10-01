@@ -35,11 +35,13 @@ class Kasir extends BaseController
 		$this->billingmodel = new Billingmodel();
 		$this->discountmodel = new Discountmodel();
 		$this->membermodel = new Membermodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
 	}
 	
 	public function index() {
+		// if (session()->get('user_nm') == "") {
+	 //        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	 //        return redirect()->to(base_url('/'));
+	 //    }
 		$data = [
 			'title' => 'Kasir Dashboard',
 			'subtitle' => 'Kasir',
@@ -53,11 +55,12 @@ class Kasir extends BaseController
 		$id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
 		$resdc = $this->discountmodel->getbybillid($id)->getResult();
-		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
 		$discount_nmx = "";	 
 		$discount_valuex = "";
 		$discount = "";
 		if (count($res)>0) {
+		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
+			
 			$discount_nm = "";
 			$subtotal = 0;
 			$ret = "<div align='center' id='div-item'>

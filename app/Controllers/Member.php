@@ -12,12 +12,8 @@ class member extends BaseController
 	protected $imagesmodel;
 	protected $session;
 	public function __construct(){
-
 		$this->membermodel = new Membermodel();
 		$this->imagesmodel = new Imagesmodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
-
 	}
 
 	public function index() {

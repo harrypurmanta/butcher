@@ -14,12 +14,10 @@ class Usersmodel extends Model
 
 
     public function checklogin($u,$p) {
-        $Usersmodel = new Usersmodel();
-        
-    	$users = $Usersmodel->where('user_nm', $u)
-                            ->where('pwd0',$p)
-                            ->findAll();
-        return $users;
+        return $this->db->table($this->table)
+                        ->where('user_nm', $u)
+                        ->where('pwd0',$p)
+                        ->get();
     }
 
     public function getbyId($id){

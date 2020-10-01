@@ -9,14 +9,14 @@ class Membertype extends BaseController {
 	protected $membertypemodel;
 	protected $session;
 	public function __construct(){
-
 		$this->membertypemodel = new Membertypemodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
-
 	}
 
 	public function index() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'membertype',
 			'subtitle' => 'membertype',
@@ -26,6 +26,10 @@ class Membertype extends BaseController {
 	}
 
 	public function tambahdata(){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Tambah Data membertype',
 			'subtitle' => 'Tambah Data membertype'

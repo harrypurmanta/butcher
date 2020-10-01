@@ -9,14 +9,14 @@ class Payplan extends BaseController {
 	protected $payplanmodel;
 	protected $session;
 	public function __construct(){
-
 		$this->payplanmodel = new Payplanmodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
-
 	}
 
 	public function index() {
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'payplan',
 			'subtitle' => 'payplan',
@@ -26,6 +26,10 @@ class Payplan extends BaseController {
 	}
 
 	public function tambahdata(){
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Tambah Data payplan',
 			'subtitle' => 'Tambah Data payplan'

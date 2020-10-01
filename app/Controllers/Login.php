@@ -10,8 +10,6 @@ class Login extends BaseController
 	protected $session;
 	public function __construct(){
 		$this->usersmodel = new Usersmodel();
-		$this->session = \Config\Services::session();
-		$this->session->start();
 	}
 
 	public function index() {
@@ -20,26 +18,31 @@ class Login extends BaseController
 
 	public function checklogin() {
 		
-		$u = $this->request->getVar('username');
-		$p = $this->request->getVar('password');
+		$u = $this->request->getPost('username');
+		$p = $this->request->getPost('password');
 		$pwd0 = md5($p);
     	
-		$res = $this->usersmodel->checklogin($u,$pwd0);
+		$res = $this->usersmodel->checklogin($u,$pwd0)->getResultArray();
 			if (count($res) > 0) {
 			  foreach ($res as $k) {
 			  	$this->session->set($k);
 			  }
-		  if ($res[0]['user_group'] == "waiters") {
+		  if ($this->session->user_group == "waiters") {
 		  	return redirect('dashboard/waiters');
 		  } else if ($this->session->user_group == 'owner') {
 		  	return redirect('dashboard');
 		  } else if ($this->session->user_group == 'kasir') {
-		  	return redirect('dashboard/kasir');
+		  	return redirect('kasir');
 		  } else {
 		  	return redirect('login');
 		  }
         } else {
           return redirect('login');
         } 
+	}
+
+	public function logout() {
+		$this->session->destroy();
+		return redirect()->to(site_url('/'));
 	}
 }

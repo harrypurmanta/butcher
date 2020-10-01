@@ -33,6 +33,7 @@ $routes->setAutoRoute(true);
 $routes->get('/', 'Login::index');
 $routes->get('/dashboard', 'Dashboard::index');
 $routes->get('/dashboard/waiters', 'Dashboard::waiters');
+$routes->get('/kasir', 'Kasir::index');
 $routes->get('/produk/listmenu', 'Produk::listmenu');
 // $routes->get('/backend/kategori', 'Kategori::index');
 /**
