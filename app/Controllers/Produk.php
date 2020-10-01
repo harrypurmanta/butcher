@@ -47,10 +47,6 @@ class Produk extends BaseController
 	}
 
 	public function listmenu(){
-		if (session()->get('user_nm') == "") {
-	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
-	        return redirect()->to(base_url('/'));
-	    }
 		$meja_id = $this->request->uri->getSegment(3);
 		if ($meja_id == "") {
 			return redirect('dashboard');
