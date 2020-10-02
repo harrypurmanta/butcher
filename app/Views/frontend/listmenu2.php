@@ -85,7 +85,7 @@ $uri = current_url(true);
 
                         . "<td width='75%' align='left' style='color: white; font-weight: bold; font-size: 45px;'>$key->produk_nm</td>"
 
-                        . "<td align='right' style='color: white; font-weight: bold; font-size: 45px;'>$harga</td>"
+                        . "<td width='10%' align='right' style='color: white; font-weight: bold; font-size: 45px;'>$harga</td>"
                         . "</tr>";
                   }
             $ret .= "</table>"
