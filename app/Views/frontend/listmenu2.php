@@ -9,7 +9,6 @@ $uri = current_url(true);
 	<title>Daftar Menu</title>
   <style>
   html, body {
-
     height: 100% !important;
     background: #dc0000 !important;
   }
@@ -56,7 +55,7 @@ $uri = current_url(true);
             <button style="height: 350px; width: 400px;  margin: 10px; padding:0px; border-radius: 10px; background-color: white; color:black;" class="btn btn-success" type="button" onclick="showmenubykat(<?= $k->kategori_id?>)">
               <div style=" display: flex;align-items:center;text-align: center;">
                 <img style="width: 400px; height: 350px; margin: 0px; padding: 0px; border-radius: 10px;" src="../../../images/<?=$k->image_nm?>">
-                <span style="position: absolute; font-size: 50px; font-weight: bold; background: #ffffff85"><?= $k->kategori_nm ?></span>
+                <span style="font-family: Coconut !important; position: absolute; font-size: 50px; font-weight: bold; background: #ffffff85; padding: 5px 25px;"><?= $k->kategori_nm ?></span>
               </div>
             </button>
             
@@ -76,15 +75,15 @@ $uri = current_url(true);
                   . "<div align='center' style='margin-top: 30px; margin-left: 55px'>";
                     $produkmodel = new Produkmodel();
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
-            $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000;'>";
+            $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000;font-family: Coconut !important;'>";
                     foreach ($produk->getResult() as $key) {
                     $harga = str_replace(0,'', $key->produk_harga);
                   
                       $ret .= "<tr class='tr'>"
-                        . "<td width='150' align='left'>"
+                        . "<td align='left'>"
                         . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 70%; height: 70%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/>"
-                        . "<td width='65%' align='left' style='color: white; font-weight: bold; font-size: 30px;'>$key->produk_nm</td>"
-                        . "<td width='150' align='right' style='color: white; font-weight: bold; font-size: 40px;'>$harga</td>"
+                        . "<td width='75%' align='left' style='color: white; font-weight: bold; font-size: 45px;'>$key->produk_nm</td>"
+                        . "<td align='right' style='color: white; font-weight: bold; font-size: 45px;'>$harga</td>"
                         . "</tr>";
                   }
             $ret .= "</table>"
