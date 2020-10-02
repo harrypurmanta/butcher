@@ -83,12 +83,18 @@ $uri = current_url(true);
             $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000; font-family: Coconut !important;'>";
                     foreach ($produk->getResult() as $key) {
                     $harga = str_replace(0,'', $key->produk_harga);
+                    if (strlen($key->produk_nm) <= 28) {
+                      $fontsize = "font-size: 18px;";
+                    } else {
+                      $fontsize = "font-size: 16px;";
+                    }
+                    
                   
                       $ret .= "<tr>"
                         . "<td style='padding: 3px;' width='20%' align='left'>"
-                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 80%; height: 70%; font-size: 20px; font-weight: bold; text-align: center; display: inline-block;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
+                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 80%; height: 60%; font-size: 20px; font-weight: bold; text-align: center; display: inline-block;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
 
-                        . "<td width='100%' align='left' style='padding: 3px; color: white; font-weight: bold; font-size: 18px;'>$key->produk_nm</td>"
+                        . "<td width='100%' align='left' style='padding: 3px; color: white; font-weight: bold; $fontsize'>$key->produk_nm</td>"
 
                         . "<td width='5%' align='right' style='padding: 3px; color: white; font-weight: bold; font-size: 20px;'>$harga</td>"
                         . "</tr>";
