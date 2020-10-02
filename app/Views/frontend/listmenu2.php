@@ -28,7 +28,7 @@ $uri = current_url(true);
   <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1,string-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
   <!-- Chrome, Firefox OS and Opera -->
@@ -86,9 +86,9 @@ $uri = current_url(true);
                   
                       $ret .= "<tr>"
                         . "<td style='padding: 3px;' width='20%' align='left'>"
-                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 80%; height: 70%; font-size: 18px; font-weight: bold; text-align: center; display: inline-block;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
+                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 80%; height: 70%; font-size: 20px; font-weight: bold; text-align: center; display: inline-block;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
 
-                        . "<td width='100%' align='left' style='padding: 3px; color: white; font-weight: bold; font-size: 20px;'>$key->produk_nm</td>"
+                        . "<td width='100%' align='left' style='padding: 3px; color: white; font-weight: bold; font-size: 18px;'>$key->produk_nm</td>"
 
                         . "<td width='5%' align='right' style='padding: 3px; color: white; font-weight: bold; font-size: 20px;'>$harga</td>"
                         . "</tr>";

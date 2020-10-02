@@ -8,7 +8,7 @@ $uri = current_url(true);
 	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1 , maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1,string-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
      <!-- Chrome, Firefox OS and Opera -->
@@ -19,7 +19,7 @@ $uri = current_url(true);
     <!-- iOS Safari -->
     <meta name="apple-mobile-web-app-status-bar-style" content="#dc0000">
     <!-- iOS Safari -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="#dc0000">
     
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="<?=base_url() ?>/assets/images/favicon.png">
