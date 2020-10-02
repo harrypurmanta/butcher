@@ -21,7 +21,7 @@ $uri = current_url(true);
 
 </head>
 <body>
-<div class="col-lg-12 col-md-12">
+<div class="col-lg-12">
 <div class="container-fluid" id="container_content">
 	
 

@@ -2,10 +2,16 @@
 $uri = current_url(true);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<title>Billing Anda</title>
-  <!-- Chrome, Firefox OS and Opera -->
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#dc0000">
     <!-- Windows Phone -->
     <meta name="msapplication-navbutton-color" content="#dc0000">
@@ -15,14 +21,24 @@ $uri = current_url(true);
     <!-- iOS Safari -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="<?=base_url() ?>/assets/images/favicon.png">
+ 
 	<link href="<?=base_url() ?>/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Custom CSS -->
-    <link href="<?=base_url() ?>/assets/css/style.css" rel="stylesheet">
     <link href="<?=base_url() ?>/assets/plugins/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
-    <link href="<?=base_url() ?>/assets/css/custom.css" rel="stylesheet">
+
+    <link href="<?=base_url() ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?=base_url() ?>/assets/css/colors/default-dark.css" id="theme" rel="stylesheet">
+
+
 </head>
 <body>
-<div class="col-lg-12 col-md-12">
+<div id="main-wrapper">
+<div class="page-wrapper" style="margin:0px;">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
 <div class="container-fluid">
 	<?php
 	if ($billing[0]->member_id == 0) {
@@ -41,10 +57,10 @@ $uri = current_url(true);
 	}
 
 	if ($billing[0]->statusbilling == 'normal') {
-		$footer = "<button onclick='cancelorder(".$billing[0]->billing_id.")' type='button' class='btn btn-danger float-left' style='font-size: 50px; font-weight: bold;'>Cancel</button>
-			<button onclick='order(".$billing[0]->billing_id.")' class='btn btn-success float-right' style='font-size: 50px; font-weight: bold;'>Order</button>";
+		$footer = "<button onclick='cancelorder(".$billing[0]->billing_id.")' type='button' class='btn btn-danger float-left' style='font-weight: bold;'>CANCEL</button>
+			<button onclick='order(".$billing[0]->billing_id.")' class='btn btn-success float-right' style='font-weight: bold;'>ORDER</button>";
 		$buttonmenu = "<div style='display:inline-block;' class='float-left'>
-			<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-size: 40px; font-weight: bold;'>Menu</button>
+			<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-weight: bold;'>MENU</button>
 			</div>";
 	} else if ($billing[0]->statusbilling == 'waiting') {
 		$footer = "<div align='center' class='alert alert-info alert-rounded'> 
@@ -52,7 +68,7 @@ $uri = current_url(true);
 					</div>";
 
 		$buttonmenu = "<div style='display:inline-block;' class='float-left'>
-						<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-size: 40px; font-weight: bold;'>Menu</button>
+						<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-weight: bold;'>MENU</button>
 						</div>";
 	} else if ($billing[0]->statusbilling == 'verified') {
 		$footer = "<div align='center' class='alert alert-success alert-rounded'> 
@@ -64,20 +80,31 @@ $uri = current_url(true);
 	
 	
 $subtotal = 0;
-$ret = "<div align='center'>
-			$buttonmenu
-			<div style='display:inline-block; margin-left: -137px;'>
-				<img style='max-height: 100%; width: 150px;' src='../../images/lib/logo.jpeg'>
+$ret = "<div>
+			<div class='row'>
+				<div class='col-3'>
+				$buttonmenu
+				</div>
+				<div class='col-6'>
+				<div align='center'>
+					<img style='max-height: 100%; width: 80px;' src='../../images/lib/logo.jpeg'>
+				</div>
+				</div>
 			</div>
-			<div style='margin-top: 30px;'>
-				<p>
-					<span style='font-size: 30px;'>Butcher Steak & Pasta Palembang</span><br>
-					<span style='font-size: 30px;'>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
-					<span style='font-size: 30px;'>Sumatera Selatan, 30114, 07115626366</span>
-				</p>
+			<div class='row'>
+				<div class='col-md-12'>
+				<div align='center' style='margin-top: 30px;'>
+					<p>
+						<span>Butcher Steak & Pasta Palembang</span><br>
+						<span>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
+						<span>Sumatera Selatan, 30114, 07115626366</span>
+					</p>
+				</div>
+				</div>
 			</div>
+			
 		</div>";
-$ret .= "<table width='100%' style='margin-top: 20px;font-size: 30px;'>
+$ret .= "<table width='100%' style='margin-top: 20px;'>
 	        <tr>
 	          <td align='left'>Tanggal</td>
 	          <td align='right'>".$billing[0]->created_dttm."</td>
@@ -89,16 +116,16 @@ $ret .= "<table width='100%' style='margin-top: 20px;font-size: 30px;'>
 	        $collctedby
 	      </table>
 	      <hr style='border: 1px solid red'>
-	      <table style='font-size: 30px;' width='100%'>";
+	      <table width='100%'>";
 foreach ($billing as $key) {
 	$total = $key->produk_harga * $key->qty;
 	$subtotal = $subtotal + $total;
 	$ret .= "<tr>
-	        <td colspan='3' align='left' style='font-weight: bold;font-size: 30px;'>
+	        <td colspan='3' align='left' style='font-weight: bold;'>
 	            $key->produk_nm
 	          </td>
 	        </tr>
-	        <tr style='font-size: 30px;'>
+	        <tr>
 	          <td align='left' width='50'>$key->qty X</td>
 	          <td align='center'>@".number_format($key->produk_harga)."</td>
 	          <td align='right'>".number_format($total)."</td>
@@ -115,7 +142,7 @@ foreach ($billing as $key) {
 	$service = $subtotal * 0.05;
 	$grandtotal = $subtotal + $tax + $service;
 	        
-	$ret .= "<table style='font-size: 30px; margin-top:30px;' width='100%'>
+	$ret .= "<table style='margin-top:30px;' width='100%'>
 	        <tr>
 	          <td align='left'>Subtotal</td>
 	          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
@@ -146,14 +173,20 @@ foreach ($billing as $key) {
 
 </div>
 </div>
+		</div>
+	</div>
+</div>
+</div>
 <div class="d-none" id='loader-wrapper'>
     <div class="loader"></div>
 </div>
+
 <script src="<?=base_url() ?>/assets/plugins/jquery/jquery.min.js"></script>
 <script src="<?=base_url() ?>/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <!-- Sweet-Alert  -->
 <script src="<?=base_url() ?>/assets/plugins/sweetalert2/dist/sweetalert2.all.min.js"></script>
 <script src="<?=base_url() ?>/assets/plugins/sweetalert2/sweet-alert.init.js"></script>
+
 <script type="text/javascript">
 function listmenu() {
   window.location.href = "<?=base_url()?>/produk/listmenu2/"+<?= $uri->getSegment(3)?>;

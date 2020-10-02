@@ -107,7 +107,7 @@ $uri = current_url(true);
 
     </div>
      <button onclick="simpanorder()" type="button" class="btn btn-success btn-circle btn-xls" style="position: fixed; bottom: 50px; right: 20px;"><i class="fa fa-check"></i></button>
-     <button onclick="listmenu()" type="button" class="btn btn-success btn-circle btn-xls" style="position: fixed; bottom: 50px; left: 30px;"><i class="fas fa-file-alt"></i></button>
+     <button onclick="listmenu()" type="button" class="btn btn-info btn-circle btn-xls" style="position: fixed; bottom: 50px; left: 30px;"><i class="fas fa-file-alt"></i></button>
       </div>
     </div>
   </div>
