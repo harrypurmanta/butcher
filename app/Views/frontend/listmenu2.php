@@ -46,7 +46,7 @@ $uri = current_url(true);
   <div class="page-wrapper" style="margin-left: 0px; padding-bottom: 0px;">
     <div class="container-fluid  full-height" id="container_content">
       <div class="row">
-        <div class="col-lg-12 col-md-12">
+        <div class="col-lg-12">
           <input type="hidden" id="meja_id" value="<?= $uri->getSegment(3) ?>"/>
           <div align="center" style="text-align: center;" id="div-menukategori">
             <?php
