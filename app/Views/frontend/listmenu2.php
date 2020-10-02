@@ -72,7 +72,7 @@ $uri = current_url(true);
                 . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 160px;' src='../../images/lib/arrowback.png'></div>"
                 . "<div style='display: inline-block;'><span style='font-size: 80px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
                 . "</div>"
-                  . "<div align='center' style='margin-top: 30px; margin-left: 55px'>";
+                  . "<div align='center' style='margin-top: 30px; margin-left: 40px'>";
                     $produkmodel = new Produkmodel();
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
             $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000;font-family: Coconut !important;'>";
