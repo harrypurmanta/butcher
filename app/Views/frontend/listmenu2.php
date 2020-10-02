@@ -70,7 +70,7 @@ $uri = current_url(true);
                 . "<div style='display: none;' id='menu_".$k2->kategori_id."'>"
                 . "<div align='center'>"
                 . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 160px;' src='../../images/lib/arrowback.png'></div>"
-                . "<div style='display: inline-block;'><span style='font-size: 80px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
+                . "<div style='display: inline-block;'><span style='font-family: Coconut !important; font-size: 80px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
                 . "</div>"
                   . "<div align='center' style='margin-top: 30px; margin-left: 20px'>";
                     $produkmodel = new Produkmodel();
