@@ -80,7 +80,7 @@ $uri = current_url(true);
                     $harga = str_replace(0,'', $key->produk_harga);
                   
                       $ret .= "<tr class='tr'>"
-                        . "<td width='20%' align='left'>"
+                        . "<td width='15%' align='left'>"
                         . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 100%; height: 70%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
 
                         . "<td width='75%' align='left' style='color: white; font-weight: bold; font-size: 45px;'>$key->produk_nm</td>"
