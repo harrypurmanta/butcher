@@ -94,7 +94,7 @@ $uri = current_url(true);
                       $imagesmodel = new Imagesmodel();
                       $images = $imagesmodel->getimagebykatid($k2->kategori_id);
                       foreach ($images->getResult() as $key2) {
-                    $ret .= "<div style='display: inline-block; padding: 10px;'><img src='../../images/$key2->image_nm' style='height: 185px; width: 300px;'></div>";
+                    $ret .= "<div style='display: inline-block; margin: 10px; width: 45%; height: 200px;'><img src='../../images/$key2->image_nm' style='height: 100%; width: 100%;'></div>";
                       }
                       $ret .= "</div>"
                         . "</div>"
