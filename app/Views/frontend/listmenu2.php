@@ -75,7 +75,7 @@ $uri = current_url(true);
                   . "<div align='center' style='margin-top: 30px; margin-left: 40px'>";
                     $produkmodel = new Produkmodel();
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
-            $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000;font-family: Coconut !important;'>";
+            $ret .= "<table class='table-responsive w-100 table' id='myTable' align='center' style='background-color: #dc0000;font-family: Coconut !important;'>";
                     foreach ($produk->getResult() as $key) {
                     $harga = str_replace(0,'', $key->produk_harga);
                   
