@@ -25,6 +25,12 @@ $uri = current_url(true);
     font-size: 70px;
   }
   </style>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+    <meta name="description" content="">
+    <meta name="author" content="">
   <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#dc0000">
     <!-- Windows Phone -->
@@ -43,7 +49,7 @@ $uri = current_url(true);
 </head>
 <body>
   <div class="page-wrapper" style="margin-left: 0px; padding-bottom: 0px;">
-    <div class="container-fluid  full-height" id="container_content">
+    <div class="container-fluid full-height" id="container_content">
       <div class="row">
         <div class="col-lg-12">
           <input type="hidden" id="meja_id" value="<?= $uri->getSegment(3) ?>"/>
@@ -52,13 +58,12 @@ $uri = current_url(true);
             foreach ($kategori as $k) {
             ?>
             <div align="center" style="display: inline-block; text-align: center;">
-            <button style="height: 350px; width: 400px;  margin: 10px; padding:0px; border-radius: 10px; background-color: white; color:black;" class="btn btn-success" type="button" onclick="showmenubykat(<?= $k->kategori_id?>)">
-              <div style=" display: flex;align-items:center;text-align: center;">
-                <img style="width: 400px; height: 350px; margin: 0px; padding: 0px; border-radius: 10px;" src="../../../images/<?=$k->image_nm?>">
-                <span style="font-family: Coconut !important; position: absolute; font-size: 50px; font-weight: bold; background: #ffffff85; padding: 5px 25px;"><?= $k->kategori_nm ?></span>
+            <button style="height: 160px; width: 160px;  margin: 10px; padding:0px; border-radius: 10px; background-color: white; color:black;" class="btn btn-success" type="button" onclick="showmenubykat(<?= $k->kategori_id?>)">
+              <div style=" display: flex;align-items:center;text-align: center; width: 100%; height: 100%; margin: 0px;">
+                <img style="width: 100%; height: 100%; margin: 0px; padding: 0px; border-radius: 10px;" src="../../../images/<?=$k->image_nm?>">
+                <span style="font-family: Coconut !important; position: absolute; font-size: 20px; font-weight: bold; background: #ffffff85; padding: 5px 25px;"><?= $k->kategori_nm ?></span>
               </div>
             </button>
-            
             </div>
             <?php } ?>
           </div>
@@ -69,23 +74,23 @@ $uri = current_url(true);
             $ret .= "<!-- LIST MENU -->"
                 . "<div style='display: none;' id='menu_".$k2->kategori_id."'>"
                 . "<div align='center'>"
-                . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 160px;' src='../../images/lib/arrowback.png'></div>"
-                . "<div style='display: inline-block;'><span style='font-family: Coconut !important; font-size: 80px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
+                . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 100px;' src='../../images/lib/arrowback.png'></div>"
+                . "<div style='display: inline-block;'><span style='font-family: Coconut !important; font-size: 50px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
                 . "</div>"
-                  . "<div align='center' style='margin-top: 30px; margin-left: 20px'>";
+                  . "<div align='center' style='margin-top: 30px;'>";
                     $produkmodel = new Produkmodel();
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
-            $ret .= "<table class='table-responsive w-100 table' id='myTable' align='center' style='background-color: #dc0000;font-family: Coconut !important;'>";
+            $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000; font-family: Coconut !important;'>";
                     foreach ($produk->getResult() as $key) {
                     $harga = str_replace(0,'', $key->produk_harga);
                   
                       $ret .= "<tr>"
-                        . "<td width='15%' align='left'>"
-                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 100%; height: 70%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
+                        . "<td style='padding: 3px;' width='20%' align='left'>"
+                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 80%; height: 70%; font-size: 18px; font-weight: bold; text-align: center; display: inline-block;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
 
-                        . "<td width='100%' align='left' style='color: white; font-weight: bold; font-size: 45px;'>$key->produk_nm</td>"
+                        . "<td width='100%' align='left' style='padding: 3px; color: white; font-weight: bold; font-size: 20px;'>$key->produk_nm</td>"
 
-                        . "<td width='10%' align='right' style='color: white; font-weight: bold; font-size: 45px;'>$harga</td>"
+                        . "<td width='5%' align='right' style='padding: 3px; color: white; font-weight: bold; font-size: 20px;'>$harga</td>"
                         . "</tr>";
                   }
             $ret .= "</table>"
@@ -94,7 +99,7 @@ $uri = current_url(true);
                       $imagesmodel = new Imagesmodel();
                       $images = $imagesmodel->getimagebykatid($k2->kategori_id);
                       foreach ($images->getResult() as $key2) {
-                    $ret .= "<div style='display: inline-block; margin: 10px; width: 45%; height: 200px;'><img src='../../images/$key2->image_nm' style='height: 100%; width: 100%;'></div>";
+                    $ret .= "<div style='display: inline-block; margin: 5px; width: 45%; height: 120px; border-radius: 10px;'><img src='../../images/$key2->image_nm' style='border-radius: 10px; height: 100%; width: 100%;'></div>";
                       }
                       $ret .= "</div>"
                         . "</div>"

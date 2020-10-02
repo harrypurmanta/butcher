@@ -1929,10 +1929,10 @@ Buttons
   font-size: 24px; }
 
   .btn-circle.btn-xls {
-  width: 150px !important;
-  height: 150px !important;
-  padding: 14px 15px !important;
-  font-size: 60px !important; }
+  width: 80px !important;
+  height: 80px !important;
+  padding: 4px 15px !important;
+  font-size: 40px !important; }
 
 .btn-sm {
   padding: .25rem .5rem;
