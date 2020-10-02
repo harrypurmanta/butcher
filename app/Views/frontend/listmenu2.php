@@ -72,7 +72,7 @@ $uri = current_url(true);
                 . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 160px;' src='../../images/lib/arrowback.png'></div>"
                 . "<div style='display: inline-block;'><span style='font-size: 80px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
                 . "</div>"
-                  . "<div align='center' style='margin-top: 30px; margin-left: 40px'>";
+                  . "<div align='center' style='margin-top: 30px; margin-left: 20px'>";
                     $produkmodel = new Produkmodel();
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
             $ret .= "<table class='table-responsive w-100 table' id='myTable' align='center' style='background-color: #dc0000;font-family: Coconut !important;'>";
@@ -80,7 +80,7 @@ $uri = current_url(true);
                     $harga = str_replace(0,'', $key->produk_harga);
                   
                       $ret .= "<tr class='tr'>"
-                        . "<td width='10%' align='left'>"
+                        . "<td width='20%' align='left'>"
                         . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 100%; height: 70%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/></td>"
 
                         . "<td width='75%' align='left' style='color: white; font-weight: bold; font-size: 45px;'>$key->produk_nm</td>"
