@@ -73,16 +73,16 @@ $uri = current_url(true);
                 . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 160px;' src='../../images/lib/arrowback.png'></div>"
                 . "<div style='display: inline-block;'><span style='font-size: 80px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
                 . "</div>"
-                  . "<div class='table-responsive' style='margin-top: 30px;'>";
+                  . "<div style='margin-top: 30px;'>";
                     $produkmodel = new Produkmodel();
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
-            $ret .= "<table id='myTable' align='center' style='background-color: #dc0000;'>";
+            $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000;'>";
                     foreach ($produk->getResult() as $key) {
                     $harga = str_replace(0,'', $key->produk_harga);
                   
                       $ret .= "<tr class='tr'>"
                         . "<td align='left'>"
-                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 100%; height: 80%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/>"
+                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 70%; height: 80%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/>"
                         . "<td align='left' style='color: white; font-weight: bold; font-size: 30px;'>$key->produk_nm</td>"
                         . "<td width='150' align='right' style='color: white; font-weight: bold; font-size: 40px;'>$harga</td>"
                         . "</tr>";
