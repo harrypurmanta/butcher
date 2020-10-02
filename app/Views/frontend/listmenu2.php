@@ -18,6 +18,13 @@ $uri = current_url(true);
     height: 100%;
     background: #dc0000;
   }
+
+  .btn-xls {
+    width: 150px;
+    height: 150px;
+    padding: 24px 15px;
+    font-size: 70px;
+  }
   </style>
   <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#dc0000">
@@ -36,10 +43,10 @@ $uri = current_url(true);
 <link href="<?=base_url() ?>/assets/css/custom.css" rel="stylesheet">
 </head>
 <body>
-  <div class="page-wrapper full-height" style="margin-left: 0px;">
-    <div style="" class="container-fluid" id="container_content">
+  <div class="page-wrapper" style="margin-left: 0px; padding-bottom: 0px;">
+    <div class="container-fluid  full-height" id="container_content">
       <div class="row">
-        <div class="col-lg-12 col-md-12 full-height">
+        <div class="col-lg-12 col-md-12">
           <input type="hidden" id="meja_id" value="<?= $uri->getSegment(3) ?>"/>
           <div align="center" style="text-align: center;" id="div-menukategori">
             <?php
@@ -69,15 +76,15 @@ $uri = current_url(true);
                   . "<div class='table-responsive' style='margin-top: 30px;'>";
                     $produkmodel = new Produkmodel();
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
-            $ret .= "<table id='myTable' align='center' style='margin-top: 5px; background-color: #dc0000;'>";
+            $ret .= "<table id='myTable' align='center' style='background-color: #dc0000;'>";
                     foreach ($produk->getResult() as $key) {
                     $harga = str_replace(0,'', $key->produk_harga);
                   
                       $ret .= "<tr class='tr'>"
-                        . "<td width='250' height='50' align='left'>"
-                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 40%; height: 55px; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/>"
-                        . "<td width='550' align='left' style='color: white; font-weight: bold; font-size: 40px;'>$key->produk_nm</td>"
-                        . "<td width='150' align='center' style='color: white; font-weight: bold; font-size: 50px;'>$harga</td>"
+                        . "<td align='left'>"
+                        . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 60%; height: 80%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/>"
+                        . "<td align='left' style='color: white; font-weight: bold; font-size: 30px;'>$key->produk_nm</td>"
+                        . "<td width='150' align='right' style='color: white; font-weight: bold; font-size: 40px;'>$harga</td>"
                         . "</tr>";
                   }
             $ret .= "</table>"
@@ -98,8 +105,8 @@ $uri = current_url(true);
           ?>
 
     </div>
-     <button onclick="simpanorder()" type="button" class="btn btn-success btn-circle btn-xl" style="position: fixed; bottom: 50px; right: 20px;"><i class="fa fa-check"></i></button>
-     <button onclick="listmenu()" type="button" class="btn btn-success btn-circle btn-xl" style="position: fixed; bottom: 50px; right: 100px;"><i class="fas fa-file-alt"></i></button>
+     <button onclick="simpanorder()" type="button" class="btn btn-success btn-circle btn-xls" style="position: fixed; bottom: 50px; right: 20px;"><i class="fa fa-check"></i></button>
+     <button onclick="listmenu()" type="button" class="btn btn-success btn-circle btn-xls" style="position: fixed; bottom: 50px; left: 30px;"><i class="fas fa-file-alt"></i></button>
       </div>
     </div>
   </div>
