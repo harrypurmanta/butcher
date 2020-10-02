@@ -81,7 +81,7 @@ $uri = current_url(true);
                     $harga = str_replace(0,'', $key->produk_harga);
                   
                       $ret .= "<tr class='tr'>"
-                        . "<td align='left'>"
+                        . "<td width='150' align='left'>"
                         . "<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' id='qty$key->produk_id' data-produk-id='$key->produk_id' value='0' style='width: 70%; height: 80%; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='qty[]' maxlength='2' min='0' max='99'/>"
                         . "<td width='65%' align='left' style='color: white; font-weight: bold; font-size: 30px;'>$key->produk_nm</td>"
                         . "<td width='150' align='right' style='color: white; font-weight: bold; font-size: 40px;'>$harga</td>"
