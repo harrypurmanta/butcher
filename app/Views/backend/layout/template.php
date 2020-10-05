@@ -146,7 +146,7 @@ $this->session->start();
                                     <li role='separator' class='divider'></li>
                                     <li><a href='#'><i class='ti-settings'></i> Account Setting</a></li>
                                     <li role='separator' class='divider'></li>
-                                    <li><a href='#'><i class='fa fa-power-off'></i> Logout</a></li>
+                                    <li><a href='<?=base_url()?>/login/logout'><i class='fa fa-power-off'></i>Logout</a></li>
                                 </ul>
                             </div>
                         </li>
