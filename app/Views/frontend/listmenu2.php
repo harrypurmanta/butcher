@@ -163,56 +163,69 @@ function simpanorder(){
         produk_id.push(dataid);
       }
     });
-  $.ajax({
-   url : "<?= base_url('produk/simpanorder')?>",
-   type: "POST",
-   data : {meja_id:meja_id,qty:qty,produk_id:produk_id},
-   beforeSend: function () { 
-      $("#loader-wrapper").removeClass("d-none")
-   },
-   success:function(data){
-      setTimeout(function(){ 
-        $("#loader-wrapper").addClass("d-none");
-        if (data == "belumorder") {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, order it!'
+}).then((result) => {
+    if (result.value == true) {
+      $.ajax({
+         url : "<?= base_url('produk/simpanorder')?>",
+         type: "POST",
+         data : {meja_id:meja_id,qty:qty,produk_id:produk_id},
+         beforeSend: function () { 
+            $("#loader-wrapper").removeClass("d-none")
+         },
+         success:function(data){
+            setTimeout(function(){ 
+              $("#loader-wrapper").addClass("d-none");
+              if (data == "belumorder") {
+                Swal.fire({
+                  title: "Anda belum memilih produk !",
+                  text: "Pesanan anda belum terkirim.",
+                  type:"warning",
+                  timer: 5000,
+                  showConfirmButton: true
+                });
+              } else if (data == "false") {
+                Swal.fire({
+                  title: "Terjadi kesalahan!",
+                  text: "Silahkan hubungi petugas.",
+                  type:"danger",
+                  timer: 5000,
+                  showConfirmButton: true
+                });
+              } else if (data == "true") {
+                Swal.fire({
+                  title: "Terima Kasih!",
+                  text: "Pesanan anda sudah terkirim.",
+                  type:"success",
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+              }
+              
+            }, 3000);   
+              
+          },
+          error:function(){
           Swal.fire({
-            title: "Anda belum memilih produk !",
-            text: "Pesanan anda belum terkirim.",
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
             type:"warning",
-            timer: 5000,
-            showConfirmButton: true
-          });
-        } else if (data == "false") {
-          Swal.fire({
-            title: "Terjadi kesalahan!",
-            text: "Silahkan hubungi petugas.",
-            type:"danger",
-            timer: 5000,
-            showConfirmButton: true
-          });
-        } else if (data == "true") {
-          Swal.fire({
-            title: "Terima Kasih!",
-            text: "Pesanan anda sudah terkirim.",
-            type:"success",
-            timer: 2000,
-            showConfirmButton: false
-          });
-        }
-        
-      }, 3000);   
-        
-    },
-    error:function(){
-    Swal.fire({
-      title:"Gagal!",
-      text:"Data gagal disimpan!",
-      type:"warning",
-      showCancelButton:!0,
-      confirmButtonColor:"#556ee6",
-      cancelButtonColor:"#f46a6a"
-    })
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+          })
+          }
+        });
+      
     }
-  });
+ })
 }
         
   function closeOver(f, value){

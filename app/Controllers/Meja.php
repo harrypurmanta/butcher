@@ -57,7 +57,7 @@ class Meja extends BaseController {
 			$cekmejabill = $this->billingmodel->getbyMejaid($key->meja_id);
 			if (count($cekmejabill->getResultArray())>0) {
 				foreach ($cekmejabill->getResult() as $k) {
-					if ($k->statusbilling == 'waiting' || $k->statusbilling == 'verified') {
+					if ($k->statusbilling == 'waiting' || $k->statusbilling == 'verified' || $k->statusbilling == 'normal') {
 						$spannotif = "<span style='margin-right:20px;' class='badgex badge-dangerx'> </span>";
 					} else {
 						$spannotif = "";

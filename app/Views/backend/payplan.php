@@ -162,7 +162,9 @@
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
-                setTimeout(function(){ window.location.href = "<?=base_url()?>/payplan"; }, 1000);
+                $('#modaledit').modal('hide');
+                 $( "#myTable" ).load("<?= base_url('payplan') ?> #myTable");
+                // setTimeout(function(){ window.location.href = "<?=base_url()?>/payplan"; }, 1000);
                 }
             },
             error:function(){
@@ -218,8 +220,8 @@ function hapus(id) {
             confirmButtonColor:"#556ee6",
             cancelButtonColor:"#f46a6a"
         })
-        setTimeout(function(){ window.location.href = "<?=base_url()?>/payplan"; }, 1000);
-    
+        $('#modaledit').modal('hide');
+                 $( "#myTable" ).load("<?= base_url('payplan') ?> #myTable");
      },
      error:function(){
         Swal.fire({
@@ -270,7 +272,8 @@ function update(id) {
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
-                setTimeout(function(){ window.location.href = "<?=base_url()?>/payplan"; }, 1000);
+                $('#modaledit').modal('hide');
+                 $( "#myTable" ).load("<?= base_url('payplan') ?> #myTable");
                 }
             },
             error:function(){

@@ -6,6 +6,7 @@ use App\Models\Mejamodel;
 use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
+use App\Models\Payplanmodel;
 // require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
 require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
@@ -22,6 +23,7 @@ class Kasir extends BaseController
 	protected $billingmodel;
 	protected $discountmodel;
 	protected $membermodel;
+	protected $payplanmodel;
 	protected $connector;
 	protected $profile;
 	protected $printer;
@@ -35,6 +37,7 @@ class Kasir extends BaseController
 		$this->billingmodel = new Billingmodel();
 		$this->discountmodel = new Discountmodel();
 		$this->membermodel = new Membermodel();
+		$this->payplanmodel = new Payplanmodel();
 	}
 	
 	public function index() {
@@ -169,7 +172,7 @@ class Kasir extends BaseController
 						<hr style='border: 1px solid red;margin-bottom:20px;'>";
 
 				$ret .= "<div align='center'><button onclick='cetakmenu($id,this)' class='btn btn-info' style='font-size:30px;'>Cetak Menu</button> <button onclick='cetakbilling($id,this)' class='btn btn-info' style='font-size:30px;'>Cetak Billing</button> </div>";
-				$ret .= "<div class='m-t-20' align='center'><button onclick='checkout($id)' class='btn btn-info' style='font-size:40px;'>Checkout</button></div>";
+				$ret .= "<div class='m-t-20' align='center'><button onclick='showcheckout($id)' class='btn btn-info' style='font-size:40px;'>Checkout</button></div>";
 		} else {
 			$ret = "<div align='center'><h3>TIDAK ADA PESANAN !!</h3> <button class='meja-button' type='button' onclick='backtowaiters()'>Kembali</button></div>";
 		}
@@ -224,6 +227,31 @@ class Kasir extends BaseController
 	            . "</div>";
 		
 		return $ret;
+	}
+
+	public function showcheckout(){
+		$id = $this->request->getPost('id');
+		$res = $this->payplanmodel->_getbynormal()->getResult();
+			$ret = "<div class='modal-dialog modal-lg'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>Silahkan Pilih Member</h4>"
+	            . "<button type='button' class='close-xl' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+	            . "<div><table  width='100%'>";
+	            foreach ($res as $key) {
+	            $ret .= "<tr style='border-bottom: 1px solid #ccc; line-height: 60px; font-size: 25px; font-weight: bold;'>"
+	            	 . "<td align='left'><button onclick='addpayplan($id,$key->payplan_id)' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->payplan_nm</button></td>"
+	            	 . "<td align='right'>$key->type</td>"
+	            	 . "</tr>";
+	            }
+	       $ret .= "</table></div>"
+	       		. "</div>"
+	            . "</div>"
+	            . "</div>";
+		
+		return $ret;	
 	}
 
 	public function adddiscounttobill() {

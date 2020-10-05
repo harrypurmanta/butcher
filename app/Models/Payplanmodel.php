@@ -32,4 +32,10 @@ class Payplanmodel extends Model
 
         return $payplan;
     }
+
+    public function _getbynormal() {
+        return $this->db->table($this->table)
+                        ->where('status_cd','normal')
+                        ->get();
+    }
 }

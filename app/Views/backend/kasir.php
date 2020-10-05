@@ -99,7 +99,40 @@ function diskon() {
       }
       });
     }
-    
+}
+
+function showcheckout() {
+    var id = $('#meja_id').val();
+    if (id == undefined) {
+      Swal.fire({
+        title:"PILIH MEJA TERLEBIH DAHULU!",
+        text:"Data gagal ditampilkan!",
+        type:"warning",
+        showCancelButton:!0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+      })
+    } else {
+      $.ajax({
+       url : "<?= base_url('kasir/showcheckout') ?>",
+       type: "post",
+       data: {id:id},
+       success:function(data){
+        $('#modaledit').html(data);
+        $('#modaledit').modal('show');
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+      });
+    }
 }
 
 function member() {
