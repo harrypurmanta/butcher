@@ -260,11 +260,11 @@ class Meja extends BaseController {
 				]);
 		        $qrnm = str_replace(" ", "_", $meja_nm);
 				$qrcode = new QRCode($options);
-				$qrcode->render($url, '../images/qrcode/'.$qrnm.'.png');
+				$qrcode->render($url, '../public/images/qrcode/'.$qrnm.'.png');
 				$dataqr = [
 					'meja_id' => $mejaid,
 					'image_nm' => $qrnm.'.png',
-					'image_path' => '../images/qrcode/',
+					'image_path' => '../public/images/qrcode/',
 					'status_cd' => 'normal',
 					'created_dttm' => $datenow,
 					'created_user' => $this->session->user_id
