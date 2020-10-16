@@ -10,12 +10,9 @@ class Mejamodel extends Model
     protected $mejamodel;
     
     public function getbyKatnm($meja_nm) {
-        $this->mejamodel = new Mejamodel();
-        
-    	$meja_nm = $this->mejamodel->where('meja_nm', $meja_nm)
-                            ->findAll();
-
-        return $meja_nm;
+        return $this->db->table($this->table)
+                        ->where('meja_nm',$meja_nm)
+                        ->get();
     }
 
     public function getbyNormal() {

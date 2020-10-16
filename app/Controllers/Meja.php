@@ -235,7 +235,7 @@ class Meja extends BaseController {
 
 	public function save(){
 		$meja_nm = $this->request->getVar('meja_nm');
-		$bykatnm = $this->mejamodel->getbyKatnm($meja_nm);
+		$bykatnm = $this->mejamodel->getbyKatnm($meja_nm)->getResult();
 		if (count($bykatnm)>0) {
 			return 'already';
 		} else {
@@ -260,11 +260,11 @@ class Meja extends BaseController {
 				]);
 		        $qrnm = str_replace(" ", "_", $meja_nm);
 				$qrcode = new QRCode($options);
-				$qrcode->render($url, '../public/images/qrcode/'.$qrnm.'.png');
+				$qrcode->render($url, '../images/qrcode/'.$qrnm.'.png');
 				$dataqr = [
 					'meja_id' => $mejaid,
 					'image_nm' => $qrnm.'.png',
-					'image_path' => '../public/images/qrcode/',
+					'image_path' => '../images/qrcode/',
 					'status_cd' => 'normal',
 					'created_dttm' => $datenow,
 					'created_user' => $this->session->user_id
