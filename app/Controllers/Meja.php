@@ -249,7 +249,7 @@ class Meja extends BaseController {
 			$mejaid = $this->mejamodel->simpan($data);
 			if ($mejaid) {
 				require_once APPPATH.'/Libraries/vendor/autoload.php';
-				$url = 'https://butcher.cliniccoding.id/produk/listmenu/'.$mejaid.'/$datenow';
+				$url = 'https://butcher.agete.id/produk/listmenu/'.$mejaid.'/$datenow';
 		        $options = new QROptions([
 					'version'      => 7,
 					'outputType'   => QRCode::OUTPUT_IMAGE_PNG,
