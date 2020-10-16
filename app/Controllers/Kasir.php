@@ -41,10 +41,10 @@ class Kasir extends BaseController
 	}
 	
 	public function index() {
-		// if (session()->get('user_nm') == "") {
-	 //        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
-	 //        return redirect()->to(base_url('/'));
-	 //    }
+		if (session()->get('user_nm') == "") {
+	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+	        return redirect()->to(base_url('/'));
+	    }
 		$data = [
 			'title' => 'Kasir Dashboard',
 			'subtitle' => 'Kasir',
@@ -54,28 +54,43 @@ class Kasir extends BaseController
 
 	}
 
+	public function pembulatanratusan($uang){
+	 $ratusan = substr($uang, -4);
+	 $akhir = $uang + (100-$ratusan);
+	 return $akhir;
+	}
+
+	public function pembulatanratusanribu($uang){
+	 $ratusan = substr($uang, -6);
+	 $akhir = $uang + (100000-$ratusan);
+	 return $akhir;
+	}
+
 	public function getbymejaidkasir() {
 		$id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
-		$resdc = $this->discountmodel->getbybillid($id)->getResult();
 		$discount_nmx = "";	 
 		$discount_valuex = "";
 		$discount = "";
+		$discount_nm = "";
+		$subtotal = 0;
 		if (count($res)>0) {
+		$billing_id = $res[0]->billing_id;
 		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
-			$discount_nm = "";
-			$subtotal = 0;
-			$ret = "<div align='center' id='div-item'>
+		$resdc = $this->discountmodel->getbybillid($billing_id)->getResult();
+			
+			$ret = "<div class='row col-md-12 m-0' id='div-item'>
 				<input type='hidden' id='meja_id' value='$id'/>
-						<div style='margin-top: 30px;'>
+				<input type='hidden' id='billing_id' value='$billing_id'/>
+						<div class='col-md-12 m-0' align='center' style='margin-top: 30px;'>
 							<p>
-								<span style='font-size: 20px;'>Butcher Steak & Pasta Palembang</span><br>
-								<span style='font-size: 20px;'>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
-								<span style='font-size: 20px;'>Sumatera Selatan, 30114, 07115626366</span>
+								<span style='font-size: 12px;line-height: 0px !important;'>Butcher Steak & Pasta Palembang</span><br>
+								<span style='font-size: 12px;line-height: 0px !important;'>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
+								<span style='font-size: 12px;line-height: 0px !important;'>Sumatera Selatan, 30114, 07115626366</span>
 							</p>
 						</div>
 					</div>";
-			$ret .= "<table width='100%' style='margin-top: 20px;font-size: 20px;'>
+			$ret .= "<div class='row col-md-12 m-0'><table width='100%' style='margin-top: 20px;font-size: 12px;'>
 				        <tr>
 				          <td align='left'>".panjang($dt)."</td>
 				          <td align='right'>".$tm."</td>
@@ -89,64 +104,71 @@ class Kasir extends BaseController
 				          <td align='right'>".$res[0]->collected_nm."</td>
 				        </tr>
 				      </table>
+				      </div>
 				      <hr style='border: 1px solid red'>
-				      <div style='overflow:auto;'><table class='active' style='font-size: 30px;' width='100%; '><tbody>";
+				      <div class='row col-md-12 m-0' style='overflow:auto;'><table class='active' style='font-size: 18px;' width='100%; '><tbody>";
 			foreach ($res as $key) {
 				$total = $key->produk_harga * $key->qty;
-				foreach ($resdc as $dc) {
-					$symb = substr($dc->value, -1);
-					if ($symb == "%") {
-						$percentega = str_replace("%", "", $dc->value);
-						$ptotal = ($percentega/100) * $total;
-						$discount = "<span>(".number_format($ptotal).")</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
-						$afterdc = $total - $ptotal;
-						$subtotal = $subtotal + $afterdc;
-						$discount_nmx = $dc->discount_nm;
-						$discount_valuex = $dc->value;
-					} else {
-						$subtotal = $subtotal + $total;
+				if (count($resdc)>0) {
+					foreach ($resdc as $dc) {
+						$symb = substr($dc->value, -1);
+						if ($symb == "%") {
+							$percentega = str_replace("%", "", $dc->value);
+							$ptotal = ($percentega/100) * $total;
+							$discount = "<span>(".number_format($ptotal).")</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
+							$afterdc = $total - $ptotal;
+							$subtotal = $subtotal + $afterdc;
+							$discount_nmx = $dc->discount_nm;
+							$discount_valuex = $dc->value;
+						} 
 					}
+				} else {
+					$subtotal = $subtotal + $total;
 				}
-
+				
 				$ret .= "<tr>
-				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
+				        <td colspan='3' align='left' style='font-weight: bold;font-size: 12px;'>
 				            <span>$key->produk_nm</span>
 				          </td>
 				        </tr>
-				        <tr style='font-size: 20px;'>
+				        <tr style='font-size: 12px;'>
 				          <td align='left' width='180'><span>$key->qty X</span><br>$discount_nmx $discount_valuex</td>
 				          <td align='center'><span>@".number_format($key->produk_harga)."</span></td>
 				          <td align='right'><span>".number_format($total)."<br>$discount</span></td>
 				        </tr>
-				        <tr style='line-height:20px;'>
+				        <tr style='line-height:12px;'>
 				        <td>&nbsp </td>
 				        <td></td>
 				        <td></td>
 				        </tr>";
 				 }
 
-				 foreach ($resdc as $dc) {
-					$symb = substr($dc->value, -1);
-					if ($symb != "%") {
-						$discount_nm = $dc->discount_nm;
-						$discount_value = $dc->value;
-						$ret .= "<tr style='font-size: 20px;'>
-						        <td align='left' width='80'>$discount_nm </td>
-						        <td></td>
-						        <td align='right'>".number_format($discount_value)." <a href='#' onclick='removedc($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a></td>
-						        </tr>";
-						$subtotal = $subtotal - $dc->value;
-					} 
-				}
+				if (count($resdc)>0) {
+					 foreach ($resdc as $dc) {
+						$symb = substr($dc->value, -1);
+						if ($symb != "%") {
+							$discount_nm = $dc->discount_nm;
+							$discount_value = $dc->value;
+							$ret .= "<tr style='font-size: 12px;'>
+							        <td align='left' width='80'>$discount_nm </td>
+							        <td></td>
+							        <td align='right'>".number_format($discount_value)." <a href='#' onclick='removedc($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a></td>
+							        </tr>";
+							$subtotal = $subtotal - $dc->value;
+						} 
+					}
+				} 
 				
 					$tax = $subtotal * 0.10;
 					$service = $subtotal * 0.05;
 					$grandtotal = $subtotal + $tax + $service;
+					$jmlbulat = $this->pembulatanratusan($grandtotal);
+					$nilaibulat = $jmlbulat - $grandtotal;
 
 				$ret .= "</tbody></table></div>
 						<hr style='border: 1px solid red'>";
 				        
-				$ret .= "<table style='font-size: 20px; margin-top:30px;' width='100%'>
+				$ret .= "<table style='font-size: 12px; margin-top:30px;' width='100%'>
 				        <tr>
 				          <td align='left'>Subtotal</td>
 				          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
@@ -161,18 +183,25 @@ class Kasir extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Rounding Amount</td>
-				          <td colspan='2' align='right'>Rp. dak tau rumusnyo</td>
+				          <td colspan='2' align='right'>Rp. ".number_format($nilaibulat)."</td>
 				        </tr>
 
 				        <tr>
 				          <td align='left' style='font-weight:bold;'>Total</td>
-				          <td colspan='2' align='right'>Rp. ".number_format($grandtotal)."</td>
+				          <td colspan='2' align='right'>Rp. ".number_format($jmlbulat)."</td>
 				        </tr>
 						</table>
 						<hr style='border: 1px solid red;margin-bottom:20px;'>";
 
-				$ret .= "<div align='center'><button onclick='cetakmenu($id,this)' class='btn btn-info' style='font-size:30px;'>Cetak Menu</button> <button onclick='cetakbilling($id,this)' class='btn btn-info' style='font-size:30px;'>Cetak Billing</button> </div>";
-				$ret .= "<div class='m-t-20' align='center'><button onclick='showcheckout($id)' class='btn btn-info' style='font-size:40px;'>Checkout</button></div>";
+				$ret .= "<div class='col-md-12' align='center' style='margin:0;padding:0;'>
+							<center>
+							<button onclick='cetakmenu($id,this)' class='btn btn-info' style='font-size:15px;width: 40%;'>Cetak Menu</button>
+							<button onclick='cetakbilling($id,this)' class='btn btn-info' style='font-size:15px;width: 40%;'>Cetak Billing</button>
+							</center>
+						</div>";
+				$ret .= "<div class='m-t-20' align='center'>
+							<button onclick='showcheckout($id,$grandtotal)' class='btn btn-info' style='font-size:20px;'>Checkout</button>
+						</div>";
 		} else {
 			$ret = "<div align='center'><h3>TIDAK ADA PESANAN !!</h3> <button class='meja-button' type='button' onclick='backtowaiters()'>Kembali</button></div>";
 		}
@@ -231,22 +260,34 @@ class Kasir extends BaseController
 
 	public function showcheckout(){
 		$id = $this->request->getPost('id');
-		$res = $this->payplanmodel->_getbynormal()->getResult();
-			$ret = "<div class='modal-dialog modal-lg'>"
+		$gt = $this->request->getPost('gt');
+		$res = $this->payplanmodel->_getbynormaledc()->getResult();
+			$ret = "<div class='modal-dialog'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
-	            . "<h4 class='modal-title'>Silahkan Pilih Member</h4>"
+	            . "<h4 class='modal-title'>Pilih Cara Bayar</h4>"
 	            . "<button type='button' class='close-xl' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
-	            . "<div><table  width='100%'>";
+	            . "<form>"
+	            . "<div><label style='color:black;'>TUNAI</label></div>";
+	            $ret .= "<label class='btn btn-secondary'>
+                            <input type='radio' name='payplan' id='tunai1' value='".number_format($gt)."' autocomplete='off'> ".number_format($gt)."
+                        </label> ";
+                $ret .= "<label class='btn btn-secondary'>
+                            <input type='radio' name='payplan' id='tunai2' value='".$this->pembulatanratusanribu($gt)."' autocomplete='off'> ".$this->pembulatanratusanribu($gt)."
+                        </label> ";
+                $ret .= "<label class='btn btn-secondary'>
+                            <input type='number' name='payplan' id='tunai3' placeholder='input disini'>
+                        </label>";
+                $ret .= "<div><label style='color:black;'>EDC</label></div>";
 	            foreach ($res as $key) {
-	            $ret .= "<tr style='border-bottom: 1px solid #ccc; line-height: 60px; font-size: 25px; font-weight: bold;'>"
-	            	 . "<td align='left'><button onclick='addpayplan($id,$key->payplan_id)' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->payplan_nm</button></td>"
-	            	 . "<td align='right'>$key->type</td>"
-	            	 . "</tr>";
+	            $ret .= "<label style='width: 100px; height: 70px;' class='btn btn-secondary'>
+                            <input type='radio' name='payplan' value='$key->payplan_id' id='option$key->payplan_id' autocomplete='off'> <span style='justify-content:center; display:flex;  align-items:center; width:100%; height:100%;'>$key->payplan_nm</span>
+                        </label> ";
 	            }
-	       $ret .= "</table></div>"
+	       $ret .= "<div align='right'><button data-dismiss='modal' aria-hidden='true' type='button' class='btn btn-secondary'>Batal</button> <button onclick='checkout($id,$gt)' class='btn btn-success' type='button'>Simpan</button></div>"
+	       		. "</form>"
 	       		. "</div>"
 	            . "</div>"
 	            . "</div>";
@@ -677,7 +718,8 @@ class Kasir extends BaseController
 	public function cetakcheckout() {
 		$id = $this->request->getPost('id');
 		$data = $this->billingmodel->getbyMejaidkasir($id)->getResult();
-		$resdc = $this->discountmodel->getbybillid($id)->getResult();
+		$resdc = $this->discountmodel->getbybillid($data[0]->billing_id)->getResult();
+
 		$subtotal = 0;
 		$discount_nmx = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);

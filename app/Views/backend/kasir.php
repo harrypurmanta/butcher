@@ -37,7 +37,7 @@
                         </div>
                       </div>
             </div>
-            <div id="modaledit" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+            <div id="responsive-modal" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
                               
             </div>
             <!-- ============================================================== -->
@@ -84,8 +84,8 @@ function diskon() {
        type: "post",
        data: {id:id},
        success:function(data){
-        $('#modaledit').html(data);
-        $('#modaledit').modal('show');
+        $('#responsive-modal').html(data);
+        $('#responsive-modal').modal('show');
       },
       error:function(){
           Swal.fire({
@@ -101,7 +101,7 @@ function diskon() {
     }
 }
 
-function showcheckout() {
+function showcheckout(id,gt) {
     var id = $('#meja_id').val();
     if (id == undefined) {
       Swal.fire({
@@ -116,10 +116,10 @@ function showcheckout() {
       $.ajax({
        url : "<?= base_url('kasir/showcheckout') ?>",
        type: "post",
-       data: {id:id},
+       data: {id:id,gt:gt},
        success:function(data){
-        $('#modaledit').html(data);
-        $('#modaledit').modal('show');
+        $('#responsive-modal').html(data);
+        $('#responsive-modal').modal('show');
       },
       error:function(){
           Swal.fire({
@@ -152,8 +152,8 @@ function member() {
        type: "post",
        data: {id:id},
        success:function(data){
-        $('#modaledit').html(data);
-        $('#modaledit').modal('show');
+        $('#responsive-modal').html(data);
+        $('#responsive-modal').modal('show');
       },
       error:function(){
           Swal.fire({
@@ -210,7 +210,7 @@ function addmember(id,di){
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
-        $('#modaledit').modal('hide');
+        $('#responsive-modal').modal('hide');
       } else {
         Swal.fire({
             title:"Gagal!",
@@ -351,6 +351,10 @@ function cetakbilling(id,btn) {
 }
 
 function checkout(id,btn) {
+  var meja_id = $('#meja_id').val();
+  var billing_id = $('#billing_id').val();
+  var payplan = $("input[name='payplan']").val();
+  alert(payplan);
   b = $(btn);
   b.attr('data-old', b.text());
   b.text('wait');

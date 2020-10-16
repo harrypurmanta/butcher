@@ -33,9 +33,24 @@ class Payplanmodel extends Model
         return $payplan;
     }
 
-    public function _getbynormal() {
+    public function _getbynormaltunai() {
         return $this->db->table($this->table)
                         ->where('status_cd','normal')
+                        ->where('type','tunai')
+                        ->get();
+    }
+
+    public function _getbynormalwallet() {
+        return $this->db->table($this->table)
+                        ->where('status_cd','normal')
+                        ->where('type','ewallet')
+                        ->get();
+    }
+
+    public function _getbynormaledc() {
+        return $this->db->table($this->table)
+                        ->where('status_cd','normal')
+                        ->where('type','edc')
                         ->get();
     }
 }
