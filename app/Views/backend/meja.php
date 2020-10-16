@@ -87,7 +87,7 @@
                                                 </td>
                                                 <td class="text-center"><?= $k->status_cd ?></td>
                                                 <td class="text-center"><?= $k->created_dttm ?></td>
-                                                <td><a href="images/qrcode<?=$k->image_nm?>">Download</a></td>
+                                                <td><a href="images/qrcode/<?=$k->image_nm?>">Download</a></td>
                                                 <td class="text-center">
                                                     <a href="" onclick="showedit(<?= $k->meja_id ?>)"><span style="text-decoration:underline;">Edit</span></a> |
                                                     <a href="" onclick="hapus(<?= $k->meja_id ?>)"><span style="text-decoration:underline;">Hapus</span></a>
