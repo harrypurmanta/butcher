@@ -9,7 +9,7 @@
             <!-- ============================================================== -->
             <div class="container-fluid">
                       <div class="row">
-                        <div class="col-md-7 col-sm-6">
+                        <div class="col-md-5 col-sm-6">
                             <div class="card" style="display: inline-block;" align="center">
                                 <div class="card-body">
                                 <?php
@@ -25,7 +25,7 @@
                                  <button style="font-size: 20px; width: 40%;" type="button" onclick="member()" class="btn btn-rounded btn-primary">Member</button>
                             </div>
                         </div>
-                        <div class="col-md-5 col-sm-6">
+                        <div class="col-md-7 col-sm-6">
                             <div class="card">
                                 <div class="card-body" id="cardbody"> 
                                 </div>
