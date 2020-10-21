@@ -121,9 +121,11 @@ $.ajax({
 }
 
 function verifybilling(id){
+var grandtotal = $('#grandtotal').val();
+
 $.ajax({
      url : "<?= base_url('meja/verifybilling') ?>",
-     data : {'id':id},
+     data : {'id':id,'grandtotal':grandtotal},
      type: "post",
      beforeSend: function () { 
       $("#loader-wrapper").removeClass("d-none");

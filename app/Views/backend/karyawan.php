@@ -97,7 +97,6 @@
                 type: "post",
                 data : {'person_nm':person_nm},
                 success:function(data){
-                    // _data = JSON.parse(data);
                     $('#modalkaryawanlist').modal('show');
                     $('#modal_body').html(data);
                 },

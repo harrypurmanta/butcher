@@ -2,11 +2,7 @@
 ?>
 
     <?= $this->section('content'); ?>
-        <!-- ============================================================== -->
-        <!-- ============================================================== -->
-        <!-- Page wrapper  -->
-        <!-- ============================================================== -->
-        <div class="page-wrapper" style="padding-top: 0px;">
+        <div class="page-wrapper" style="padding-top: 0px; margin-left: 0px !important;">
             
             <!-- ============================================================== -->
             <!-- Container fluid  -->
@@ -69,6 +65,7 @@ function showbillingbymeja(id) {
 
 function diskon() {
     var id = $('#meja_id').val();
+    var billing_id = $('#billing_id').val();
     if (id == undefined) {
       Swal.fire({
         title:"PILIH MEJA TERLEBIH DAHULU!",
@@ -82,7 +79,7 @@ function diskon() {
       $.ajax({
        url : "<?= base_url('kasir/discountkasir') ?>",
        type: "post",
-       data: {id:id},
+       data: {id:id,billing_id:billing_id},
        success:function(data){
         $('#responsive-modal').html(data);
         $('#responsive-modal').modal('show');
@@ -137,6 +134,7 @@ function showcheckout(id,gt) {
 
 function member() {
     var id = $('#meja_id').val();
+    var billing_id = $('#billing_id').val();
     if (id == undefined) {
       Swal.fire({
         title:"PILIH MEJA TERLEBIH DAHULU!",
@@ -150,7 +148,7 @@ function member() {
       $.ajax({
        url : "<?= base_url('kasir/memberkasir') ?>",
        type: "post",
-       data: {id:id},
+       data: {id:id,billing_id:billing_id},
        success:function(data){
         $('#responsive-modal').html(data);
         $('#responsive-modal').modal('show');
@@ -170,11 +168,11 @@ function member() {
     
 }
 
-function addDiscount(id,di) {
+function addDiscount(id,di,bi) {
     $.ajax({
      url : "<?= base_url('kasir/adddiscounttobill') ?>",
      type: "post",
-     data: {id:id,di:di},
+     data: {id:id,di:di,bi:bi},
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
@@ -202,11 +200,11 @@ function addDiscount(id,di) {
     });
 }
 
-function addmember(id,di){
+function addmember(id,di,bi){
   $.ajax({
      url : "<?= base_url('kasir/addmembertobill') ?>",
      type: "post",
-     data: {id:id,di:di},
+     data: {id:id,di:di,bi:bi},
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
@@ -350,18 +348,18 @@ function cetakbilling(id,btn) {
   });
 }
 
-function checkout(id,btn) {
+function checkout(id,gt,btn) {
   var meja_id = $('#meja_id').val();
   var billing_id = $('#billing_id').val();
-  var payplan = $("input[name='payplan']").val();
-  alert(payplan);
+  var paid = $("input[name='payplan']").val();
+  var payplan_id = $("input[name=payplan]:checked").data('payplan-id');;
   b = $(btn);
   b.attr('data-old', b.text());
   b.text('wait');
   $.ajax({
      url : "<?= base_url('kasir/cetakcheckout') ?>",
      type: "post",
-     data: {id:id},
+     data: {id:id,gt:gt,meja_id:meja_id,billing_id:billing_id,payplan_id:payplan_id,paid:paid},
      success:function(data){
       window.location.href = data;
       b.text(b.attr('data-old'));

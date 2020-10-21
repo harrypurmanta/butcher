@@ -33,10 +33,6 @@ class Produk extends BaseController
 	}
 
 	public function listmenu2(){
-		if (session()->get('user_nm') == "") {
-	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
-	        return redirect()->to(base_url('/'));
-	    }
 		$meja_id = $this->request->uri->getSegment(3);
 			$data = [
 			'title' => 'Menu',

@@ -7,8 +7,8 @@ use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
 use App\Models\Payplanmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-//  require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -69,6 +69,7 @@ class Kasir extends BaseController
 	public function getbymejaidkasir() {
 		$id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
+// 		echo json_encode($res);exit;
 		$discount_nmx = "";	 
 		$discount_valuex = "";
 		$discount = "";
@@ -210,6 +211,7 @@ class Kasir extends BaseController
 
 	public function discountkasir() {
 		$id = $this->request->getPost('id');
+		$billing_id = $this->request->getPost('billing_id');
 		$res = $this->discountmodel->getbyNormal()->getResult();
 			$ret = "<div class='modal-dialog'>"
 	            . "<div class='modal-content'>"
@@ -221,7 +223,7 @@ class Kasir extends BaseController
 	            . "<div><table  width='100%'>";
 	            foreach ($res as $key) {
 	            $ret .= "<tr style='border-bottom: 1px solid #ccc; line-height: 60px; font-size: 25px; font-weight: bold;'>"
-	            	 . "<td align='left'><button onclick='addDiscount($id,$key->discount_id)' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->discount_nm</button></td>"
+	            	 . "<td align='left'><button onclick='addDiscount($id,$key->discount_id,$billing_id)' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->discount_nm</button></td>"
 	            	 . "<td align='right'>$key->value</td>"
 	            	 . "</tr>";
 	            }
@@ -235,6 +237,7 @@ class Kasir extends BaseController
 
 	public function memberkasir() {
 		$id = $this->request->getPost('id');
+		$billing_id = $this->request->getPost('billing_id');
 		$res = $this->membermodel->getbyNormal()->getResult();
 			$ret = "<div class='modal-dialog'>"
 	            . "<div class='modal-content'>"
@@ -246,7 +249,7 @@ class Kasir extends BaseController
 	            . "<div><table  width='100%'>";
 	            foreach ($res as $key) {
 	            $ret .= "<tr style='border-bottom: 1px solid #ccc; line-height: 60px; font-size: 25px; font-weight: bold;'>"
-	            	 . "<td align='left'><button onclick='addmember($id,$key->member_id)' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->person_nm</button></td>"
+	            	 . "<td align='left'><button onclick='addmember($id,$key->member_id,$billing_id)' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->person_nm</button></td>"
 	            	 . "<td align='right'>$key->cellphone</td>"
 	            	 . "</tr>";
 	            }
@@ -270,22 +273,24 @@ class Kasir extends BaseController
 	            . "</div>"
 	            . "<div class='modal-body'>"
 	            . "<form>"
-	            . "<div><label style='color:black;'>TUNAI</label></div>";
-	            $ret .= "<label class='btn btn-secondary'>
-                            <input type='radio' name='payplan' id='tunai1' value='".number_format($gt)."' autocomplete='off'> ".number_format($gt)."
-                        </label> ";
-                $ret .= "<label class='btn btn-secondary'>
-                            <input type='radio' name='payplan' id='tunai2' value='".$this->pembulatanratusanribu($gt)."' autocomplete='off'> ".$this->pembulatanratusanribu($gt)."
-                        </label> ";
-                $ret .= "<label class='btn btn-secondary'>
-                            <input type='number' name='payplan' id='tunai3' placeholder='input disini'>
+	            . "<div><label style='color:black !important;'>TUNAI</label></div>"
+	            . "<div class='btn-group btn-group-toggle' data-toggle='buttons' style='display:block !important;'>";
+	            $ret .= "<label class='btn btn-outline-primary' style='margin:5px !important; color:black !important;'>
+                            <input type='radio' name='payplan' id='tunai1' data-payplan-id='1' value='".number_format($gt)."' autocomplete='off'>".number_format($gt)."
                         </label>";
-                $ret .= "<div><label style='color:black;'>EDC</label></div>";
+                $ret .= "<label for='tunai2' class='btn btn-outline-primary' style='margin:5px !important; color:black !important;'>
+                            <input type='radio' name='payplan' id='tunai2' data-payplan-id='1' value='".$this->pembulatanratusanribu($gt)."' autocomplete='off'>".$this->pembulatanratusanribu($gt)."
+                        </label> ";
+                $ret .= "<label class='btn btn-outline-primary' style='margin:0 !important; color:black !important;'>
+                            <input type='number' name='payplan' id='tunai3' data-payplan-id='1' placeholder='input disini'>
+                        </label>";
+                $ret .= "<div><label style='color:black !important;'>EDC</label></div>";
 	            foreach ($res as $key) {
-	            $ret .= "<label style='width: 100px; height: 70px;' class='btn btn-secondary'>
-                            <input type='radio' name='payplan' value='$key->payplan_id' id='option$key->payplan_id' autocomplete='off'> <span style='justify-content:center; display:flex;  align-items:center; width:100%; height:100%;'>$key->payplan_nm</span>
+	            $ret .= "<label style='width: 100px; height: 70px; margin: 5px; color:black !important;' class='btn btn-outline-primary'>
+                            <input type='radio' name='payplan' data-payplan-id='$key->payplan_id' value='".number_format($gt)."' id='edc$key->payplan_id' autocomplete='off'><span style='justify-content:center; display:flex;  align-items:center; width:100%; height:100%;'>$key->payplan_nm</span>
                         </label> ";
 	            }
+	            $ret .= "</div> ";
 	       $ret .= "<div align='right'><button data-dismiss='modal' aria-hidden='true' type='button' class='btn btn-secondary'>Batal</button> <button onclick='checkout($id,$gt)' class='btn btn-success' type='button'>Simpan</button></div>"
 	       		. "</form>"
 	       		. "</div>"
@@ -298,9 +303,9 @@ class Kasir extends BaseController
 	public function adddiscounttobill() {
 		$id = $this->request->getPost('id');
 		$di = $this->request->getPost('di');
-
+        $bi = $this->request->getPost('bi');
 		$data = [
-			'billing_id' => $id,
+			'billing_id' => $bi,
 			'discount_id' => $di,
 			'status_cd' => 'normal',
 			'created_user' => $this->session->user_id,
@@ -317,14 +322,13 @@ class Kasir extends BaseController
 	public function addmembertobill() {
 		$id = $this->request->getPost('id');
 		$di = $this->request->getPost('di');
-
+        $bi = $this->request->getPost('bi');
 		$data = [
-			'billing_id' => $id,
 			'member_id' => $di,
 			'updated_user' => $this->session->user_id,
 			'updated_dttm' => date('Y-m-d H:i:s')
 		];
-		$addtobill = $this->billingmodel->insertbillmember($id,$data);
+		$addtobill = $this->billingmodel->insertbillmember($bi,$data);
 		if ($addtobill) {
 			return 'true';
 		} else {
@@ -381,6 +385,8 @@ class Kasir extends BaseController
 		$resdc = $this->discountmodel->getbybillid($id)->getResult();
 		$subtotal = 0;
 		$discount_nmx = "";
+		$discount_valuex = "";
+		$ptotal = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
 		$this->connector = new RawbtPrintConnector();
@@ -489,6 +495,8 @@ class Kasir extends BaseController
 		$resdc = $this->discountmodel->getbybillid($id)->getResult();
 		$subtotal = 0;
 		$discount_nmx = "";
+		$discount_valuex = "";
+		$ptotal = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
 		$this->connector = new RawbtPrintConnector();
@@ -598,6 +606,8 @@ class Kasir extends BaseController
 		$resdc = $this->discountmodel->getbybillid($id)->getResult();
 		$subtotal = 0;
 		$discount_nmx = "";
+		$discount_valuex = "";
+		$ptotal = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
 		$this->connector = new RawbtPrintConnector();
@@ -716,11 +726,18 @@ class Kasir extends BaseController
 	}
 
 	public function cetakcheckout() {
-		$id = $this->request->getPost('id');
+		$id 		= $this->request->getPost('id');
+		$gt 		= $this->request->getPost('gt');
+		$meja_id 	= $this->request->getPost('meja_id');
+		$billing_id = $this->request->getPost('billing_id');
+		$payplan_id = $this->request->getPost('payplan_id');
+		$paid 		= $this->request->getPost('paid');
+		
 		$data = $this->billingmodel->getbyMejaidkasir($id)->getResult();
 		$resdc = $this->discountmodel->getbybillid($data[0]->billing_id)->getResult();
 
 		$subtotal = 0;
+		$ttl_discount = 0;
 		$discount_nmx = "";
 		list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		$this->profile = CapabilityProfile::load("POS-5890");
@@ -787,12 +804,15 @@ class Kasir extends BaseController
 						$subtotal = $subtotal + $afterdc;
 						$discount_nmx = $dc->discount_nm;
 						$discount_valuex = $dc->value;
+						$ttl_discount = $ttl_discount + $valuedc;
 					} else {
 						$discount = "";
 						$discount_nmx = "";
 						$discount_valuex = "";
 						$ptotal = "";
 						$subtotal = $subtotal + $total;
+						$ttl_discount = $ttl_discount;
+
 					}
 				}
 		        $this->printer->text($item->produk_nm."\n");
@@ -808,6 +828,7 @@ class Kasir extends BaseController
 					$discount_value = $dc->value;
 		        $this->printer->text($this->getAsString(32,$discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
 				$subtotal = $subtotal - $dc->value;
+				$ttl_discount = $ttl_discount + $dc->value;
 				} 
 			}
 		    $this->printer->setEmphasis(false);
@@ -829,6 +850,21 @@ class Kasir extends BaseController
 		    /*footer */
 		    $this->printer->feed(2);
 		    $this->printer->text($date . "\n");
+		    if ($payplan_id == 1) {
+				$ttlpaid = $paid;
+			} else {
+				$ttlpaid = $grandtotal;
+			}
+		    $updatebill = [
+				'payplan_id' => $payplan_id,
+				'ttl_paid' => $ttlpaid,
+				'ttl_amount' => $grandtotal,
+				'ttl_discount' => $ttl_discount,
+				'amt_before_discount' => $subtotal,
+				'checkout_dttm' => date('Y-m-d H:i:s'),
+				'checkout_user' => $this->session->user_id
+			];
+			$updatebill = $this->billingmodel->update($billing_id,$updatebill);
 
 		    /* Cut the receipt and open the cash drawer */
 		    $this->printer->cut();

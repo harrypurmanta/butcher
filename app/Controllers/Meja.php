@@ -188,6 +188,7 @@ class Meja extends BaseController {
 				          <td colspan='2' align='right'>Rp. ".number_format($grandtotal)."</td>
 				        </tr>
 						</table>
+						<input type='hidden' value='$grandtotal' id='grandtotal' />
 						<hr style='border: 1px solid red;margin-bottom:100px;'>";
 		} else {
 			$ret = "<div align='center'><h3>TIDAK ADA PESANAN !!</h3> <button class='meja-button' type='button' onclick='backtowaiters()'>Kembali</button></div>";
@@ -209,9 +210,11 @@ class Meja extends BaseController {
 
 	public function verifybilling(){
 		$id = $this->request->getPost('id');
+		$grandtotal = $this->request->getPost('grandtotal');
 		$datenow = date('Y-m-d H:i:s');
 		$data = [
 			'status_cd' => 'verified',
+			'amt_before_discount' => $grandtotal,
 			'verified_dttm' => $datenow,
 			'verified_user' => $this->session->user_id 
 		];
