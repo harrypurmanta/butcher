@@ -10,13 +10,13 @@
             <div class="container-fluid">
                       <div class="row">
                         <div class="col-md-5 col-sm-6">
-                            <div class="card" style="display: inline-block;" align="center">
+                            <div class="card" style="display: inline-block; padding-bottom: 20px;" align="center">
                                 <div class="card-body">
                                 <?php
                                   foreach ($meja->getResult() as $key) {
                                 ?>
-                                <div style="display: inline-block; margin: 10px;">
-                                  <button onclick="showbillingbymeja(<?= $key->meja_id ?>)" class="btn btn-info font-weight-bold" style="font-size: 20px; padding: 10px;"><?= $key->meja_nm ?></button>
+                                <div style="display: inline-block; margin: 5px;">
+                                  <button onclick="showbillingbymeja(<?= $key->meja_id ?>)" class="btn btn-info font-weight-bold" style="font-size: 20px; padding: 10px;"><?= $key->meja_nm?></button>
                                 </div>
                                 <?php } ?>
                                 </div>
