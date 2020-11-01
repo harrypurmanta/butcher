@@ -1,8 +1,5 @@
  
 <?= $this->extend('backend/layout/template'); 
-
-use CodeIgniter\HTTP\IncomingRequest;
-$request = service('request');
 ?>
     
 
@@ -67,14 +64,25 @@ $request = service('request');
 <script src="../../assets/plugins/jquery/jquery.min.js"></script>
 		<script type="text/javascript">
 $(document).ready(function() {
-	var id = <?= $id ?>;
+	var id = <?php
+    if ($id == "") {
+        echo 'null';
+    } else {
+        echo $id;
+    }
+     ?>;
 	profile(id);                
 });
 
 function simpanuser(id){
         var user_nm = $('#user_nm').val();
         var pwd0 = $('#pwd0').val();
-        if (user_nm==''||pwd0=='') {
+        var oldpassword = $('#oldpassword').val();
+        var user_group = $('#user_group').val();
+        var user_id = $('#user_id').val();
+        alert(pwd0);
+        alert(oldpassword);
+        if (user_nm==""||pwd0=="") {
         	Swal.fire({
                     title:"username & Password harus di isi!!",
                     text:"GAGAL!",
@@ -87,7 +95,7 @@ function simpanuser(id){
             $.ajax({
             url : "<?= base_url('users/save') ?>",
             type: "post",
-            data : {'user_nm':user_nm,'pwd0':pwd0,'id':id},
+            data : {'user_nm':user_nm,'pwd0':pwd0,'id':id,'oldpassword':oldpassword,'user_group':user_group,'user_id':user_id},
             success:function(_data){
              if (_data=='already') {
                 Swal.fire({
@@ -107,7 +115,7 @@ function simpanuser(id){
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
-                // setTimeout(function(){ window.location.href = "<?=base_url()?>/karyawan/formdaftarkaryawan"; }, 1000);
+                account(id);
                 }
             },
             error:function(){
@@ -212,16 +220,6 @@ function simpan() {
             type: "post",
             data : {'person_id':person_id,'person_nm':person_nm,'ext_id':ext_id,'gender_cd':gender_cd,'birth_dttm':birth_dttm,'birth_place':birth_place,'cellphone':cellphone,'addr_txt':addr_txt},
             success:function(_data){
-             if (_data=='already') {
-                Swal.fire({
-                    title:"Nomor Identitas sudah ada!!",
-                    text:"GAGAL!",
-                    type:"warning",
-                    showCancelButton:!0,
-                    confirmButtonColor:"#556ee6",
-                    cancelButtonColor:"#f46a6a"
-                })
-             } else {
                 Swal.fire({
                     title:"Berhasil!",
                     text:"Data berhasil disimpan!",
@@ -230,8 +228,7 @@ function simpan() {
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
-                // setTimeout(function(){ window.location.href = "<?=base_url()?>/karyawan/formdaftarkaryawan"; }, 1000);
-                }
+                setTimeout(function(){ window.location.href = "<?=base_url()?>/karyawan/formdaftarkaryawan/"+_data; }, 1000);
             },
             error:function(){
                 Swal.fire({

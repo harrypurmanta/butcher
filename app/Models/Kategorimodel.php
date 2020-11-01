@@ -16,11 +16,9 @@ class Kategorimodel extends Model
     
     
     public function getbyKatnm($kategori_nm) {
-        $this->kategorimodel = new Kategorimodel();
-    	$kategori_nm = $this->kategorimodel->where('kategori_nm', $kategori_nm)
-                            ->findAll();
-
-        return $kategori_nm;
+        return $this->db->table('kategori_produk')
+                        ->where('kategori_nm',$kategori_nm)
+                        ->get();
     }
 
     public function getbyNormal() {
@@ -30,6 +28,12 @@ class Kategorimodel extends Model
                     ->where('a.status_cd','normal')
                     ->groupby('a.kategori_id')
                     ->get();
+    }
+
+    public function getbyid($id) {
+        return $this->db->table('kategori_produk')
+                        ->where('kategori_id',$id)
+                        ->get();
     }
 
     public function getOptionbynormal(){

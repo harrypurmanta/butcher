@@ -20,19 +20,23 @@ class Produk extends BaseController
 	}
 
 	public function index() {
-		if (session()->get('user_nm') == "") {
-	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
-	        return redirect()->to(base_url('/'));
-	    }
+// 		if (session()->get('user_nm') == "") {
+// 	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+// 	        return redirect()->to(base_url('/'));
+// 	    }
 		$data = [
 			'title' => 'Produk',
 			'subtitle' => 'Produk',
-			'produk' => $this->produkmodel->getbyNormal()->getResult()
+			'produk' => $this->produkmodel->getbyNormal()
 		];
 		return view('backend/produk', $data);
 	}
 
 	public function listmenu2(){
+// 		if (session()->get('user_nm') == "") {
+// 	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+// 	        return redirect()->to(base_url('/'));
+// 	    }
 		$meja_id = $this->request->uri->getSegment(3);
 			$data = [
 			'title' => 'Menu',
@@ -142,7 +146,7 @@ class Produk extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Rounding Amount</td>
-				          <td colspan='2' align='right'>Rp. </td>
+				          <td colspan='2' align='right'>Rp. dak tau rumusnyo</td>
 				        </tr>
 				        <tr>
 				          <td align='left' style='font-weight:bold;'>Total</td>
@@ -151,6 +155,8 @@ class Produk extends BaseController
 						</table>
 						<hr style='border: 1px solid red;margin-bottom:100px;'>";
 		} else {
+		
+
 	    	foreach ($kategori as $k2) {
 			$ret .= "<!-- LIST MENU -->"
 			. "<div style='display:none;' id='menu_".$k['kategori_id']."'>"
@@ -198,7 +204,7 @@ class Produk extends BaseController
 		$ret = "<div class='table-responsive'>"
       	     . "<table id='myTable' align='center' style='margin-top: 50px;'>";
 		foreach ($res as $k) {
-		$harga = substr($k->produk_harga,0,-1);
+		$harga = str_replace(0,'', $k->produk_harga);
 		$ret .= "<tr class='tr'>"
     		 . "<td width='250' height='50' align='left'>"
     		 . "<input id='qty$k->produk_id' value='0' style='width: 40%; height: 55px; font-size: 40px; font-weight: bold; text-align: center; display: inline-block; top: 20px;' type='number' name='' max-length='2'/>"
@@ -325,8 +331,8 @@ class Produk extends BaseController
 	}
 
 	public function formadd(){
-		$produk_id = $this->request->getPost('id');
-		$kategori = $this->kategorimodel->getbyNormal()->getResult();
+		$produk_id = $this->request->getVar('id');
+		$kategori = $this->kategorimodel->getbyNormal();
 		if ($produk_id!=null) {
 			$res = $this->produkmodel->getbyId($produk_id);
 			foreach ($res->getResult('array') as $key) {
@@ -347,7 +353,7 @@ class Produk extends BaseController
 	            . "<label for='recipient-name' class='control-label'>Kategori Produk</label>"
 	            . "<select class='form-control' id='kategori_id' >";
 	            foreach ($kategori as $k) {
-	            	$ret .= "<option value='".$k->kategori_id."'>".$k->kategori_nm."</option>";
+	            	$ret .= "<option value='".$k['kategori_id']."'>".$k['kategori_nm']."</option>";
 	            }
 	        
 	        $ret .= "</select>"
@@ -384,7 +390,7 @@ class Produk extends BaseController
 	            . "<label for='recipient-name' class='control-label'>Kategori Produk</label>"
 	            . "<select class='form-control' id='kategori_id' >";
 	            foreach ($kategori as $k) {
-	            	$ret .= "<option value='".$k->kategori_id."'>".$k->kategori_nm."</option>";
+	            	$ret .= "<option value='".$k['kategori_id']."'>".$k['kategori_nm']."</option>";
 	            }
 	        
 	        $ret .= "</select>"

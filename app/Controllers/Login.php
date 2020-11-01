@@ -34,10 +34,10 @@ class Login extends BaseController
 		  } else if ($this->session->user_group == 'kasir') {
 		  	return redirect('kasir');
 		  } else {
-		  	return redirect('login');
+		  	return redirect('/');
 		  }
         } else {
-          return redirect('login');
+          return redirect('/');
         } 
 	}
 

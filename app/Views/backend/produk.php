@@ -56,21 +56,21 @@
                                         <tbody>
                                         	<?php 
                                         		$no=1;
-                                        		foreach ($produk->getResult('array') as $k) {
+                                        		foreach ($produk as $k) {
                                         	?>
 
-                                            <tr id="accordian-3">
+                                             <tr id="accordian-3">
                                                 <td class="text-center"><?= $no++ ?></td>
-                                                <td><a onclick="showedit(<?= $k['produk_id'] ?>)"><span style="text-decoration:underline;" class="btn btn-link"><?= $k['produk_nm'] ?> </span></a>
-                                                    Rp. <?= number_format($k['produk_harga']) ?>
+                                                <td><a onclick="showedit(<?= $k->produk_id ?>)"><span style="text-decoration:underline;" class="btn btn-link"><?= $k->produk_nm ?> </span></a>
+                                                    Rp. <?= number_format($k->produk_harga) ?>
                                                 </td>
-                                                <td class="text-center"><?= $k['kategori_nm'] ?></td>
-                                                <td class="text-center"><?= $k['status_cd'] ?></td>
-                                                <td class="text-center"><?= $k['created_dttm'] ?></td>
-                                                <td><?= $k['user_nm'] ?></td>
+                                                <td class="text-center"><?= $k->kategori_nm ?></td>
+                                                <td class="text-center"><?= $k->status_cd ?></td>
+                                                <td class="text-center"><?= $k->created_dttm ?></td>
+                                                <td><?= $k->user_nm ?></td>
                                                 <td class="text-center">
-                                                    <a href="" onclick="showedit(<?= $k['produk_id'] ?>)"><span style="text-decoration:underline;">Edit</span></a> |
-                                                    <a href="" onclick="hapus(<?= $k['produk_id'] ?>)"><span style="text-decoration:underline;">Hapus</span></a>
+                                                    <a class="btn btn-link" onclick="showedit(<?= $k->produk_id ?>)"><span style="text-decoration:underline;">Edit</span></a> |
+                                                    <a class="btn btn-link" onclick="hapus(<?= $k->produk_id ?>)"><span style="text-decoration:underline;">Hapus</span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -149,9 +149,8 @@
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
-                $('#modaledit').modal('hide');
-                 $( "#myTable" ).load("<?= base_url('produk') ?> #myTable");
-                // setTimeout(function(){ window.location.href = "<?=base_url()?>/produk"; }, 1000);
+                $('#formadd').modal('hide');
+                $( "#myTable" ).load("<?= base_url('produk') ?> #myTable");
             
             },
             error:function(){
@@ -174,7 +173,6 @@ function showedit(id) {
      type: "post",
      data : {'id':id},
      success:function(data){
-      //_data = JSON.parse(data);
      $('#formadd').modal('show');
      $('#formadd').html(data);
                 },
@@ -193,34 +191,50 @@ function showedit(id) {
 }
 
 function hapus(id) {
-    $.ajax({
-     url : "<?= base_url('produk/hapus') ?>",
-     type: "post",
-     data : {'id':id},
-     success:function(){
-      
-        Swal.fire({
-            title:"Berhasil!",
-            text:"Data berhasil disimpan!",
-            type:"success",
-            showCancelButton:!0,
-            confirmButtonColor:"#556ee6",
-            cancelButtonColor:"#f46a6a"
-        })
-        setTimeout(function(){ window.location.href = "<?=base_url()?>/Produk"; }, 1000);
+Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+}).then((result) => {
+    if (result.value == true) {
+        $.ajax({
+         url : "<?= base_url('produk/hapus') ?>",
+         type: "post",
+         data : {'id':id},
+         success:function(){
+          
+            Swal.fire({
+                title:"Berhasil!",
+                text:"Data berhasil disimpan!",
+                type:"success",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+            $('#formadd').modal('hide');
+            $( "#myTable" ).load("<?= base_url('produk') ?> #myTable");
+        
+         },
+         error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+         }
+        });
+    }
+ })
+
+
     
-     },
-     error:function(){
-        Swal.fire({
-            title:"Gagal!",
-            text:"Data gagal disimpan!",
-            type:"warning",
-            showCancelButton:!0,
-            confirmButtonColor:"#556ee6",
-            cancelButtonColor:"#f46a6a"
-        })
-     }
-    });
 
 }
 
@@ -259,9 +273,9 @@ function update(id) {
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
-                $('#modaledit').modal('hide');
-                 $( "#myTable" ).load("<?= base_url('produk') ?> #myTable");
-                // setTimeout(function(){ window.location.href = "<?=base_url()?>/Produk"; }, 1000);
+                $('#formadd').modal('hide');
+                $( "#myTable" ).load("<?= base_url('produk') ?> #myTable");
+                
                 }
             },
             error:function(){

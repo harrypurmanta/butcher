@@ -24,8 +24,8 @@ class Discount extends BaseController
 	        return redirect()->to(base_url('/'));
 	    }
 		$data = [
-			'title' => 'discount',
-			'subtitle' => 'discount',
+			'title' => 'Discount',
+			'subtitle' => 'Discount',
 			'discount' => $this->discountmodel->getbyNormal()->getResult()
 		];
 		return view('backend/discount', $data);
@@ -45,7 +45,7 @@ class Discount extends BaseController
 
 	public function save(){
 		$discount_nm = $this->request->getPost('discount_nm');
-		$bykatnm = $this->discountmodel->getbyKatnm($discount_nm);
+		$bykatnm = $this->discountmodel->getbyKatnm($discount_nm)->getResult();
 		if (count($bykatnm)>0) {
 			return 'already';
 		} else {
@@ -72,8 +72,6 @@ class Discount extends BaseController
 		$id = $this->request->getVar('id');
 		$discount_nm = $this->request->getVar('discount_nm');
 		
-			// $session = \Config\Services::session();
-			// $session->start();
 			$datenow = date('Y-m-d H:i:s');
 			$data = [
 			'discount_nm' => $discount_nm,
@@ -92,9 +90,10 @@ class Discount extends BaseController
 	}
 
 	public function formedit(){
-		$discount_id = $this->request->getVar('id');
-		$res = $this->discountmodel->find($discount_id);
+		$discount_id = $this->request->getPost('id');
+		$res = $this->discountmodel->getbyid($discount_id)->getResult();
 		if (count($res)>0) {
+			foreach ($res as $key) {
 				$ret = "<div class='modal-dialog'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
@@ -106,11 +105,11 @@ class Discount extends BaseController
 	            . "<input type='hidden' value='".$discount_id."' class='form-control' id='discount_id'>"
 	            . "<div class='form-group'>"
 	            . "<label for='recipient-name' class='control-label'>Nama discount</label>"
-	            . "<input type='text' class='form-control' id='discount_nm' value='".$res['discount_nm']."'>"
+	            . "<input type='text' class='form-control' id='discount_nm' value='$key->discount_nm'>"
 	            . "</div>"
 	            . "<div class='form-group'>"
 	            . "<label class='control-label'>Nilai discount</label>"
-	            . "<input type='text' class='form-control' id='nilaidiskon' value='".$res['value']."'>"
+	            . "<input type='text' class='form-control' id='nilaidiskon' value='$key->value'>"
 	            . "</div>"
 	            . "</form>"
 	            . "</div>"
@@ -120,6 +119,8 @@ class Discount extends BaseController
 	            . "</div>"
 	            . "</div>"
 	            . "</div>";
+			}
+				
 	         return $ret;
 		} else {
 			
@@ -170,7 +171,7 @@ class Discount extends BaseController
 		];
 
 		$update = $this->discountmodel->update($id,$data);
-		if ($save) {
+		if ($update) {
 			return true;
 		} else {
 			return false;

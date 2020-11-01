@@ -27,6 +27,8 @@ $uri = current_url(true);
 	
 
 </div>
+<audio id="sirena_ambulanza" src="assets/sirena_ambulanza.mp3" > </audio>
+
 </div>
 <div class="d-none" id='loader-wrapper'>
     <div class="loader"></div>
@@ -37,25 +39,24 @@ $uri = current_url(true);
 <script src="../assets/plugins/sweetalert2/sweet-alert.init.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	$.ajax({
-	 url : "<?= base_url('meja/viewmejawaiters') ?>",
-	 beforeSend: function () { 
-	  $("#loader-wrapper").removeClass("d-none");
-	 },
-	success:function(data){
-	  $('#container_content').html(data);
-	  setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
-	},
-	error:function(){
-	Swal.fire({
-	  title:"Error!",
-	  type:"warning",
-	  showCancelButton:!0,
-	  confirmButtonColor:"#556ee6",
-	  cancelButtonColor:"#f46a6a"
-	})
-	}
-	});
+	setInterval(function(){ 
+		$.ajax({
+		 url : "<?= base_url('meja/viewmejawaiters') ?>",
+			success:function(data){
+			  $('#container_content').html(data);
+			},
+			error:function(){
+				Swal.fire({
+				  title:"Error!",
+				  type:"warning",
+				  showCancelButton:!0,
+				  confirmButtonColor:"#556ee6",
+				  cancelButtonColor:"#f46a6a"
+				})
+			}
+		});
+	}, 3000);
+	
 });
 </script>
 </body>

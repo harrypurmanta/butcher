@@ -30,6 +30,7 @@ $uri = current_url(true);
 
     <link href="<?=base_url() ?>/assets/css/style.css" rel="stylesheet">
     <link href="<?=base_url() ?>/assets/css/colors/default-dark.css" id="theme" rel="stylesheet">
+    <link href="<?=base_url() ?>/assets/css/custom.css" rel="stylesheet">
 
 
 </head>
@@ -78,7 +79,7 @@ $uri = current_url(true);
 	}
 	
 	
-	
+list($dt,$tm) = explode(" ", $billing[0]->created_dttm);
 $subtotal = 0;
 $ret = "<div>
 			<div class='row'>
@@ -93,7 +94,7 @@ $ret = "<div>
 			</div>
 			<div class='row'>
 				<div class='col-md-12'>
-				<div align='center' style='margin-top: 30px;'>
+				<div align='center' style='margin-top: 30px; font-size: 18px;'>
 					<p>
 						<span>Butcher Steak & Pasta Palembang</span><br>
 						<span>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
@@ -104,10 +105,10 @@ $ret = "<div>
 			</div>
 			
 		</div>";
-$ret .= "<table width='100%' style='margin-top: 20px;'>
+$ret .= "<table width='100%' style='margin-top: 20px; font-size: 22px;'>
 	        <tr>
-	          <td align='left'>Tanggal</td>
-	          <td align='right'>".$billing[0]->created_dttm."</td>
+	          <td align='left'>$dt</td>
+	          <td align='right'>$tm</td>
 	        </tr>
 	        <tr>
 	          <td align='left'>Bill Name</td>
@@ -116,17 +117,25 @@ $ret .= "<table width='100%' style='margin-top: 20px;'>
 	        $collctedby
 	      </table>
 	      <hr style='border: 1px solid red'>
-	      <table width='100%'>";
+	      <table style='font-size: 22px;' width='100%'>";
 foreach ($billing as $key) {
 	$total = $key->produk_harga * $key->qty;
 	$subtotal = $subtotal + $total;
+	if ($key->statusbilling == 'verified' || $key->statusbilling == 'waiting') {
+		$buttonqty = "";
+	} else {
+		$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 25px; line-height: 15px; margin-left:5px;'>-</button>
+	       		      <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 25px; line-height: 15px;'>+</button>";
+	}
+	
 	$ret .= "<tr>
 	        <td colspan='3' align='left' style='font-weight: bold;'>
 	            $key->produk_nm
 	          </td>
 	        </tr>
 	        <tr>
-	          <td align='left' width='50'>$key->qty X</td>
+	        <input type='hidden' id='qty$key->billing_item_id' value='$key->qty'/>
+	          <td align='left' ><span id='spanqty$key->billing_item_id'>$key->qty X </span> </td>
 	          <td align='center'>@".number_format($key->produk_harga)."</td>
 	          <td align='right'>".number_format($total)."</td>
 	        </tr>
@@ -138,11 +147,21 @@ foreach ($billing as $key) {
 	 }
 	$ret .= "</table>
 			<hr style='border: 1px solid red'>";
-	$tax = $subtotal * 0.10;
-	$service = $subtotal * 0.05;
+
+	$tax 		= $subtotal * 0.10;
+	$service 	= $subtotal * 0.05;
 	$grandtotal = $subtotal + $tax + $service;
-	        
-	$ret .= "<table style='margin-top:30px;' width='100%'>
+	$nilai = round($grandtotal);
+	$ratusan = substr($nilai, -3);
+	if ($ratusan >= 100) {
+	    $akhir = $grandtotal + (1000-$ratusan);
+	} else {
+	    $akhir = $grandtotal + (100-$ratusan);
+	}
+
+	$nilaibulat = $akhir - $grandtotal;
+
+	$ret .= "<table style='margin-top:30px; font-size: 22px;' width='100%'>
 	        <tr>
 	          <td align='left'>Subtotal</td>
 	          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
@@ -157,11 +176,11 @@ foreach ($billing as $key) {
 	        </tr>
 	        <tr>
 	          <td align='left'>Rounding Amount</td>
-	          <td colspan='2' align='right'>Rp. dak tau rumusnyo</td>
+	          <td colspan='2' align='right'>Rp. ".number_format($nilaibulat)."</td>
 	        </tr>
 	        <tr>
 	          <td align='left' style='font-weight:bold;'>Total</td>
-	          <td colspan='2' align='right'>Rp. ".number_format($grandtotal)."</td>
+	          <td colspan='2' align='right'>Rp. ".number_format($akhir)."</td>
 	        </tr>
 			</table>
 			<hr style='border: 1px solid red;margin-bottom:100px;'>
@@ -188,6 +207,53 @@ foreach ($billing as $key) {
 <script src="<?=base_url() ?>/assets/plugins/sweetalert2/sweet-alert.init.js"></script>
 
 <script type="text/javascript">
+function add(value){
+  $("#loader-wrapper").removeClass("d-none");
+  var currentVal = parseInt($("#qty" + value).val());    
+  if (!isNaN(currentVal)) {
+      var qty = $("#qty" + value).val(currentVal + 1);
+      	$.ajax({
+		   url : "<?= base_url('meja/updateqty')?>",
+		   type: "POST",
+		   data : {value:value,qty:qty},
+		   beforeSend: function () { 
+		      $("#loader-wrapper").removeClass("d-none")
+		   },
+		   success:function(){
+		      setTimeout(function(){ 
+		        $("#loader-wrapper").addClass("d-none");
+		        Swal.fire(
+		            'Ordered!',
+		            'Your order has been send to waiters.',
+		            'success'
+		        )
+		        window.location.href = "<?=base_url()?>/produk/listmenu/"+<?= $uri->getSegment(3)?>;
+		      }, 3000);  
+		    },
+		    error:function(){
+		    Swal.fire(
+		        'Gagal!',
+		        'Silahkan Coba Lagi.',
+		        'warning'
+		    )
+		    }
+		});
+      document.getElementById("spanqty"+value).textContent = currentVal + 1 + " X";
+  }
+  setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
+};
+
+function minus(value){
+    $("#loader-wrapper").removeClass("d-none");
+    var currentVal = parseInt($("#qty" + value).val());    
+    if (currentVal==0) {
+    } else if (!isNaN(currentVal)) {
+        $("#qty" + value).val(currentVal - 1);
+        document.getElementById("spanqty"+value).textContent = currentVal - 1 + " X";
+    }
+    setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
+};
+
 function listmenu() {
   window.location.href = "<?=base_url()?>/produk/listmenu2/"+<?= $uri->getSegment(3)?>;
 }
@@ -219,7 +285,7 @@ Swal.fire({
 		            'success'
 		        )
 		        window.location.href = "<?=base_url()?>/produk/listmenu/"+<?= $uri->getSegment(3)?>;
-		      });  
+		      }, 3000);  
 		    },
 		    error:function(){
 		    Swal.fire(
@@ -261,7 +327,7 @@ Swal.fire({
 		            'success'
 		        )
 		        window.location.href = "<?=base_url()?>/produk/listmenu/"+<?= $uri->getSegment(3)?>;
-		      });  
+		      }, 3000);  
 		    },
 		    error:function(){
 		    Swal.fire(

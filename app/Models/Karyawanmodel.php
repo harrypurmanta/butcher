@@ -37,13 +37,11 @@ class Karyawanmodel extends Model
     }
 
     public function getbyId($id){
-        $db = db_connect('default');
-        $builder = $db->table('person a');
-        $builder->select('*');
-        $builder->join('employee b', 'b.person_id = a.person_id','left');
-        $builder->where('a.person_id',$id);
-        $query = $builder->get();
-        return $query->getResult();
+        return $this->db->table('person a')
+                 ->select('*')
+                 ->join('employee b', 'b.person_id = a.person_id','left')
+                 ->where('a.person_id',$id)
+                 ->get();
     }
 
     public function simpan($data){

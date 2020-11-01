@@ -95,8 +95,8 @@
                                                 <td class="text-center"><?= $k->status_cd ?></td>
                                                 <td class="text-center"><?= $k->created_dttm ?></td>
                                                 <td class="text-center">
-                                                    <a href="" onclick="showedit(<?= $k->discount_id ?>)"><span style="text-decoration:underline;">Edit</span></a> |
-                                                    <a href="" onclick="hapus(<?= $k->discount_id ?>)"><span style="text-decoration:underline;">Hapus</span></a>
+                                                    <a class="btn btn-link" onclick="showedit(<?= $k->discount_id ?>)"><span style="text-decoration:underline;">Edit</span></a> |
+                                                    <a class="btn btn-link" onclick="hapus(<?= $k->discount_id ?>)"><span style="text-decoration:underline;">Hapus</span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -192,7 +192,6 @@ function showedit(id) {
      type: "post",
      data : {'id':id},
      success:function(data){
-      //_data = JSON.parse(data);
      $('#modaledit').modal('show');
      $('#modaledit').html(data);
     },
@@ -211,43 +210,66 @@ function showedit(id) {
 }
 
 function hapus(id) {
-    $.ajax({
-     url : "<?= base_url('discount/hapus') ?>",
-     type: "post",
-     data : {'id':id},
-     success:function(){
-      
-        Swal.fire({
-            title:"Berhasil!",
-            text:"Data berhasil disimpan!",
-            type:"success",
-            showCancelButton:!0,
-            confirmButtonColor:"#556ee6",
-            cancelButtonColor:"#f46a6a"
-        })
-        $("#myTable").load("<?= base_url('discount') ?> #myTable");
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.value == true) {
+            $.ajax({
+                 url : "<?= base_url('discount/hapus') ?>",
+                 type: "post",
+                 data : {'id':id},
+                 success:function(){
+                  
+                    Swal.fire({
+                        title:"Berhasil!",
+                        text:"Data berhasil disimpan!",
+                        type:"success",
+                        showCancelButton:!0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                    $("#myTable").load("<?= base_url('discount') ?> #myTable");
+                
+                 },
+                 error:function(){
+                    Swal.fire({
+                        title:"Gagal!",
+                        text:"Data gagal disimpan!",
+                        type:"warning",
+                        showCancelButton:!0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                 }
+                });
+        }
+     })
+
     
-     },
-     error:function(){
-        Swal.fire({
-            title:"Gagal!",
-            text:"Data gagal disimpan!",
-            type:"warning",
-            showCancelButton:!0,
-            confirmButtonColor:"#556ee6",
-            cancelButtonColor:"#f46a6a"
-        })
-     }
-    });
 
 }
 
 function update(id) {
     var discount_nm = $('#discount_nm').val();
-	var nilaidiscount = $('#nilaidiscount').val();
-        if (discount_nm == "" || nilaidiscount == "") {
+	var nilaidiskon = $('#nilaidiskon').val();
+        if (discount_nm == "") {
         	Swal.fire({
                     title:"Nama discount harus di isi!!",
+                    text:"GAGAL!",
+                    type:"warning",
+                    showCancelButton:!0,
+                    confirmButtonColor:"#556ee6",
+                    cancelButtonColor:"#f46a6a"
+                })
+        } else if (nilaidiskon == "") {
+            Swal.fire({
+                    title:"Nilai discount harus di isi!!",
                     text:"GAGAL!",
                     type:"warning",
                     showCancelButton:!0,
@@ -258,7 +280,7 @@ function update(id) {
             $.ajax({
             url : "<?= base_url('discount/update') ?>",
             type: "post",
-            data : {'discount_nm':discount_nm,'id':id,'nilaidiscount':nilaidiscount},
+            data : {'discount_nm':discount_nm,'id':id,'nilaidiskon':nilaidiskon},
             success:function(_data){
              if (_data=='already') {
                 Swal.fire({
@@ -278,6 +300,7 @@ function update(id) {
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
+                $('#modaledit').modal('hide');
                  $( "#myTable" ).load("<?= base_url('discount') ?> #myTable");
                 }
             },

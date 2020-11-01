@@ -68,8 +68,8 @@ class Kategori extends BaseController
 	}
 
 	public function save(){
-		$kategori_nm = $this->request->getVar('kategori_nm');
-		$bykatnm = $this->kategorimodel->getbyKatnm($kategori_nm);
+		$kategori_nm = $this->request->getPost('kategori_nm');
+		$bykatnm = $this->kategorimodel->getbyKatnm($kategori_nm)->getResult();
 		if (count($bykatnm)>0) {
 			return 'already';
 		} else {
@@ -179,7 +179,7 @@ class Kategori extends BaseController
 							];
 							$insertimage = $this->imagesmodel->insert($dataimg);
 				      	} else {
-				      		return 'false2';
+				      		return 'false';
 				      	}
 					}
 					if ($insertimage) {
@@ -187,13 +187,11 @@ class Kategori extends BaseController
 					} else {
 						return 'false';
 					}
-					
-					
 				} else {
-					return 'false3';
+					return 'true';
 				}
 			} else {
-				return 'false4';
+				return 'false';
 			}
 		
 	}
@@ -235,10 +233,11 @@ class Kategori extends BaseController
 	}
 
 	public function formedit(){
-		$kategori_id = $this->request->getVar('id');
-		$res = $this->kategorimodel->find($kategori_id);
+		$kategori_id = $this->request->getPost('id');
+		$res = $this->kategorimodel->getbyid($kategori_id)->getResult();
 		$resimage = $this->imagesmodel->getimagebykatid($kategori_id)->getResult();
 		if (count($res)>0) {
+			foreach ($res as $k) {
 				$ret = "<div class='modal-dialog'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
@@ -250,7 +249,7 @@ class Kategori extends BaseController
 	            . "<input type='hidden' value='".$kategori_id."' class='form-control' id='kategori_id'>"
 	            . "<div class='form-group'>"
 	            . "<label for='recipient-name' class='control-label'>Nama Kategori</label>"
-	            . "<input type='text' class='form-control' id='kategori_nm' value='".$res['kategori_nm']."'>"
+	            . "<input type='text' class='form-control' id='kategori_nm' value='$k->kategori_nm'>"
 	            . "</div>"
 	            . "<div class='col-md-4'>"
                 . "<div class='form-group'>"
@@ -272,9 +271,10 @@ class Kategori extends BaseController
 	            . "</div>"
 	            . "</div>"
 	            . "</div>";
+			}
+				
 	         return $ret;
 		} else {
-			
 			return 'false';
 		}
 	}

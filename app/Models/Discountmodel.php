@@ -7,21 +7,18 @@ class discountmodel extends Model
     protected $table      = 'discount';
     protected $primaryKey = 'discount_id ';
     protected $allowedFields = ['discount_nm','value', 'status_cd', 'created_dttm','created_user','update_dttm','update_user','nullified_dttm','nullified_user'];
-    protected $discountmodel;
-    
-    // protected $useTimestamps = true;
-    // protected $createdField  = 'created_dttm';
-    // protected $updatedField  = 'update_dttm';
-    // protected $deletedField  = 'nullified_dttm';
-    
 
     public function getbyKatnm($discount_nm) {
-        $this->discountmodel = new discountmodel();
-        
-    	$discount_nm = $this->discountmodel->where('discount_nm', $discount_nm)
-                            ->findAll();
+        return $this->db->table('discount')
+                        ->where('discount_nm'<$discount_nm)
+                        ->where('status_cd','normal')
+                        ->get();
+    }
 
-        return $discount_nm;
+    public function getbyid($id) {
+        return $this->db->table('discount')
+                        ->where('discount_id',$id)
+                        ->get();
     }
 
     public function getbyNormal() {

@@ -89,8 +89,8 @@ $this->session->start();
                             </a>
                             <div class='dropdown-menu' aria-labelledby='navbarDropdown'>
                                 <a class='dropdown-item' href='<?=base_url() ?>/kategori'>Kategori Produk</a>
-                                <a class='dropdown-item' href='<?=base_url() ?>/subkat'>Sub Kategori Produk</a>
-                                <a class='dropdown-item' href='<?=base_url() ?>/kategori/option'>Kategori Options</a>
+                                <!-- <a class='dropdown-item' href='<?=base_url() ?>/subkat'>Sub Kategori Produk</a> -->
+                                <!-- <a class='dropdown-item' href='<?=base_url() ?>/kategori/option'>Kategori Options</a> -->
                                 <a class='dropdown-item' href='<?=base_url() ?>/produk'>Produk</a>
                                 <a class='dropdown-item' href='<?=base_url() ?>/discount'>Diskon</a>
                                 <a class='dropdown-item' href='<?=base_url() ?>/payplan'>Cara Bayar</a>

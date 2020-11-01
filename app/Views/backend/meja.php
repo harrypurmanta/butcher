@@ -89,8 +89,8 @@
                                                 <td class="text-center"><?= $k->created_dttm ?></td>
                                                 <td><a href="images/qrcode/<?=$k->image_nm?>">Download</a></td>
                                                 <td class="text-center">
-                                                    <a href="" onclick="showedit(<?= $k->meja_id ?>)"><span style="text-decoration:underline;">Edit</span></a> |
-                                                    <a href="" onclick="hapus(<?= $k->meja_id ?>)"><span style="text-decoration:underline;">Hapus</span></a>
+                                                    <a class="btn btn-link" onclick="showedit(<?= $k->meja_id ?>)"><span style="text-decoration:underline;">Edit</span></a> |
+                                                    <a class="btn btn-link" onclick="hapus(<?= $k->meja_id ?>)"><span style="text-decoration:underline;">Hapus</span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -162,8 +162,8 @@
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
+                $('#modaledit').modal('hide');
                 $( "#myTable" ).load("<?= base_url('meja') ?> #myTable");
-                // setTimeout(function(){ window.location.href = "<?=base_url()?>/meja"; }, 1000);
                 }
             },
             error:function(){
@@ -205,6 +205,17 @@ function showedit(id) {
 }
 
 function hapus(id) {
+    Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+}).then((result) => {
+    if (result.value == true) {
+        
     $.ajax({
      url : "<?= base_url('meja/hapus') ?>",
      type: "post",
@@ -219,7 +230,8 @@ function hapus(id) {
             confirmButtonColor:"#556ee6",
             cancelButtonColor:"#f46a6a"
         })
-        setTimeout(function(){ window.location.href = "<?=base_url()?>/meja"; }, 1000);
+        $('#modaledit').modal('hide');
+                $( "#myTable" ).load("<?= base_url('meja') ?> #myTable");
     
      },
      error:function(){
@@ -233,6 +245,9 @@ function hapus(id) {
         })
      }
     });
+    }
+ })
+
 
 }
 
@@ -271,7 +286,8 @@ function update(id) {
                     confirmButtonColor:"#556ee6",
                     cancelButtonColor:"#f46a6a"
                 })
-                setTimeout(function(){ window.location.href = "<?=base_url()?>/meja"; }, 1000);
+                $('#modaledit').modal('hide');
+                $( "#myTable" ).load("<?= base_url('meja') ?> #myTable");
                 }
             },
             error:function(){

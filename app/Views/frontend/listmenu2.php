@@ -74,7 +74,7 @@ $uri = current_url(true);
             $ret .= "<!-- LIST MENU -->"
                 . "<div style='display: none;' id='menu_".$k2->kategori_id."'>"
                 . "<div align='center'>"
-                . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 100px;' src='../../images/lib/arrowback.png'></div>"
+                . "<div onclick='backtolistmenu(".$k2->kategori_id.")' style='display: inline-block; float: left; margin-top: 15px;'><img style='max-height: 100%; width: 100px;' src='".base_url()."/images/lib/arrowback.png'></div>"
                 . "<div style='display: inline-block;'><span style='font-family: Coconut !important; font-size: 50px; font-weight: bold; color: white;' >".$k2->kategori_nm."</span></div>"
                 . "</div>"
                   . "<div align='center' style='margin-top: 30px;'>";
@@ -82,7 +82,7 @@ $uri = current_url(true);
                     $produk = $produkmodel->getbyKatId($k2->kategori_id);
             $ret .= "<table class='table-responsive w-100' id='myTable' align='center' style='background-color: #dc0000; font-family: Coconut !important;'>";
                     foreach ($produk->getResult() as $key) {
-                    $harga = str_replace(0,'', $key->produk_harga);
+                    $harga = substr($key->produk_harga, 0,-3);
                     if (strlen($key->produk_nm) <= 28) {
                       $fontsize = "font-size: 18px;";
                     } else {
@@ -105,7 +105,7 @@ $uri = current_url(true);
                       $imagesmodel = new Imagesmodel();
                       $images = $imagesmodel->getimagebykatid($k2->kategori_id);
                       foreach ($images->getResult() as $key2) {
-                    $ret .= "<div style='display: inline-block; margin: 5px; width: 45%; height: 120px; border-radius: 10px;'><img src='../../images/$key2->image_nm' style='border-radius: 10px; height: 100%; width: 100%;'></div>";
+                    $ret .= "<div style='display: inline-block; margin: 5px; width: 45%; height: 120px; border-radius: 10px;'><img src='".base_url()."/images/$key2->image_nm' style='border-radius: 10px; height: 100%; width: 100%;'></div>";
                       }
                       $ret .= "</div>"
                         . "</div>"
@@ -207,6 +207,7 @@ function simpanorder(){
                   timer: 2000,
                   showConfirmButton: false
                 });
+                window.location.href = "<?=base_url()?>/produk/listmenu/"+<?= $uri->getSegment(3)?>;
               }
               
             }, 3000);   

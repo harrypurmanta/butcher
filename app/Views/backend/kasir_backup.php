@@ -2,21 +2,25 @@
 ?>
 
     <?= $this->section('content'); ?>
-        <div class="page-wrapper" style="padding-top: 0px; margin-left: 0px !important;">
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Page wrapper  -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper" style="padding-top: 0px;">
             
             <!-- ============================================================== -->
             <!-- Container fluid  -->
             <!-- ============================================================== -->
             <div class="container-fluid">
                       <div class="row">
-                        <div class="col-md-5 col-sm-6">
-                            <div class="card" style="display: inline-block; padding-bottom: 20px;" align="center">
+                        <div class="col-md-7 col-sm-6">
+                            <div class="card" style="display: inline-block;" align="center">
                                 <div class="card-body">
                                 <?php
                                   foreach ($meja->getResult() as $key) {
                                 ?>
-                                <div style="display: inline-block; margin: 5px;">
-                                  <button onclick="showbillingbymeja(<?= $key->meja_id ?>)" class="btn btn-info font-weight-bold" style="font-size: 20px; padding: 10px;"><?= $key->meja_nm?></button>
+                                <div style="display: inline-block; margin: 10px;">
+                                  <button onclick="showbillingbymeja(<?= $key->meja_id ?>)" class="btn btn-info font-weight-bold" style="font-size: 20px; padding: 10px;"><?= $key->meja_nm ?></button>
                                 </div>
                                 <?php } ?>
                                 </div>
@@ -25,7 +29,7 @@
                                  <button style="font-size: 20px; width: 40%;" type="button" onclick="member()" class="btn btn-rounded btn-primary">Member</button>
                             </div>
                         </div>
-                        <div class="col-md-7 col-sm-6">
+                        <div class="col-md-5 col-sm-6">
                             <div class="card">
                                 <div class="card-body" id="cardbody"> 
                                 </div>
@@ -299,95 +303,13 @@ function removedc(id,di) {
 }
 
 function cetakmenu(id,btn) {
-  cetakmenudrinks(id,btn);
-  setTimeout(
-  function() 
-  {
-    cetakmenufood(id,btn);
-  }, 10000);
-}
-
-function cetakmenudrinks(id,btn) {
-    b = $(btn);
-      b.attr('data-old', b.text());
-      b.text('wait');
-      $.ajax({
-         url : "<?= base_url('kasir/cetakmenudrinks') ?>",
-         type: "post",
-         data: {id:id},
-         success:function(data){
-          if (data == "false") {
-              Swal.fire({
-                title:"Tidak ada order Minuman!",
-                text:"Data tidak di print!",
-                type:"warning",
-                showCancelButton:!0,
-                confirmButtonColor:"#556ee6",
-                cancelButtonColor:"#f46a6a"
-            })
-          } else {
-              window.location.href = data;
-          }
-          b.text(b.attr('data-old'));
-        },
-        error:function(){
-            Swal.fire({
-                title:"Gagal!",
-                text:"Data gagal disimpan!",
-                type:"warning",
-                showCancelButton:!0,
-                confirmButtonColor:"#556ee6",
-                cancelButtonColor:"#f46a6a"
-            })
-        }
-      });
-}
-
-function cetakmenufood(id,btn){
-    b = $(btn);
-      b.attr('data-old', b.text());
-      b.text('wait');
-      $.ajax({
-         url : "<?= base_url('kasir/cetakmenufood') ?>",
-         type: "post",
-         data: {id:id},
-         success:function(data){
-          if (data == "false") {
-              Swal.fire({
-                title:"Tidak ada order Makanan!",
-                text:"Data tidak di print!",
-                type:"warning",
-                showCancelButton:!0,
-                confirmButtonColor:"#556ee6",
-                cancelButtonColor:"#f46a6a"
-            })
-          } else {
-              window.location.href = data;
-          }
-          b.text(b.attr('data-old'));
-        },
-        error:function(){
-            Swal.fire({
-                title:"Gagal!",
-                text:"Data gagal disimpan!",
-                type:"warning",
-                showCancelButton:!0,
-                confirmButtonColor:"#556ee6",
-                cancelButtonColor:"#f46a6a"
-            })
-        }
-      });
-}
-
-function cetakbilling(id,btn) {
-var billing_id = $('#billing_id').val();
   b = $(btn);
   b.attr('data-old', b.text());
   b.text('wait');
   $.ajax({
-     url : "<?= base_url('kasir/cetakbilling') ?>",
+     url : "<?= base_url('kasir/cetakmenu') ?>",
      type: "post",
-     data: {id:id,billing_id:billing_id},
+     data: {id:id},
      success:function(data){
       window.location.href = data;
       b.text(b.attr('data-old'));
@@ -405,18 +327,43 @@ var billing_id = $('#billing_id').val();
   });
 }
 
-function checkout(id,gt,btn) {
+function cetakbilling(id,btn) {
+  b = $(btn);
+  b.attr('data-old', b.text());
+  b.text('wait');
+  $.ajax({
+     url : "<?= base_url('kasir/cetakbilling') ?>",
+     type: "post",
+     data: {id:id},
+     success:function(data){
+      window.location.href = data;
+      b.text(b.attr('data-old'));
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function checkout(id,btn) {
   var meja_id = $('#meja_id').val();
   var billing_id = $('#billing_id').val();
-  var paid = $("input[name='payplan']").val();
-  var payplan_id = $("input[name=payplan]:checked").data('payplan-id');;
+  var payplan = $("input[name='payplan']").val();
+  alert(payplan);
   b = $(btn);
   b.attr('data-old', b.text());
   b.text('wait');
   $.ajax({
      url : "<?= base_url('kasir/cetakcheckout') ?>",
      type: "post",
-     data: {id:id,gt:gt,meja_id:meja_id,billing_id:billing_id,payplan_id:payplan_id,paid:paid},
+     data: {id:id},
      success:function(data){
       window.location.href = data;
       b.text(b.attr('data-old'));

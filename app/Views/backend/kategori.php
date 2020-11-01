@@ -177,8 +177,7 @@
                     cancelButtonColor:"#f46a6a"
                 })
                 $('#modaledit').modal('hide');
-                 $( "#myTable" ).load("<?= base_url('kategori') ?> #myTable");
-               // setTimeout(function(){ window.location.href = "<?=base_url()?>/kategori"; }, 1000);
+                $( "#myTable" ).load("<?= base_url('kategori') ?> #myTable");
                 }
             },
             error:function(){
@@ -201,7 +200,6 @@ function showedit(id) {
      type: "post",
      data : {'id':id},
      success:function(data){
-      //_data = JSON.parse(data);
      $('#modaledit').modal('show');
      $('#modaledit').html(data);
     },
@@ -233,7 +231,7 @@ function hapus(id,t) {
             confirmButtonColor:"#556ee6",
             cancelButtonColor:"#f46a6a"
         })
-        setTimeout(function(){ window.location.href = "<?=base_url()?>/kategori"; }, 1000);
+        $( "#myTable" ).load("<?= base_url('kategori') ?> #myTable");
     
      },
      error:function(){
@@ -296,7 +294,7 @@ function update(id) {
                     cancelButtonColor:"#f46a6a"
                 })
                 $('#modaledit').modal('hide');
-                //setTimeout(function(){ window.location.href = "<?=base_url()?>/kategori"; }, 1000);
+                $( "#myTable" ).load("<?= base_url('kategori') ?> #myTable");
                 }
             },
             error:function(){

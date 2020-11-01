@@ -16,10 +16,14 @@ class Billingmodel extends Model
 
     public function getbyMejaid($id){
     	$query = $this->db->table('billing a');
-    	$query->select('b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.billing_id,a.status_cd as statusbilling');
+    	$query->select('b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd as statusproduk,b.billing_item_id,a.billing_id,a.status_cd as statusbilling, a.created_dttm as created_dttm,a.member_id,f.meja_nm, g.person_nm as member_nm,h.person_nm as collected_nm');
     	$query->join('billing_item b','b.billing_id=a.billing_id');
     	$query->join('produk c','c.produk_id=b.produk_id');
     	$query->join('kategori_produk d','d.kategori_id=c.kategori_id');
+    	$query->join('member e','e.member_id=a.member_id','left');
+    	$query->join('meja f','f.meja_id=a.meja_id','left');
+    	$query->join('person g','g.person_id=e.person_id','left');
+    	$query->join('person h','h.person_id=a.verified_user','left');
     	$query->whereIn('a.status_cd',['normal','waiting','verified']);
     	$query->where('a.meja_id',$id);
     	return $query->get();
