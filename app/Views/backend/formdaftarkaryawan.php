@@ -80,8 +80,6 @@ function simpanuser(id){
         var oldpassword = $('#oldpassword').val();
         var user_group = $('#user_group').val();
         var user_id = $('#user_id').val();
-        alert(pwd0);
-        alert(oldpassword);
         if (user_nm==""||pwd0=="") {
         	Swal.fire({
                     title:"username & Password harus di isi!!",

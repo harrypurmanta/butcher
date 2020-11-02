@@ -24,7 +24,6 @@ class Users extends BaseController
 	public function save(){
 		$user_nm 		= $this->request->getPost('user_nm');
 		$pwd0 			= md5($this->request->getPost('pwd0'));
-		echo json_encode($pwd0);exit;
 		$id 			= $this->request->getPost('id');
 		$oldpassword 	= $this->request->getPost('oldpassword');
 		$user_group 	= $this->request->getPost('user_group');
