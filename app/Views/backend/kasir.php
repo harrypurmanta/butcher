@@ -11,14 +11,8 @@
                       <div class="row">
                         <div class="col-md-5 col-sm-6">
                             <div class="card" style="display: inline-block; padding-bottom: 20px;" align="center">
-                                <div class="card-body">
-                                <?php
-                                  foreach ($meja->getResult() as $key) {
-                                ?>
-                                <div style="display: inline-block; margin: 5px;">
-                                  <button onclick="showbillingbymeja(<?= $key->meja_id ?>)" class="btn btn-info font-weight-bold" style="font-size: 20px; padding: 10px;"><?= $key->meja_nm?></button>
-                                </div>
-                                <?php } ?>
+                                <div class="card-body" id="cardbodymeja">
+                                
                                 </div>
                                 <hr>
                                  <button style="font-size: 20px; width: 40%;" type="button" onclick="diskon()" class="btn btn-rounded btn-warning">Diskon</button>
@@ -33,6 +27,9 @@
                         </div>
                       </div>
             </div>
+            <div class="d-none" id='loader-wrapper'>
+                <div class="loader"></div>
+            </div>
             <div id="responsive-modal" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
                               
             </div>
@@ -40,8 +37,32 @@
             <!-- End Container fluid  -->
             <!-- ============================================================== -->
             <!-- ============================================================== -->
+            <script src="../assets/plugins/jquery/jquery.min.js"></script>
 
 <script type="text/javascript">
+$(document).ready(function(){
+  $.ajax({
+     url : "<?= base_url('kasir/cardbodymeja') ?>",
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+     },
+     success:function(data){
+      $('#cardbodymeja').html(data);
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){meja
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+    });
+});
+
 function showbillingbymeja(id) {
     $.ajax({
      url : "<?= base_url('kasir/getbymejaidkasir') ?>",
@@ -176,6 +197,7 @@ function addDiscount(id,di,bi) {
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
+        $('#responsive-modal').modal('hide');
       } else {
         Swal.fire({
             title:"Gagal!",
@@ -242,6 +264,7 @@ function removedcmember(id,di) {
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
+        $('#responsive-modal').modal('hide');
       } else {
         Swal.fire({
             title:"Error!",

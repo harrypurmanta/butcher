@@ -105,7 +105,7 @@ $ret = "<div>
 			</div>
 			
 		</div>";
-$ret .= "<table width='100%' style='margin-top: 20px; font-size: 22px;'>
+$ret .= "<table id='tbitem' width='100%' style='margin-top: 20px; font-size: 22px;'>
 	        <tr>
 	          <td align='left'>$dt</td>
 	          <td align='right'>$tm</td>
@@ -121,11 +121,11 @@ $ret .= "<table width='100%' style='margin-top: 20px; font-size: 22px;'>
 foreach ($billing as $key) {
 	$total = $key->produk_harga * $key->qty;
 	$subtotal = $subtotal + $total;
-	if ($key->statusbilling == 'verified' || $key->statusbilling == 'waiting') {
-		$buttonqty = "";
+	if ($key->statusbilling == 'normal') {
+		$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px; margin-left:5px;'>-</button>
+		<button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px;'>+</button>";
 	} else {
-		$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 25px; line-height: 15px; margin-left:5px;'>-</button>
-	       		      <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 25px; line-height: 15px;'>+</button>";
+		$buttonqty = "";
 	}
 	
 	$ret .= "<tr>
@@ -135,7 +135,7 @@ foreach ($billing as $key) {
 	        </tr>
 	        <tr>
 	        <input type='hidden' id='qty$key->billing_item_id' value='$key->qty'/>
-	          <td align='left' ><span id='spanqty$key->billing_item_id'>$key->qty X </span> </td>
+	          <td align='left' ><span id='spanqty$key->billing_item_id'>$key->qty X $buttonqty</span> </td>
 	          <td align='center'>@".number_format($key->produk_harga)."</td>
 	          <td align='right'>".number_format($total)."</td>
 	        </tr>
@@ -152,16 +152,11 @@ foreach ($billing as $key) {
 	$service 	= $subtotal * 0.05;
 	$grandtotal = $subtotal + $tax + $service;
 	$nilai = round($grandtotal);
-	$ratusan = substr($nilai, -3);
-	if ($ratusan >= 100) {
-	    $akhir = $grandtotal + (1000-$ratusan);
-	} else {
-	    $akhir = $grandtotal + (100-$ratusan);
-	}
-
+	$ratusan = substr($nilai, -2);
+	$akhir = $grandtotal + (100-$ratusan);
 	$nilaibulat = $akhir - $grandtotal;
 
-	$ret .= "<table style='margin-top:30px; font-size: 22px;' width='100%'>
+	$ret .= "<table style='margin-top:30px; font-size: 20px;' width='100%'>
 	        <tr>
 	          <td align='left'>Subtotal</td>
 	          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
@@ -208,39 +203,31 @@ foreach ($billing as $key) {
 
 <script type="text/javascript">
 function add(value){
-  $("#loader-wrapper").removeClass("d-none");
   var currentVal = parseInt($("#qty" + value).val());    
   if (!isNaN(currentVal)) {
-      var qty = $("#qty" + value).val(currentVal + 1);
-      	$.ajax({
+    var qty = $("#qty"+value).val(currentVal + 1);
+    $.ajax({
 		   url : "<?= base_url('meja/updateqty')?>",
-		   type: "POST",
-		   data : {value:value,qty:qty},
+		   type : "POST",
+		   data : {'value':value,'qty':qty},
 		   beforeSend: function () { 
-		      $("#loader-wrapper").removeClass("d-none")
+		      $("#loader-wrapper").removeClass("d-none");
 		   },
 		   success:function(){
-		      setTimeout(function(){ 
 		        $("#loader-wrapper").addClass("d-none");
-		        Swal.fire(
-		            'Ordered!',
-		            'Your order has been send to waiters.',
-		            'success'
-		        )
-		        window.location.href = "<?=base_url()?>/produk/listmenu/"+<?= $uri->getSegment(3)?>;
-		      }, 3000);  
+		        $("#tbitem").load("<?= base_url('produk/listmenu/')."/".$uri->getSegment(3) ?> #tbitem");
+		  
 		    },
 		    error:function(){
-		    Swal.fire(
-		        'Gagal!',
-		        'Silahkan Coba Lagi.',
-		        'warning'
-		    )
+				Swal.fire(
+					'Gagal!',
+					'Silahkan Coba Lagi.',
+					'warning'
+				)
 		    }
 		});
-      document.getElementById("spanqty"+value).textContent = currentVal + 1 + " X";
+    document.getElementById("spanqty"+value).textContent = currentVal + 1 + " X";
   }
-  setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
 };
 
 function minus(value){

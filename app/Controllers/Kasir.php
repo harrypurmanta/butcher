@@ -7,8 +7,8 @@ use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
 use App\Models\Payplanmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -28,9 +28,6 @@ class Kasir extends BaseController
 	protected $profile;
 	protected $printer;
 	protected $session;
-	private $name;
-	private $price;
-	private $dollarSign;
 	public function __construct(){
 		
 		$this->mejamodel = new Mejamodel();
@@ -48,20 +45,41 @@ class Kasir extends BaseController
 		$data = [
 			'title' => 'Kasir Dashboard',
 			'subtitle' => 'Kasir',
-			'meja' => $this->mejamodel->getbyNormal()
 		];
 		return view('backend/kasir', $data);
 
 	}
 
+	public function cardbodymeja() {
+		$ret = "";
+		$meja = $this->mejamodel->getbyNormal()->getResult();
+		foreach ($meja  as $key) {
+			$billing = $this->billingmodel->getbyMejaid($key->meja_id)->getResult();
+			if (count($billing)>0) {
+			  foreach ($billing as $k) {
+				if ($k->statusbilling == 'waiting' || $k->statusbilling == 'normal') {
+				  $btnclass = "btn btn-warning";
+				} else if ($k->statusbilling == 'verified') {
+				  $btnclass = "btn btn-danger";
+			  	} else {
+				  $btnclass = "btn btn-info";
+				}
+			  }
+			} else {
+			  $btnclass = "btn btn-info";
+			}
+			
+			$ret .= "<div style='display: inline-block; margin: 5px;'>
+						<button onclick='showbillingbymeja($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
+					</div>";	   
+		}
+		return $ret;                       
+	}
+
 	public function pembulatanratusan($uang){
 	 $nilai = round($uang);
-	 $ratusan = substr($nilai, -3);
-	 if ($ratusan >= 100) {
-	     $akhir = $uang + (1000-$ratusan);
-	 } else {
-	     $akhir = $uang + (100-$ratusan);
-	 }
+	 $ratusan = substr($nilai, -2);
+	 $akhir = $uang + (100-$ratusan);
 	 return $akhir;
 	}
 

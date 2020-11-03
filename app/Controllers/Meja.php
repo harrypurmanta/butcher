@@ -166,8 +166,8 @@ class Meja extends BaseController {
 						$subtotal = $subtotal + $total;
 						$buttonproduk = "";
 						$style = "";
-						$buttonqty = "<button onclick='minus($key->produk_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px; margin-left:5px;'>-</button>
-	       		          <button onclick='add($key->produk_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px;'>+</button>";
+						$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px; margin-left:5px;'>-</button>
+	       		          <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px;'>+</button>";
 					}
 				} else {
 					if ($key->statusproduk == "nullified") {
@@ -178,8 +178,8 @@ class Meja extends BaseController {
 						$subtotal = $subtotal + $total;
 						$buttonproduk = "<button onclick='disableproduk($key->billing_item_id)' xtype='button' class='btn btn-danger'>Disable</button>";
 						$style = "";
-						$buttonqty = "<button onclick='minus($key->produk_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px; margin-left:5px;'>-</button>
-	       		          <button onclick='add($key->produk_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px;'>+</button>";
+						$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px; margin-left:5px;'>-</button>
+	       		          <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px;'>+</button>";
 					}
 				}
 
@@ -189,8 +189,8 @@ class Meja extends BaseController {
 				          </td>
 				        </tr>
 				        <tr style='font-size: 40px;'>
-				        <input type='hidden' id='qty$key->produk_id' value='$key->qty'/>
-				          <td align='left' width='250'><span id='spanqty$key->produk_id' ".$style.">$key->qty X </span> 
+				        <input type='hidden' id='qty$key->billing_item_id' value='$key->qty'/>
+				          <td align='left' width='250'><span id='spanqty$key->billing_item_id' ".$style.">$key->qty X </span> 
 				          $buttonqty
 	       		          </td>
 				          <td align='center'><span ".$style.">@".number_format($key->produk_harga)."</span></td>
@@ -328,13 +328,21 @@ class Meja extends BaseController {
 	}
 
 	public function updateqty() {
-		$produk_id = $this->request->getPost('value');
-		$qty = $this->request->getPost('qty');
+		$id = $this->request->getPost('value');
+		$qty = $this->request->getPost('quanty');
 		$data = [
-			'meja_nm' => $meja_nm,
-			'updated_dttm' => $datenow,
-			'updated_user' => $this->session->user_id
+			'qty' => $qty,
+			'update_dttm' => date('Y-m-d H:i:s'),
+			'update_user' => '1'
 		];
+
+		$update = $this->billingmodel->updateqty($id,$data);
+		if ($update) {
+			return 'true';
+		} else {
+			return 'false';
+		}
+		
 	}
 
 	public function update(){

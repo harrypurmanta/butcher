@@ -16,16 +16,16 @@ class Mejamodel extends Model
     }
 
     public function getbyNormal() {
-        $query = $this->db->table('meja a');
-        $query->select('*');
-        $query->join('imagemeja b','b.meja_id=a.meja_id');
-        $query->where('a.status_cd','normal');
-        return $query->get();
+        return $this->db->table('meja a')
+                    ->select('*')
+                    ->join('imagemeja b','b.meja_id=a.meja_id','left')
+                    ->where('a.status_cd','normal')
+                    ->get();
     }
 
     public function simpan($data) {
-        $builder = $this->db->table('meja');
-        $builder->insert($data);
+               $this->db->table('meja')
+                        ->insert($data);
         return $this->db->insertID();
     }
 

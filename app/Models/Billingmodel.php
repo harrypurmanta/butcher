@@ -162,6 +162,13 @@ class Billingmodel extends Model
                         ->update();
     }
 
+    public function updateqty($id,$data) {
+        return $this->db->table('billing_item')
+                        ->set($data)
+                        ->where('billing_item_id',$id)
+                        ->update();
+    }
+
     public function removedckasir($id,$data){
         return $this->db->table('billing_discount')
                     ->set($data)

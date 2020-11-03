@@ -54,53 +54,98 @@ $uri = current_url(true);
 <script src="<?=base_url() ?>/assets/plugins/sweetalert2/sweet-alert.init.js"></script>
 <script type="text/javascript">
 function add(value){
-    $("#loader-wrapper").removeClass("d-none");
-  var currentVal = parseInt($("#qty" + value).val());    
+  var currentVal = parseInt($("#qty" + value).val());
+  $("#qty" + value).val(currentVal + 1);
+  var quanty = currentVal + 1;
   if (!isNaN(currentVal)) {
-      $("#qty" + value).val(currentVal + 1);
-      document.getElementById("spanqty"+value).textContent = currentVal + 1 + " X";
+      $.ajax({
+        url : "<?= base_url('meja/updateqty') ?>",
+        type: "post",
+        data : {'value':value,'quanty':quanty},
+        beforeSend: function () { 
+		      $("#loader-wrapper").removeClass("d-none");
+		    },
+        success:function(data){
+          $("#loader-wrapper").addClass("d-none");
+		      documentready();
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+        }
+      });
+      
   }
-  setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
 };
 
 function minus(value){
-    $("#loader-wrapper").removeClass("d-none");
-    var currentVal = parseInt($("#qty" + value).val());    
+    var currentVal = parseInt($("#qty" + value).val());   
     if (currentVal==0) {
+      
     } else if (!isNaN(currentVal)) {
         $("#qty" + value).val(currentVal - 1);
-        document.getElementById("spanqty"+value).textContent = currentVal - 1 + " X";
+        var quanty = currentVal - 1;
+        $.ajax({
+          url : "<?= base_url('meja/updateqty') ?>",
+          type: "post",
+          data : {'value':value,'quanty':quanty},
+          beforeSend: function () { 
+            $("#loader-wrapper").removeClass("d-none");
+          },
+          success:function(data){
+            $("#loader-wrapper").addClass("d-none");
+            documentready();
+          },
+          error:function(){
+              Swal.fire({
+                  title:"Gagal!",
+                  text:"Data gagal disimpan!",
+                  type:"warning",
+                  showCancelButton:!0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              })
+          }
+        });
     }
-    setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
 };
 
 $(document).ready(function() {
+  documentready();
+});
+
+function documentready() {
   var id = <?= $uri->getSegment(3); ?>
 
 	$.ajax({
-	 url : "<?= base_url('meja/showorderbymeja') ?>",
-   data : {'id':id},
-   type: "post",
+    url : "<?= base_url('meja/showorderbymeja') ?>",
+    data : {'id':id},
+    type: "post",
 
-	 beforeSend: function () { 
-	  $("#loader-wrapper").removeClass("d-none");
-	 },
-	success:function(data){
-	  $('#container_content').html(data);
-	  setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
-	},
-	error:function(){
-	Swal.fire({
-	  title:"Error!",
-	  type:"warning",
-	  showCancelButton:!0,
-	  confirmButtonColor:"#556ee6",
-	  cancelButtonColor:"#f46a6a"
-	})
-	}
-	});
-});
-
+    beforeSend: function () { 
+      $("#loader-wrapper").removeClass("d-none");
+    },
+    success:function(data){
+      $('#container_content').html(data);
+      setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
+    },
+    error:function(){
+    Swal.fire({
+      title:"Error!",
+      type:"warning",
+      showCancelButton:!0,
+      confirmButtonColor:"#556ee6",
+      cancelButtonColor:"#f46a6a"
+    })
+    }
+  });
+}
 
 function backtowaiters(){
 	window.location.href = "<?=base_url()?>/dashboard/waiters";
