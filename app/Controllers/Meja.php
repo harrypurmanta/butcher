@@ -166,8 +166,7 @@ class Meja extends BaseController {
 						$subtotal = $subtotal + $total;
 						$buttonproduk = "";
 						$style = "";
-						$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px; margin-left:5px;'>-</button>
-	       		          <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px;'>+</button>";
+						$buttonqty = "";
 					}
 				} else {
 					if ($key->statusproduk == "nullified") {
