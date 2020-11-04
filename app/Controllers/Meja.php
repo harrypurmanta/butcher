@@ -93,7 +93,7 @@ class Meja extends BaseController {
 
 
 	public function showorderbymeja(){
-	    	if (session()->get('user_nm') == "") {
+	    if (session()->get('user_nm') == "") {
 	        session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
 	        return redirect()->to(base_url('/'));
 	    }

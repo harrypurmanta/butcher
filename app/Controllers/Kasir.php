@@ -7,8 +7,8 @@ use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
 use App\Models\Payplanmodel;
-// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -84,8 +84,9 @@ class Kasir extends BaseController
 	}
 
 	public function pembulatanratusanribu($uang){
-	 $ratusan = substr($uang, -6);
-	 $akhir = $uang + (100000-$ratusan);
+	 $nilai = round($uang);
+	 $ratusan = substr($nilai, -2);
+	 $akhir = $uang + (50000-$ratusan);
 	 return $akhir;
 	}
 
@@ -401,11 +402,11 @@ class Kasir extends BaseController
 	}
 
 	public function cetakmenudrinks() {
-		$this->_getDrinksmenu($this->request->getPost('id')); 
+		return $this->_getDrinksmenu($this->request->getPost('id')); 
 	}
 	
 	public function cetakmenufood(){
-	    $this->_getFoodsmenu($this->request->getPost('id'));
+	    return $this->_getFoodsmenu($this->request->getPost('id'));
 	}
 
 	private function _getFoodsmenu($id) {
@@ -520,10 +521,9 @@ class Kasir extends BaseController
 		
 	}
 
-	private function _getDrinksmenu($id) {
+	public function _getDrinksmenu($id) {
 
 		$data = $this->billingmodel->getdrinkmenu($id)->getResult();
-		return $data;
 		if (count($data)>0) {
 		    $resdc = $this->discountmodel->getbybillid($id)->getResult();
     		$subtotal = 0;
