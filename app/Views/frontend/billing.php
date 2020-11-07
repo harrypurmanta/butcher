@@ -40,13 +40,13 @@ $uri = current_url(true);
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-lg-12">
-<div class="container-fluid">
-	<div class="row">
+<div class="container-fluid" id="container-data">
+	<!-- <div class="row">
         <div class="card">
             <div class="card-body" id="container-data"> 
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
 </div>
 		</div>
