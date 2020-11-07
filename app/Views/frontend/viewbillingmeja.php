@@ -37,7 +37,6 @@ $uri = current_url(true);
 <script type="text/javascript">
 $(document).ready(function() {
   var id = <?= $uri->getSegment(3); ?>
-
 	$.ajax({
 	 url : "<?= base_url('meja/showorderbymeja') ?>",
    data : {'id':id},
@@ -47,17 +46,16 @@ $(document).ready(function() {
 	  $("#loader-wrapper").removeClass("d-none");
 	 },
 	success:function(data){
-	  $('#container_content').html(data);
 	  setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
 	},
 	error:function(){
-	Swal.fire({
-	  title:"Error!",
-	  type:"warning",
-	  showCancelButton:!0,
-	  confirmButtonColor:"#556ee6",
-	  cancelButtonColor:"#f46a6a"
-	})
+  	Swal.fire({
+  	  title:"Error!",
+  	  type:"warning",
+  	  showCancelButton:!0,
+  	  confirmButtonColor:"#556ee6",
+  	  cancelButtonColor:"#f46a6a"
+  	})
 	}
 	});
 });

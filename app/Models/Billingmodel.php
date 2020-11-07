@@ -24,7 +24,7 @@ class Billingmodel extends Model
     	$query->join('meja f','f.meja_id=a.meja_id','left');
     	$query->join('person g','g.person_id=e.person_id','left');
     	$query->join('person h','h.person_id=a.verified_user','left');
-    	$query->whereIn('a.status_cd',['normal','waiting','verified']);
+    	$query->whereIn('a.status_cd',['waiting','verified']);
     	$query->where('a.meja_id',$id);
     	return $query->get();
     }
@@ -99,6 +99,15 @@ class Billingmodel extends Model
         return $query->get();
     }
 
+    public function getbybilldiscid($bi,$di) {
+        return $this->db->table('billing_discount a')
+                    ->join('discount b','b.discount_id=a.discount_id')
+                    ->where('a.status_cd','normal')
+                    ->where('a.billing_id',$bi)
+                    ->where('a.discount_id',$di)
+                    ->get();
+    }
+
     public function simpanbilling($data) {
     	$builder = $this->db->table('billing');
         $builder->insert($data);
@@ -166,6 +175,13 @@ class Billingmodel extends Model
         return $this->db->table('billing_item')
                         ->set($data)
                         ->where('billing_item_id',$id)
+                        ->update();
+    }
+
+    public function updateafterpayment($billing_id,$updatebill) {
+        return $this->db->table('billing')
+                        ->set($updatebill)
+                        ->where('billing_id',$billing_id)
                         ->update();
     }
 

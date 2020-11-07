@@ -6,7 +6,7 @@ class discountmodel extends Model
 {
     protected $table      = 'discount';
     protected $primaryKey = 'discount_id ';
-    protected $allowedFields = ['discount_nm','value', 'status_cd', 'created_dttm','created_user','update_dttm','update_user','nullified_dttm','nullified_user'];
+    protected $allowedFields = ['discount_nm','value','type', 'status_cd', 'created_dttm','created_user','update_dttm','update_user','nullified_dttm','nullified_user'];
 
     public function getbyKatnm($discount_nm) {
         return $this->db->table('discount')
@@ -29,10 +29,20 @@ class discountmodel extends Model
 
     public function getbybillid($id) {
         return $this->db->table('billing_discount a')
+                    ->join('discount b','b.discount_id=a.discount_id')
+                    ->where('a.status_cd','normal')
+                    ->where('a.billing_id',$id)
+                    ->where('b.type','string')
+                    ->get();
+    }
+
+    public function getbybillidpersen($id) {
+        return $this->db->table('billing_discount a')
                     ->select('*')
                     ->join('discount b','b.discount_id=a.discount_id')
                     ->where('a.status_cd','normal')
                     ->where('a.billing_id',$id)
+                    ->where('b.type','persen')
                     ->get();
     }
 

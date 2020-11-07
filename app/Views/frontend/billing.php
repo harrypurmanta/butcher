@@ -41,150 +41,12 @@ $uri = current_url(true);
 		<div class="row">
 			<div class="col-lg-12">
 <div class="container-fluid">
-	<?php
-	if ($billing[0]->member_id == 0) {
-		$billname = $billing[0]->meja_nm;
-	} else {
-		$billname = $billing[0]->person_nm;
-	}
-
-	if ($billing[0]->statusbilling == 'verified') {
-		$collctedby = "<tr>
-	          <td align='left'>Collected By</td>
-	          <td align='right'>".$billing[0]->collected_nm."</td>
-	        </tr>";
-	} else {
-		$collctedby = "";
-	}
-
-	if ($billing[0]->statusbilling == 'normal') {
-		$footer = "<button onclick='cancelorder(".$billing[0]->billing_id.")' type='button' class='btn btn-danger float-left' style='font-weight: bold;'>CANCEL</button>
-			<button onclick='order(".$billing[0]->billing_id.")' class='btn btn-success float-right' style='font-weight: bold;'>ORDER</button>";
-		$buttonmenu = "<div style='display:inline-block;' class='float-left'>
-			<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-weight: bold;'>MENU</button>
-			</div>";
-	} else if ($billing[0]->statusbilling == 'waiting') {
-		$footer = "<div align='center' class='alert alert-info alert-rounded'> 
-						<i class='far fa-handshake'></i> SILAHKAN TUNGGU WAITERS UNTUK KONFIRMASI PESANAN ANDA !!
-					</div>";
-
-		$buttonmenu = "<div style='display:inline-block;' class='float-left'>
-						<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-weight: bold;'>MENU</button>
-						</div>";
-	} else if ($billing[0]->statusbilling == 'verified') {
-		$footer = "<div align='center' class='alert alert-success alert-rounded'> 
-						<i class='far fa-handshake'></i>  PESANAN ANDA SEDANG DI PROSES. SILAHKAN TUNGGU !!
-					</div>";
-		$buttonmenu = "";
-	}
-	
-	
-list($dt,$tm) = explode(" ", $billing[0]->created_dttm);
-$subtotal = 0;
-$ret = "<div>
-			<div class='row'>
-				<div class='col-3'>
-				$buttonmenu
-				</div>
-				<div class='col-6'>
-				<div align='center'>
-					<img style='max-height: 100%; width: 80px;' src='../../images/lib/logo.jpeg'>
-				</div>
-				</div>
-			</div>
-			<div class='row'>
-				<div class='col-md-12'>
-				<div align='center' style='margin-top: 30px; font-size: 18px;'>
-					<p>
-						<span>Butcher Steak & Pasta Palembang</span><br>
-						<span>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
-						<span>Sumatera Selatan, 30114, 07115626366</span>
-					</p>
-				</div>
-				</div>
-			</div>
-			
-		</div>";
-$ret .= "<table id='tbitem' width='100%' style='margin-top: 20px; font-size: 22px;'>
-	        <tr>
-	          <td align='left'>$dt</td>
-	          <td align='right'>$tm</td>
-	        </tr>
-	        <tr>
-	          <td align='left'>Bill Name</td>
-	          <td align='right'>".$billname."</td>
-	        </tr>
-	        $collctedby
-	      </table>
-	      <hr style='border: 1px solid red'>
-	      <table style='font-size: 22px;' width='100%'>";
-foreach ($billing as $key) {
-	$total = $key->produk_harga * $key->qty;
-	$subtotal = $subtotal + $total;
-	if ($key->statusbilling == 'normal') {
-		$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px; margin-left:5px;'>-</button>
-		<button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px;'>+</button>";
-	} else {
-		$buttonqty = "";
-	}
-	
-	$ret .= "<tr>
-	        <td colspan='3' align='left' style='font-weight: bold;'>
-	            $key->produk_nm
-	          </td>
-	        </tr>
-	        <tr>
-	        <input type='hidden' id='qty$key->billing_item_id' value='$key->qty'/>
-	          <td align='left' ><span id='spanqty$key->billing_item_id'>$key->qty X $buttonqty</span> </td>
-	          <td align='center'>@".number_format($key->produk_harga)."</td>
-	          <td align='right'>".number_format($total)."</td>
-	        </tr>
-	        <tr style='line-height:40px;'>
-	        <td>&nbsp </td>
-	        <td></td>
-	        <td></td>
-	        </tr>";
-	 }
-	$ret .= "</table>
-			<hr style='border: 1px solid red'>";
-
-	$tax 		= $subtotal * 0.10;
-	$service 	= $subtotal * 0.05;
-	$grandtotal = $subtotal + $tax + $service;
-	$nilai = round($grandtotal);
-	$ratusan = substr($nilai, -2);
-	$akhir = $grandtotal + (100-$ratusan);
-	$nilaibulat = $akhir - $grandtotal;
-
-	$ret .= "<table style='margin-top:30px; font-size: 20px;' width='100%'>
-	        <tr>
-	          <td align='left'>Subtotal</td>
-	          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
-	        </tr>
-	        <tr>
-	          <td align='left'>Tax</td>
-	          <td colspan='2' align='right'>Rp. ".number_format($tax)."</td>
-	        </tr>
-	        <tr>
-	          <td align='left'>service</td>
-	          <td colspan='2' align='right'>Rp. ".number_format($service)."</td>
-	        </tr>
-	        <tr>
-	          <td align='left'>Rounding Amount</td>
-	          <td colspan='2' align='right'>Rp. ".number_format($nilaibulat)."</td>
-	        </tr>
-	        <tr>
-	          <td align='left' style='font-weight:bold;'>Total</td>
-	          <td colspan='2' align='right'>Rp. ".number_format($akhir)."</td>
-	        </tr>
-			</table>
-			<hr style='border: 1px solid red;margin-bottom:100px;'>
-			<div style='margin-bottom: 150px;'>
-			$footer
-			</div>";
-	echo $ret;
-	?>
-
+	<div class="row">
+        <div class="card">
+            <div class="card-body" id="container-data"> 
+            </div>
+        </div>
+    </div>
 </div>
 </div>
 		</div>
@@ -202,6 +64,38 @@ foreach ($billing as $key) {
 <script src="<?=base_url() ?>/assets/plugins/sweetalert2/sweet-alert.init.js"></script>
 
 <script type="text/javascript">
+
+$(document).ready(function(){
+	var meja_id = <?= $uri->getSegment(3); ?>;
+	billing(meja_id);
+ 
+});
+
+function billing(meja_id) {
+	$.ajax({
+       	url : "<?= base_url('meja/billingcustomer') ?>",
+       	type : "POST",
+		data : {'meja_id':meja_id},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+       },
+       success:function(data){
+        $('#container-data').html(data);
+        $("#loader-wrapper").addClass("d-none");
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+    });
+}
+
 function add(value){
   var currentVal = parseInt($("#qty" + value).val());    
   if (!isNaN(currentVal)) {

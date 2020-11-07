@@ -3,13 +3,16 @@
 use CodeIgniter\Controller;
 use App\Models\Mejamodel;
 use App\Models\Billingmodel;
+use App\Models\Discountmodel;
 use chillerlan\QRCode\{QRCode, QROptions};
 class Meja extends BaseController {
 	protected $mejamodel;
 	protected $billingmodel;
+	protected $discountmodel;
 	public function __construct(){
 		$this->mejamodel = new Mejamodel();
 		$this->billingmodel = new Billingmodel();
+		$this->discountmodel = new Discountmodel();
 	}
 
 	public function index() {
@@ -76,7 +79,7 @@ class Meja extends BaseController {
 					if ($k->statusbilling == 'waiting') {
 						$spannotif = "<span style='margin-right:20px;' class='badgex badge-dangerx'> </span>";
 					} else if ($k->statusbilling == 'verified') {
-						$spannotif = "<span style='margin-right:20px;' class='badgex badge-warning'> </span>";
+						$spannotif = "<span style='margin-right:20px;' class='badgex badge-success'> </span>";
 					} else {
 						$spannotif = "";
 					}
@@ -99,25 +102,36 @@ class Meja extends BaseController {
 	    }
 		$meja_id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaid($meja_id)->getResult();
+		$discount_nmx = "";	 
+		$discount_valuex = "";
+		$discount = "";
+		$discount_nm = "";
+		$discount_value = "";
+		$subtotal = 0;
+		$amt_before_discount = 0;
+
         
 		if (count($res)>0) {
+			$billing_id = $res[0]->billing_id;
+
 		    if ($res[0]->member_nm != "") {
 		        $member_nm = $res[0]->member_nm;
 		    } else {
-		        $member_nm = $res[0]->meja_nm;
+		        $member_nm = "Meja ".$res[0]->meja_nm;
 		    }
-		    list($dt,$tm) = explode(" ", $res[0]->created_dttm);
-		    
-		    
-			if ($res[0]->statusbilling == 'verified') {
+
+		    if ($res[0]->statusbilling == 'verified') {
 			$buttonverif = "<div style='display:inline-block; float: right; font-size: 2em;' align='right' class='alert alert-danger'>not yet paid !! </div>";
 			} else {
 				$buttonverif = "<div style='display:inline-block; float: right;' align='right'><button type='button' style='font-size: 2em;' class='btn btn-success' onclick='verifybilling(".$res[0]->billing_id.")'>Verifikasi</button></div>
-				<div style='display:inline-block; float: right; margin-right: 10px;' align='right'><button type='button' style='font-size: 2em;' class='btn btn-danger' onclick='batalbilling(".$res[0]->billing_id.")'>Batal</button></div>";
+								<div style='display:inline-block; float: right; margin-right: 10px;' align='right'><button type='button' style='font-size: 2em;' class='btn btn-danger' onclick='batalbilling(".$res[0]->billing_id.")'>Batal</button></div>";
 			}
 
-		    $subtotal = 0;
-			$ret = "<div class='col-md-12 row' align='center' id='div-item' style='margin-top: 10px;'>
+		    list($dt,$tm) = explode(" ", $res[0]->created_dttm);
+		    $resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
+			$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
+			
+			$ret = "<div class='col-md-12 row' align='center' id='div-item' style='margin-top: 10px;margin-left: 0px;'>
 			            <div class='col-md-4'>
 			                <button type='button' style='font-size: 2em;' class='btn btn-info' onclick='backtowaiters()'>Kembali</button>
 			            </div>
@@ -157,25 +171,46 @@ class Meja extends BaseController {
 				      <table  style='font-size: 40px;' width='100%'>";
 			foreach ($res as $key) {
 				$total = $key->produk_harga * $key->qty;
+				$amt_before_discount = $amt_before_discount + $total;
+
+
+				if (count($resdc)>0) {
+					foreach ($resdc as $dc) {
+						$symb = substr($dc->value, -1);
+						if ($symb == "%") {
+							$percentega = str_replace("%", "", $dc->value);
+							$ptotal = ($percentega/100) * $total;
+							list($harga,$belakangkoma) = explode(".", $ptotal);
+							$discount = "<span style='font-size: 40px;'>(".number_format($harga).")</span>";
+							$afterdc = $total - $harga;
+							$subtotal = $subtotal + $afterdc;
+							$discount_nmx = $dc->discount_nm;
+							$discount_valuex = $dc->value;
+						} else {
+							$subtotal = $subtotal + $total;
+						}
+					} 
+				} else {
+					$subtotal = $subtotal + $total;
+				}
+
 				if ($key->statusbilling == 'verified') {
 					if ($key->statusproduk == "nullified") {
 						$buttonproduk = "";
 						$style = "style='text-decoration: line-through;'";
 						$buttonqty = "";
 					} else {
-						$subtotal = $subtotal + $total;
 						$buttonproduk = "";
 						$style = "";
 						$buttonqty = "";
 					}
 				} else {
 					if ($key->statusproduk == "nullified") {
-						$buttonproduk = "<button onclick='enableproduk($key->billing_item_id)' type='button' class='btn btn-success'>Enable</button>";
+						$buttonproduk = "<button onclick='enableproduk($key->billing_item_id)' type='button' class='btn btn-success'><i class='fas fa-check'></i></button>";
 						$style = "style='text-decoration: line-through;'";
 						$buttonqty = "";
 					} else {
-						$subtotal = $subtotal + $total;
-						$buttonproduk = "<button onclick='disableproduk($key->billing_item_id)' xtype='button' class='btn btn-danger'>Disable</button>";
+						$buttonproduk = "<button onclick='disableproduk($key->billing_item_id)' xtype='button' class='btn btn-danger'><i class='fas fa-times'></i></button>";
 						$style = "";
 						$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px; margin-left:5px;'>-</button>
 	       		          <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px;'>+</button>";
@@ -193,7 +228,7 @@ class Meja extends BaseController {
 				          $buttonqty
 	       		          </td>
 				          <td align='center'><span ".$style.">@".number_format($key->produk_harga)."</span></td>
-				          <td align='right'><span ".$style.">".number_format($total)."</span></td>
+				          <td align='right'><span ".$style.">".number_format($total)."<br>$discount</span></td>
 				        </tr>
 				        <tr style='line-height:40px;'>
 				        <td>&nbsp </td>
@@ -201,11 +236,25 @@ class Meja extends BaseController {
 				        <td></td>
 				        </tr>";
 				 }
+
+				if (count($notpersen)>0) {
+					 foreach ($notpersen as $dc) {
+						$discount_nm = $dc->discount_nm;
+						$discount_value = $dc->value;
+							$ret .= "<tr style='font-size: 40px;'>
+							        <td align='left' width='80'>$discount_nm </td>
+							        <td></td>
+							        <td align='right'>".number_format($discount_value)."</td>
+							        </tr>";
+							$subtotal = $subtotal - $dc->value; 
+					}
+				} 
+
 				$ret .= "</table>
 				        </div>
 						<hr style='border: 1px solid red !important;'>";
-				    $tax = $subtotal * 0.10;
-					$service = $subtotal * 0.05;
+				    $tax = $amt_before_discount * 0.10;
+					$service = $amt_before_discount * 0.05;
 					$grandtotal = $subtotal + $tax + $service;
 					$jmlbulat = $this->pembulatanratusan($grandtotal);
 					$nilaibulat = $jmlbulat - $grandtotal;
@@ -237,9 +286,165 @@ class Meja extends BaseController {
 						<input type='hidden' value='$grandtotal' id='grandtotal' />
 						<hr style='border: 1px solid red;margin-bottom:100px;'>";
 		} else {
-			$ret = "<div align='center'><h3>TIDAK ADA PESANAN !!</h3> <button class='meja-button' type='button' onclick='backtowaiters()'>Kembali</button></div>";
+			$ret = "<div class='col-md-12 row' align='center'>
+					<h3>TIDAK ADA PESANAN !!</h3> 
+					<button class='meja-button' type='button' onclick='backtowaiters()'>Kembali</button>
+					</div>";
 		}
   		return $ret;
+	}
+
+	public function billingcustomer() {
+	$meja_id = $this->request->getPost('meja_id');
+	$res = $this->billingmodel->getbyMejaidcustomer($meja_id)->getResult();
+	if (count($res)>0) {
+		if ($res[0]->member_id == 0) {
+			$billname = $res[0]->meja_nm;
+		} else {
+			$billname = $res[0]->person_nm;
+		}
+
+		if ($res[0]->statusbilling == 'verified') {
+			$collctedby = "<tr>
+		          <td align='left'>Collected By</td>
+		          <td align='right'>".$res[0]->collected_nm."</td>
+		        </tr>";
+		} else {
+			$collctedby = "";
+		}
+
+		if ($res[0]->statusbilling == 'normal') {
+			$footer = "<button onclick='cancelorder(".$res[0]->billing_id.")' type='button' class='btn btn-danger float-left' style='font-weight: bold;'>CANCEL</button>
+				<button onclick='order(".$res[0]->billing_id.")' class='btn btn-success float-right' style='font-weight: bold;'>ORDER</button>";
+			$buttonmenu = "<div style='display:inline-block;' class='float-left'>
+				<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-weight: bold;'>MENU</button>
+				</div>";
+		} else if ($res[0]->statusbilling == 'waiting') {
+			$footer = "<div align='center' class='alert alert-info alert-rounded'> 
+							<i class='far fa-handshake'></i> SILAHKAN TUNGGU WAITERS UNTUK KONFIRMASI PESANAN ANDA !!
+						</div>";
+
+			$buttonmenu = "<div style='display:inline-block;' class='float-left'>
+							<button onclick='listmenu()' type='button' class='btn btn-info float-left' style='font-weight: bold;'>MENU</button>
+							</div>";
+		} else if ($res[0]->statusbilling == 'verified') {
+			$footer = "<div align='center' class='alert alert-success alert-rounded'> 
+							<i class='far fa-handshake'></i>  PESANAN ANDA SEDANG DI PROSES. SILAHKAN TUNGGU !!
+						</div>";
+			$buttonmenu = "";
+		}
+		
+		
+		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
+		$subtotal = 0;
+		$ret = "<div>
+					<div class='row'>
+						<div class='col-3'>
+						$buttonmenu
+						</div>
+						<div class='col-6'>
+						<div align='center'>
+							<img style='max-height: 100%; width: 80px;' src='../../images/lib/logo.jpeg'>
+						</div>
+						</div>
+					</div>
+					<div class='row'>
+						<div class='col-md-12'>
+						<div align='center' style='margin-top: 30px; font-size: 18px;'>
+							<p>
+								<span>Butcher Steak & Pasta Palembang</span><br>
+								<span>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
+								<span>Sumatera Selatan, 30114, 07115626366</span>
+							</p>
+						</div>
+						</div>
+					</div>
+					
+				</div>";
+		$ret .= "<table id='tbitem' width='100%' style='margin-top: 20px; font-size: 22px;'>
+			        <tr>
+			          <td align='left'>$dt</td>
+			          <td align='right'>$tm</td>
+			        </tr>
+			        <tr>
+			          <td align='left'>Bill Name</td>
+			          <td align='right'>".$billname."</td>
+			        </tr>
+			        $collctedby
+			      </table>
+			      <hr style='border: 1px solid red'>
+			      <table style='font-size: 22px;' width='100%'>";
+		foreach ($res as $key) {
+			$total = $key->produk_harga * $key->qty;
+			$subtotal = $subtotal + $total;
+			if ($key->statusbilling == 'normal') {
+				$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px; margin-left:5px;'>-</button>
+				<button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px;'>+</button>";
+			} else {
+				$buttonqty = "";
+			}
+			
+			$ret .= "<tr>
+			        <td colspan='3' align='left' style='font-weight: bold;'>
+			            $key->produk_nm
+			          </td>
+			        </tr>
+			        <tr>
+			        <input type='hidden' id='qty$key->billing_item_id' value='$key->qty'/>
+			          <td align='left' ><span id='spanqty$key->billing_item_id'>$key->qty X $buttonqty</span> </td>
+			          <td align='center'>@".number_format($key->produk_harga)."</td>
+			          <td align='right'>".number_format($total)."</td>
+			        </tr>
+			        <tr style='line-height:40px;'>
+			        <td>&nbsp </td>
+			        <td></td>
+			        <td></td>
+			        </tr>";
+			 }
+			$ret .= "</table>
+					<hr style='border: 1px solid red'>";
+
+			$tax 		= $subtotal * 0.10;
+			$service 	= $subtotal * 0.05;
+			$grandtotal = $subtotal + $tax + $service;
+			$nilai = round($grandtotal);
+			$ratusan = substr($nilai, -2);
+			$akhir = $grandtotal + (100-$ratusan);
+			$nilaibulat = $akhir - $grandtotal;
+
+			$ret .= "<table style='margin-top:30px; font-size: 20px;' width='100%'>
+			        <tr>
+			          <td align='left'>Subtotal</td>
+			          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
+			        </tr>
+			        <tr>
+			          <td align='left'>Tax</td>
+			          <td colspan='2' align='right'>Rp. ".number_format($tax)."</td>
+			        </tr>
+			        <tr>
+			          <td align='left'>service</td>
+			          <td colspan='2' align='right'>Rp. ".number_format($service)."</td>
+			        </tr>
+			        <tr>
+			          <td align='left'>Rounding Amount</td>
+			          <td colspan='2' align='right'>Rp. ".number_format($nilaibulat)."</td>
+			        </tr>
+			        <tr>
+			          <td align='left' style='font-weight:bold;'>Total</td>
+			          <td colspan='2' align='right'>Rp. ".number_format($akhir)."</td>
+			        </tr>
+					</table>
+					<hr style='border: 1px solid red;margin-bottom:100px;'>
+					<div style='margin-bottom: 150px;'>
+					$footer
+					</div>";
+	} else {
+		$ret = "false";
+	}
+	
+
+	return $ret;
+	
 	}
 
 	public function orderbilling() {

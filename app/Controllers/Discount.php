@@ -49,11 +49,19 @@ class Discount extends BaseController
 		if (count($bykatnm)>0) {
 			return 'already';
 		} else {
-			
+
+			$symb = substr($this->request->getPost('nilaidiscount'), -1);
+			if ($symb == "%") {
+				$type = "persen";
+			} else {
+				$type = "string";
+			}
+
 			$datenow = date('Y-m-d H:i:s');
 			$data = [
 			'discount_nm' => $discount_nm,
 			'value' => $this->request->getPost('nilaidiscount'),
+			'type' => $type,
 			'created_dttm' => $datenow,
 			'created_user' => $this->session->user_id
 			];
@@ -70,12 +78,21 @@ class Discount extends BaseController
 
 	public function update(){
 		$id = $this->request->getVar('id');
-		$discount_nm = $this->request->getVar('discount_nm');
+		$discount_nm = $this->request->getPost('discount_nm');
+
+		$symb = substr($this->request->getPost('nilaidiscount'), -1);
+		if ($symb == "%") {
+			$type = "persen";
+		} else {
+			$type = "string";
+		}
+			
 		
 			$datenow = date('Y-m-d H:i:s');
 			$data = [
 			'discount_nm' => $discount_nm,
 			'value' => $this->request->getPost('nilaidiskon'),
+			'type' => $type,
 			'updated_dttm' => $datenow,
 			'updated_user' => $this->session->user_id
 			];

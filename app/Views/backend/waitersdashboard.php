@@ -27,7 +27,6 @@ $uri = current_url(true);
 	
 
 </div>
-<audio id="sirena_ambulanza" src="assets/sirena_ambulanza.mp3" > </audio>
 
 </div>
 <div class="d-none" id='loader-wrapper'>

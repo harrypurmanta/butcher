@@ -52,7 +52,7 @@ class Produk extends BaseController
 				$data = [
 				'title' => 'Your Bill',
 				'subtitle' => 'Your Bill',
-				'billing' => $res
+				'meja_id' => $meja_id
 				];
 				return view('frontend/billing', $data);
 			} else {

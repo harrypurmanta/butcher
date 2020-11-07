@@ -14,7 +14,7 @@ $uri = current_url(true);
     <!-- iOS Safari -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-<link rel="icon" type="image/png" sizes="16x16" href="<?=base_url() ?>/assets/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?=base_url() ?>/assets/images/favicon.png">
 
     <!-- Bootstrap Core CSS -->
     <link href="<?=base_url() ?>/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -31,16 +31,11 @@ $uri = current_url(true);
     <link href="<?=base_url() ?>/assets/css/colors/default-dark.css" id="theme" rel="stylesheet">
     <link href="<?=base_url() ?>/assets/css/custom.css" rel="stylesheet">
 </head>
-<body class="fix-header fix-sidebar card-no-border">
+<body>
 <div id="main-wrapper">
-    <div class="page-wrapper" style="margin: 0px !important; padding-top: 0px !important;">
-        <div class="container-fluid" style='padding-top: 0px !important;'>
-            <div class="row">
-                <div class="card">
-                    <div class="card-body" id="container_content"> 
-                    </div>
-                </div>
-            </div>
+    <div class="page-wrapper" style="margin: 0px !important;">
+        <div class="container-fluid" id="container_content">
+           
         </div>
     </div>
 </div>
@@ -121,8 +116,7 @@ $(document).ready(function() {
 });
 
 function documentready() {
-  var id = <?= $uri->getSegment(3); ?>
-
+  var id = <?= $uri->getSegment(3); ?>;
 	$.ajax({
     url : "<?= base_url('meja/showorderbymeja') ?>",
     data : {'id':id},
