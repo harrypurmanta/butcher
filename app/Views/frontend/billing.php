@@ -97,19 +97,85 @@ function billing(meja_id) {
 }
 
 function add(value){
-  var currentVal = parseInt($("#qty" + value).val());    
+	var meja_id = <?= $uri->getSegment(3); ?>;
+  var currentVal = parseInt($("#qty" + value).val());
+  $("#qty"+value).val(currentVal + 1); 
+  var qty = currentVal + 1;    
   if (!isNaN(currentVal)) {
-    var qty = $("#qty"+value).val(currentVal + 1);
-    $.ajax({
+    	$.ajax({
 		   url : "<?= base_url('meja/updateqty')?>",
 		   type : "POST",
-		   data : {'value':value,'qty':qty},
+		   data : {'value':value,'quanty':qty},
 		   beforeSend: function () { 
 		      $("#loader-wrapper").removeClass("d-none");
 		   },
 		   success:function(){
 		        $("#loader-wrapper").addClass("d-none");
-		        $("#tbitem").load("<?= base_url('produk/listmenu/')."/".$uri->getSegment(3) ?> #tbitem");
+		  		billing(meja_id);
+		    },
+		    error:function(){
+				Swal.fire(
+					'Gagal!',
+					'Silahkan Coba Lagi.',
+					'warning'
+				)
+		    }
+		});
+  }
+}
+
+
+function minus(value){
+	var meja_id = <?= $uri->getSegment(3); ?>;
+  	var currentVal = parseInt($("#qty" + value).val()); 
+  	$("#qty"+value).val(currentVal - 1);  
+    var qty = currentVal - 1;    
+    if (qty==0) {
+    	Swal.fire({
+		    title: 'Yakin menghapus item ini ?',
+		    text: "item yang sudah dihapus tidak bisa dikembalikan lagi, tapi anda bisa memesan lagi",
+		    type: 'warning',
+		    showCancelButton: true,
+		    confirmButtonColor: '#3085d6',
+		    cancelButtonColor: '#d33',
+		    confirmButtonText: 'Yakin'
+		}).then((result) => {
+		    if (result.value == true) {
+		    	$.ajax({
+				   url : "<?= base_url('meja/updateqty')?>",
+				   type : "POST",
+				   data : {'value':value,'quanty':qty},
+				   beforeSend: function () { 
+				      $("#loader-wrapper").removeClass("d-none");
+				      
+				   },
+				   success:function(){
+				      $("#loader-wrapper").addClass("d-none");
+				  		billing(meja_id);
+				    },
+				    error:function(){
+						Swal.fire(
+							'Gagal!',
+							'Silahkan Coba Lagi.',
+							'warning'
+						)
+				    }
+				});
+		    	
+		    }
+		 });
+
+    } else if (!isNaN(currentVal)) {
+        $.ajax({
+		   url : "<?= base_url('meja/updateqty')?>",
+		   type : "POST",
+		   data : {'value':value,'quanty':qty},
+		   beforeSend: function () { 
+		      $("#loader-wrapper").removeClass("d-none");
+		   },
+		   success:function(){
+		        $("#loader-wrapper").addClass("d-none");
+		        billing(meja_id);
 		  
 		    },
 		    error:function(){
@@ -120,19 +186,7 @@ function add(value){
 				)
 		    }
 		});
-    document.getElementById("spanqty"+value).textContent = currentVal + 1 + " X";
-  }
-};
-
-function minus(value){
-    $("#loader-wrapper").removeClass("d-none");
-    var currentVal = parseInt($("#qty" + value).val());    
-    if (currentVal==0) {
-    } else if (!isNaN(currentVal)) {
-        $("#qty" + value).val(currentVal - 1);
-        document.getElementById("spanqty"+value).textContent = currentVal - 1 + " X";
     }
-    setTimeout(function(){ $("#loader-wrapper").addClass("d-none"); }, 1000);
 };
 
 function listmenu() {
@@ -141,13 +195,13 @@ function listmenu() {
 
 function order(id) {
 Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
+    title: 'Apakah anda yakin ??',
+    text: "Jika ingin cancel silahkan panggil petugas kami ",
     type: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, order it!'
+    confirmButtonText: 'Yakin!'
 }).then((result) => {
     if (result.value == true) {
     	$.ajax({

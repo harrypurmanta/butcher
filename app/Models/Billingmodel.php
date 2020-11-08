@@ -41,6 +41,7 @@ class Billingmodel extends Model
         $query->join('person h','h.person_id=a.verified_user','left');
         $query->whereIn('a.status_cd',['verified','waiting','normal']);
         $query->where('b.status_cd','normal');
+        $query->whereNotIn('b.qty',['0']);
         $query->where('a.meja_id',$id);
         return $query->get();
     }

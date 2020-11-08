@@ -86,16 +86,49 @@ function add(value){
 };
 
 function minus(value){
-    var currentVal = parseInt($("#qty" + value).val());   
-    if (currentVal==0) {
-      
+    var meja_id = <?= $uri->getSegment(3); ?>;
+    var currentVal = parseInt($("#qty" + value).val()); 
+    $("#qty"+value).val(currentVal - 1);  
+    var qty = currentVal - 1;     
+    if (qty==0) {
+        Swal.fire({
+            title: 'Yakin menghapus item ini ?',
+            text: "item yang sudah dihapus tidak bisa dikembalikan lagi, tapi anda bisa memesan lagi",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yakin'
+        }).then((result) => {
+            if (result.value == true) {
+              $.ajax({
+               url : "<?= base_url('meja/setnullifieditem')?>",
+               type : "POST",
+               data : {'id':value},
+               beforeSend: function () { 
+                  $("#loader-wrapper").removeClass("d-none");
+                  
+               },
+               success:function(){
+                  $("#loader-wrapper").addClass("d-none");
+                  documentready();
+                },
+                error:function(){
+                Swal.fire(
+                  'Gagal!',
+                  'Silahkan Coba Lagi.',
+                  'warning'
+                )
+                }
+            });
+              
+            }
+         });
     } else if (!isNaN(currentVal)) {
-        $("#qty" + value).val(currentVal - 1);
-        var quanty = currentVal - 1;
         $.ajax({
           url : "<?= base_url('meja/updateqty') ?>",
           type: "post",
-          data : {'value':value,'quanty':quanty},
+          data : {'value':value,'quanty':qty},
           beforeSend: function () { 
             $("#loader-wrapper").removeClass("d-none");
           },

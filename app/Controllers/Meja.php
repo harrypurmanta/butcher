@@ -212,8 +212,8 @@ class Meja extends BaseController {
 					} else {
 						$buttonproduk = "<button onclick='disableproduk($key->billing_item_id)' xtype='button' class='btn btn-danger'><i class='fas fa-times'></i></button>";
 						$style = "";
-						$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px; margin-left:5px;'>-</button>
-	       		          <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 50px; line-height: 25px;'>+</button>";
+						$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 80px; height: 80px; width: 60px; line-height: 25px; margin-left:5px;'>-</button>
+	       		          <button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 50px; height: 50px; width: 80px; line-height: 25px;'>+</button>";
 					}
 				}
 
@@ -321,7 +321,7 @@ class Meja extends BaseController {
 				</div>";
 		} else if ($res[0]->statusbilling == 'waiting') {
 			$footer = "<div align='center' class='alert alert-info alert-rounded'> 
-							<i class='far fa-handshake'></i> SILAHKAN TUNGGU WAITERS UNTUK KONFIRMASI PESANAN ANDA !!
+							<i class='far fa-handshake'></i> SILAHKAN TUNGGU WAITERS UNTUK KONFIRMASI PESANAN ANDA
 						</div>";
 
 			$buttonmenu = "<div style='display:inline-block;' class='float-left'>
