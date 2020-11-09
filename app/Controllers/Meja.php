@@ -54,13 +54,8 @@ class Meja extends BaseController {
 	
 	public function pembulatanratusan($uang){
 	 $nilai = round($uang);
-	 $ratusan = substr($nilai, -3);
-	 if ($ratusan >= 100) {
-	     $akhir = $uang + (1000-$ratusan);
-	 } else {
-	     $akhir = $uang + (100-$ratusan);
-	 }
-	 
+	 $ratusan = substr($nilai, -2);
+	 $akhir = $uang + (100-$ratusan);
 	 return $akhir;
 	}
 
@@ -109,13 +104,13 @@ class Meja extends BaseController {
 		$discount_value = "";
 		$subtotal = 0;
 		$amt_before_discount = 0;
-
+		$total = 0;
         
 		if (count($res)>0) {
 			$billing_id = $res[0]->billing_id;
 
 		    if ($res[0]->member_nm != "") {
-		        $member_nm = $res[0]->member_nm;
+		        $member_nm = "<span style='font-size: 35px;'>".substr($res[0]->member_nm, 0,6)."</span>";
 		    } else {
 		        $member_nm = "Meja ".$res[0]->meja_nm;
 		    }
@@ -170,29 +165,34 @@ class Meja extends BaseController {
 				      <div class='col-md-12'>
 				      <table  style='font-size: 40px;' width='100%'>";
 			foreach ($res as $key) {
-				$total = $key->produk_harga * $key->qty;
-				$amt_before_discount = $amt_before_discount + $total;
+				if ($key->statusproduk == 'normal') {
+					$total = $key->produk_harga * $key->qty;
+					$amt_before_discount = $amt_before_discount + $total;
 
+					if (count($resdc)>0) {
+						foreach ($resdc as $dc) {
+							$symb = substr($dc->value, -1);
+							if ($symb == "%") {
+								$percentega = str_replace("%", "", $dc->value);
+								$ptotal = ($percentega/100) * $total;
+								list($harga,$belakangkoma) = explode(".", $ptotal);
+								$discount = "<span style='font-size: 35px;'>(".number_format($harga).")</span>";
+								$afterdc = $total - $harga;
+								$subtotal = $subtotal + $afterdc;
+								$discount_nmx = $dc->discount_nm;
+								$discount_valuex = $dc->value;
+							} else {
+								$subtotal = $subtotal + $total;
+							}
+						} 
+					} else {
+						$subtotal = $subtotal + $total;
+					}
 
-				if (count($resdc)>0) {
-					foreach ($resdc as $dc) {
-						$symb = substr($dc->value, -1);
-						if ($symb == "%") {
-							$percentega = str_replace("%", "", $dc->value);
-							$ptotal = ($percentega/100) * $total;
-							list($harga,$belakangkoma) = explode(".", $ptotal);
-							$discount = "<span style='font-size: 40px;'>(".number_format($harga).")</span>";
-							$afterdc = $total - $harga;
-							$subtotal = $subtotal + $afterdc;
-							$discount_nmx = $dc->discount_nm;
-							$discount_valuex = $dc->value;
-						} else {
-							$subtotal = $subtotal + $total;
-						}
-					} 
 				} else {
-					$subtotal = $subtotal + $total;
+					$total = $key->produk_harga * $key->qty;
 				}
+				
 
 				if ($key->statusbilling == 'verified') {
 					if ($key->statusproduk == "nullified") {
@@ -241,10 +241,10 @@ class Meja extends BaseController {
 					 foreach ($notpersen as $dc) {
 						$discount_nm = $dc->discount_nm;
 						$discount_value = $dc->value;
-							$ret .= "<tr style='font-size: 40px;'>
+							$ret .= "<tr style='font-size: 30px;'>
 							        <td align='left' width='80'>$discount_nm </td>
 							        <td></td>
-							        <td align='right'>".number_format($discount_value)."</td>
+							        <td align='right'>(".number_format($discount_value).")</td>
 							        </tr>";
 							$subtotal = $subtotal - $dc->value; 
 					}
@@ -297,11 +297,18 @@ class Meja extends BaseController {
 	public function billingcustomer() {
 	$meja_id = $this->request->getPost('meja_id');
 	$res = $this->billingmodel->getbyMejaidcustomer($meja_id)->getResult();
+	$discount_nmx = "";	 
+	$discount_valuex = "";
+	$discount = "";
+	$discount_nm = "";
+	$discount_value = "";
+	$subtotal = 0;
+	$amt_before_discount = 0;
 	if (count($res)>0) {
 		if ($res[0]->member_id == 0) {
-			$billname = $res[0]->meja_nm;
+			$billname = "Meja ".$res[0]->meja_nm;
 		} else {
-			$billname = $res[0]->person_nm;
+			$billname = "<span style='font-size: 18px;'>".substr($res[0]->member_nm, 0,6)."</span>";
 		}
 
 		if ($res[0]->statusbilling == 'verified') {
@@ -321,7 +328,7 @@ class Meja extends BaseController {
 				</div>";
 		} else if ($res[0]->statusbilling == 'waiting') {
 			$footer = "<div align='center' class='alert alert-info alert-rounded'> 
-							<i class='far fa-handshake'></i> SILAHKAN TUNGGU WAITERS UNTUK KONFIRMASI PESANAN ANDA
+							<i class='far fa-handshake'></i> SILAHKAN TUNGGU WAITERS UNTUK KONFIRMASI PESANAN ANDA.
 						</div>";
 
 			$buttonmenu = "<div style='display:inline-block;' class='float-left'>
@@ -329,14 +336,15 @@ class Meja extends BaseController {
 							</div>";
 		} else if ($res[0]->statusbilling == 'verified') {
 			$footer = "<div align='center' class='alert alert-success alert-rounded'> 
-							<i class='far fa-handshake'></i>  PESANAN ANDA SEDANG DI PROSES. SILAHKAN TUNGGU !!
+							<i class='far fa-handshake'></i>  PESANAN ANDA SEDANG DI PROSES. SILAHKAN TUNGGU.
 						</div>";
 			$buttonmenu = "";
 		}
 		
 		
 		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
-		$subtotal = 0;
+		$resdc = $this->discountmodel->getbybillidpersen($res[0]->billing_id)->getResult();
+		$notpersen = $this->discountmodel->getbybillid($res[0]->billing_id)->getResult();
 		$ret = "<div>
 					<div class='row'>
 						<div class='col-3'>
@@ -361,9 +369,9 @@ class Meja extends BaseController {
 					</div>
 					
 				</div>";
-		$ret .= "<table id='tbitem' width='100%' style='margin-top: 20px; font-size: 22px;'>
+		$ret .= "<table id='tbitem' width='100%' style='margin-top: 20px; font-size: 18px;'>
 			        <tr>
-			          <td align='left'>$dt</td>
+			          <td align='left'>".panjang($dt)."</td>
 			          <td align='right'>$tm</td>
 			        </tr>
 			        <tr>
@@ -373,10 +381,30 @@ class Meja extends BaseController {
 			        $collctedby
 			      </table>
 			      <hr style='border: 1px solid red'>
-			      <table style='font-size: 22px;' width='100%'>";
+			      <table style='font-size: 18px;' width='100%'>";
 		foreach ($res as $key) {
 			$total = $key->produk_harga * $key->qty;
-			$subtotal = $subtotal + $total;
+			$amt_before_discount = $amt_before_discount + $total;
+				if (count($resdc)>0) {
+					foreach ($resdc as $dc) {
+						$symb = substr($dc->value, -1);
+						if ($symb == "%") {
+							$percentega = str_replace("%", "", $dc->value);
+							$ptotal = ($percentega/100) * $total;
+							list($harga,$belakangkoma) = explode(".", $ptotal);
+							$discount = "<span style='font-size: 16px;'>(".number_format($harga).")</span>";
+							$afterdc = $total - $harga;
+							$subtotal = $subtotal + $afterdc;
+							$discount_nmx = $dc->discount_nm;
+							$discount_valuex = $dc->value;
+						} else {
+							$subtotal = $subtotal + $total;
+						}
+					} 
+				} else {
+					$subtotal = $subtotal + $total;
+				}
+
 			if ($key->statusbilling == 'normal') {
 				$buttonqty = "<button onclick='minus($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px; margin-left:5px;'>-</button>
 				<button onclick='add($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px;'>+</button>";
@@ -393,7 +421,7 @@ class Meja extends BaseController {
 			        <input type='hidden' id='qty$key->billing_item_id' value='$key->qty'/>
 			          <td align='left' ><span id='spanqty$key->billing_item_id'>$key->qty X $buttonqty</span> </td>
 			          <td align='center'>@".number_format($key->produk_harga)."</td>
-			          <td align='right'>".number_format($total)."</td>
+			          <td align='right'>".number_format($total)."<br>$discount</td>
 			        </tr>
 			        <tr style='line-height:40px;'>
 			        <td>&nbsp </td>
@@ -401,18 +429,30 @@ class Meja extends BaseController {
 			        <td></td>
 			        </tr>";
 			 }
+
+			if (count($notpersen)>0) {
+					 foreach ($notpersen as $dc) {
+						$discount_nm = $dc->discount_nm;
+						$discount_value = $dc->value;
+							$ret .= "<tr style='font-size: 18px;'>
+							        <td align='left' width='120'>$discount_nm </td>
+							        <td></td>
+							        <td align='right'>(".number_format($discount_value).")</td>
+							        </tr>";
+							$subtotal = $subtotal - $dc->value; 
+					}
+				} 
+
 			$ret .= "</table>
 					<hr style='border: 1px solid red'>";
 
-			$tax 		= $subtotal * 0.10;
-			$service 	= $subtotal * 0.05;
+			$tax = $amt_before_discount * 0.10;
+			$service = $amt_before_discount * 0.05;
 			$grandtotal = $subtotal + $tax + $service;
-			$nilai = round($grandtotal);
-			$ratusan = substr($nilai, -2);
-			$akhir = $grandtotal + (100-$ratusan);
-			$nilaibulat = $akhir - $grandtotal;
+			$jmlbulat = $this->pembulatanratusan($grandtotal);
+			$nilaibulat = $jmlbulat - $grandtotal;
 
-			$ret .= "<table style='margin-top:30px; font-size: 20px;' width='100%'>
+			$ret .= "<table style='margin-top:30px; font-size: 18px;' width='100%'>
 			        <tr>
 			          <td align='left'>Subtotal</td>
 			          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
@@ -431,7 +471,7 @@ class Meja extends BaseController {
 			        </tr>
 			        <tr>
 			          <td align='left' style='font-weight:bold;'>Total</td>
-			          <td colspan='2' align='right'>Rp. ".number_format($akhir)."</td>
+			          <td colspan='2' align='right'>Rp. ".number_format($jmlbulat)."</td>
 			        </tr>
 					</table>
 					<hr style='border: 1px solid red;margin-bottom:100px;'>

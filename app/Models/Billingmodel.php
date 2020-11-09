@@ -31,7 +31,7 @@ class Billingmodel extends Model
 
     public function getbyMejaidcustomer($id){
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm');
+        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd as statusproduk,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm,,h.person_nm as collected_nm');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -163,6 +163,11 @@ class Billingmodel extends Model
     public function insertbilldisct($data) {
         return $this->db->table('billing_discount')
                     ->insert($data);
+    }
+
+    public function insertpoin($data) {
+        return $this->db->table('member_poin')
+                        ->insert($data);
     }
 
     public function insertbillmember($id,$data) {

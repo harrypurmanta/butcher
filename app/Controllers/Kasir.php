@@ -54,10 +54,10 @@ class Kasir extends BaseController
 		$ret = "";
 		$meja = $this->mejamodel->getbyNormal()->getResult();
 		foreach ($meja  as $key) {
-			$billing = $this->billingmodel->getbyMejaid($key->meja_id)->getResult();
+			$billing = $this->billingmodel->getbyMejaid($key->meja_id)->getResult();	
 			if (count($billing)>0) {
 			  foreach ($billing as $k) {
-				if ($k->statusbilling == 'waiting' || $k->statusbilling == 'normal') {
+				if ($k->statusbilling == 'waiting') {
 				  $btnclass = "btn btn-warning";
 				} else if ($k->statusbilling == 'verified') {
 				  $btnclass = "btn btn-danger";
@@ -149,7 +149,7 @@ class Kasir extends BaseController
 							$percentega = str_replace("%", "", $dc->value);
 							$ptotal = ($percentega/100) * $total;
 							list($harga,$belakangkoma) = explode(".", $ptotal);
-							$discount = "<span style='font-size: 16px;'>($harga)</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
+							$discount = "<span style='font-size: 16px;'>(".number_format($harga).")</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
 							$afterdc = $total - $harga;
 							$subtotal = $subtotal + $afterdc;
 							$discount_nmx = $dc->discount_nm;
@@ -170,7 +170,7 @@ class Kasir extends BaseController
 				        <tr style='font-size: 16px;'>
 				          <td align='left' width='180'><span>$key->qty X</span><br>$discount_nmx $discount_valuex</td>
 				          <td align='center'><span>@".number_format($key->produk_harga)."</span></td>
-				          <td align='right'><span>$total<br>$discount</span></td>
+				          <td align='right'><span>".number_format($total)."<br>$discount</span></td>
 				        </tr>
 				        <tr style='line-height:12px;'>
 				        <td>&nbsp </td>
@@ -186,7 +186,7 @@ class Kasir extends BaseController
 							$ret .= "<tr style='font-size: 16px;'>
 							        <td align='left' width='80'>$discount_nm </td>
 							        <td></td>
-							        <td align='right'>$discount_value <a href='#' onclick='removedc($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a></td>
+							        <td align='right'>(".number_format($discount_value).") <a href='#' onclick='removedc($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a></td>
 							        </tr>";
 							$subtotal = $subtotal - $dc->value; 
 					}
@@ -840,6 +840,7 @@ class Kasir extends BaseController
 		$ptotal = "";
 		$ttl_discount = 0;
 		$amt_before_discount = 0;
+		$poinmb = 0;
 		if (count($data)>0) {
 			if ($data[0]->member_nm != "") {
 		        $member_nm = $data[0]->member_nm;
@@ -919,6 +920,7 @@ class Kasir extends BaseController
 								$discount_nmx = $dc->discount_nm;
 								$discount_valuex = $dc->value;
 								$ttl_discount = $ttl_discount + $ptotal; 
+								$poinmb = $poinmb + $harga;
 							} else {
 								$subtotal = $subtotal + $total;
 							}
@@ -994,6 +996,16 @@ class Kasir extends BaseController
 					'status_cd' => 'finish'
 				];
 				$updatebill = $this->billingmodel->updateafterpayment($billing_id,$updatebill);
+
+				if ($data[0]->member_nm != "") {
+					$datapoin = [
+						'member_id' => $data[0]->member_id,
+						'poin_value' => $poinmb,
+						'deposit_dttm' => date('Y-m-d H:i:s'),
+						'trans_type' => 'deposit',
+ 					];
+					$insertpoin = $this->billingmodel->insertpoin($datapoin);
+				}
 
 			    /* Cut the receipt and open the cash drawer */
 			    $this->printer->cut();
