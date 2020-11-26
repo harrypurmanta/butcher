@@ -1140,7 +1140,7 @@ class Kasir extends BaseController
 			    $this->printer->pulse();
 
 			} catch (Exception $e) {
-			    echo $e->getMessage();
+			    // echo $e->getMessage();
 			} finally {
 			    $this->printer->close();
 			}
