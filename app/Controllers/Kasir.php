@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -252,8 +252,10 @@ class Kasir extends BaseController
 				} 
 				
 				    
-					$tax = $amt_before_discount * 0.10;
-					$service = $amt_before_discount * 0.05;
+					$taxx = $amt_before_discount * 0.10;
+					list($tax,$belakangkoma) = explode(".", $taxx);
+					$servicex = $amt_before_discount * 0.05;
+					list($service,$belakangkomas) = explode(".", $servicex);
 					$grandtotal = $subtotal + $tax + $service;
 					$jmlbulat = $this->pembulatanratusan($grandtotal);
 					$nilaibulat = $jmlbulat - $grandtotal;
@@ -1208,8 +1210,10 @@ class Kasir extends BaseController
 			    $this->printer->setEmphasis(false);
 			    $this->printer->feed();
 			    
-				$tax = $amt_before_discount * 0.10;
-				$service = $amt_before_discount * 0.05;
+				$taxx = $amt_before_discount * 0.10;
+				list($tax,$belakangkoma) = explode(".", $taxx);
+				$servicex = $amt_before_discount * 0.05;
+				list($service,$belakangkoma) = explode(".", $servicex);
 				$grandtotal = $subtotal + $tax + $service;
 				$jmlbulat = $this->pembulatanratusan($grandtotal);
 				$nilaibulat = $jmlbulat - $grandtotal;
@@ -1380,8 +1384,10 @@ class Kasir extends BaseController
 			    $this->printer->setEmphasis(false);
 			    $this->printer->feed();
 
-			    $tax = $amt_before_discount * 0.10;
-				$service = $amt_before_discount * 0.05;
+			    $taxx = $amt_before_discount * 0.10;
+			    list($tax,$belakangkomax) = explode(".", $taxx);
+				$servicex = $amt_before_discount * 0.05;
+				list($service,$belakangkomas) = explode(".", $servicex);
 				$grandtotal = $subtotal + $tax + $service;
 				$jmlbulat = $this->pembulatanratusan($grandtotal);
 				$nilaibulat = $jmlbulat - $grandtotal;
