@@ -913,13 +913,13 @@ class Kasir extends BaseController
     		        
     		    }
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->text("-------------------------------------\n");
+    		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
     		   
     
     		    /* Cut the receipt and open the cash drawer */
-    		    $this->printer->cut();
-    		    $this->printer->pulse();
+    		    // $this->printer->cut();
+    		    // $this->printer->pulse();
     
     		} catch (Exception $e) {
     		    echo $e->getMessage();
@@ -977,7 +977,7 @@ class Kasir extends BaseController
     		        $this->printer->text($this->getAsString(32,$item->qty."x","","")); // for 58mm Font A
     		    }
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->text("-------------------------------------\n");
+    		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
     		    
     		 
@@ -1225,7 +1225,7 @@ class Kasir extends BaseController
 			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_nm, 0,6))."\n");
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
-			    $this->printer->text("-------------------------------------\n");
+			    $this->printer->text("--------------------------------\n");
 			    $this->printer->feed(1);
 			    
 
@@ -1285,7 +1285,7 @@ class Kasir extends BaseController
 				// 	} 
 				// }
 			    $this->printer->setEmphasis(false);
-			    $this->printer->text("-------------------------------------\n");
+			    $this->printer->text("--------------------------------\n");
 			    $this->printer->setEmphasis(false);
 			    $this->printer->feed();
 
