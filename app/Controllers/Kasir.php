@@ -952,7 +952,11 @@ class Kasir extends BaseController
     		$this->profile = CapabilityProfile::load("POS-5890");
     		$this->connector = new RawbtPrintConnector();
     		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
-    
+    		if ($data[0]->member_nm != "") {
+		        $member_nm = $data[0]->member_nm;
+		    } else {
+		        $member_nm = "Meja ".$data[0]->meja_nm;
+		    }
     
     		$this->printer = new Printer($this->connector);
     		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
@@ -982,9 +986,11 @@ class Kasir extends BaseController
     		    /* Items */
     		    
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->setFont(Printer::FONT_A);
+    		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
-    				
     		        $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
     		        $this->printer->text($this->getAsString(32,$item->qty."x","","")); // for 58mm Font A
@@ -1017,7 +1023,11 @@ class Kasir extends BaseController
     		$this->profile = CapabilityProfile::load("POS-5890");
     		$this->connector = new RawbtPrintConnector();
     		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
-    
+    		if ($data[0]->member_nm != "") {
+		        $member_nm = $data[0]->member_nm;
+		    } else {
+		        $member_nm = "Meja ".$data[0]->meja_nm;
+		    }
     
     		$this->printer = new Printer($this->connector);
     		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
@@ -1048,6 +1058,8 @@ class Kasir extends BaseController
     		    /* Items */
     		    
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->setFont(Printer::FONT_A);
+    		    $this->printer->text($member_nm."\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
     		        $this->printer->text($item->produk_nm."\n");
