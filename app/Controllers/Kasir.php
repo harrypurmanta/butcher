@@ -1009,6 +1009,7 @@ class Kasir extends BaseController
 		$ptotal = "";
 		$ttl_discount = 0;
 		$amt_before_discount = 0;
+		$nilaidiskon = "";
 
 		if (count($data)>0) {
 			if ($data[0]->member_nm != "") {
