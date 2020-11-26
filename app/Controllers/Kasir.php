@@ -342,7 +342,7 @@ class Kasir extends BaseController
 
 	public function discountkasir() {
 		$res = $this->discountmodel->getbyNormal()->getResult();
-			$ret = "<div class='modal-dialog'>"
+			$ret = "<div class='modal-dialog modal-lg'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
 	            . "<button type='button' class='btn btn-info' onclick='formtambahdiskon()' style='font-size: 25px;'>+</button>"
@@ -367,7 +367,7 @@ class Kasir extends BaseController
 
 	public function memberkasir() {
 		$res = $this->membermodel->getbyNormal()->getResult();
-			$ret = "<div class='modal-dialog'>"
+			$ret = "<div class='modal-dialog modal-lg'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
 	            . "<button type='button' class='btn btn-info' onclick='formtambahmember()' style='font-size: 25px;'>+</button>"
@@ -1213,6 +1213,7 @@ class Kasir extends BaseController
 			    /* Name of shop */
 			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
 			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+			    $this->printer->setFont(Printer::FONT_B);
 			    $this->printer->text("Butcher Steak & Pasta Palembang\n");
 			    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
 			    $this->printer->text("Sumatera Selatan, 30114, 07115626366\n");
