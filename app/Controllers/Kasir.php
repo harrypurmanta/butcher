@@ -253,9 +253,20 @@ class Kasir extends BaseController
 				
 				    
 					$taxx = $amt_before_discount * 0.10;
-					list($tax,$belakangkoma) = explode(".", $taxx);
+					if (strpos($taxx,'.') == TRUE) {
+						list($tax,$belakangkoma) = explode(".", $taxx);
+					} else {
+						$tax = $taxx;
+					}
+					
 					$servicex = $amt_before_discount * 0.05;
-					list($service,$belakangkomas) = explode(".", $servicex);
+					if (strpos($servicex,'.') == TRUE) {
+						list($service,$belakangkomas) = explode(".", $servicex);
+					} else {
+						$service = $servicex;
+					}
+					
+					
 					$grandtotal = $subtotal + $tax + $service;
 					$jmlbulat = $this->pembulatanratusan($grandtotal);
 					$nilaibulat = $jmlbulat - $grandtotal;
@@ -989,6 +1000,8 @@ class Kasir extends BaseController
     		    
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
+    		    $this->printer->setEmphasis(true);
+    		    $this->printer->setTextSize(2, 2);
     		    $this->printer->text($member_nm."\n");
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
@@ -1061,6 +1074,7 @@ class Kasir extends BaseController
     		    
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
+    		    $this->printer->setEmphasis(true);
     		    $this->printer->text($member_nm."\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
