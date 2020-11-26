@@ -59,27 +59,42 @@ class Kasir extends BaseController
 
 	public function cardbodymeja() {
 		$ret = "";
-		$meja = $this->mejamodel->getbyNormal()->getResult();
-		foreach ($meja  as $key) {
-			$billing = $this->billingmodel->getbyMejaid($key->meja_id)->getResult();	
-			if (count($billing)>0) {
-			  foreach ($billing as $k) {
-				if ($k->statusbilling == 'waiting') {
-				  $btnclass = "btn btn-warning";
-				} else if ($k->statusbilling == 'verified') {
-				  $btnclass = "btn btn-danger";
-			  	} else {
-				  $btnclass = "btn btn-info";
+		$kasirstatus = $this->billingmodel->getStatuskasir()->getResult();
+		if (count($kasirstatus)>0) {
+			if ($kasirstatus[0]->status_cd == "open") {
+				$meja = $this->mejamodel->getbyNormal()->getResult();
+				foreach ($meja  as $key) {
+					$billing = $this->billingmodel->getbyMejaid($key->meja_id)->getResult();	
+					if (count($billing)>0) {
+					  foreach ($billing as $k) {
+						if ($k->statusbilling == 'waiting') {
+						  $btnclass = "btn btn-warning";
+						} else if ($k->statusbilling == 'verified') {
+						  $btnclass = "btn btn-danger";
+					  	} else {
+						  $btnclass = "btn btn-info";
+						}
+					  }
+					} else {
+					  $btnclass = "btn btn-info";
+					}
+					
+					$ret .= "<div style='display: inline-block; margin: 5px;'>
+								<button onclick='showbillingbymeja($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
+							</div>";	   
 				}
-			  }
 			} else {
-			  $btnclass = "btn btn-info";
+				$ret .= "<div style='display: inline-block; margin: 5px;'>
+							<button onclick='openkasir()' class='btn btn-info font-weight-bold' style='font-size: 20px; padding: 10px;'>OPEN KASIR</button>
+						</div>";	
 			}
-			
+		} else {
 			$ret .= "<div style='display: inline-block; margin: 5px;'>
-						<button onclick='showbillingbymeja($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
-					</div>";	   
+						<button onclick='openkasir()' class='btn btn-info font-weight-bold' style='font-size: 20px; padding: 10px;'>OPEN KASIR</button>
+					</div>";	
 		}
+
+		
 		return $ret;                       
 	}
 
@@ -580,6 +595,36 @@ class Kasir extends BaseController
        return $nol.$angka;
     }
 
+    public function openkasir() {
+    	$date = date('Y-m-d');
+    	$ret = "<div class='modal-dialog'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>Open Kasir</h4>"
+	             . "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+	            . "<form>"
+	            . "<div class='form-group'>"
+	            . "<label for='namadiscount' class='control-label'>Tanggal Buka</label>"
+	            . "<input type='date' class='form-control' id='open_dttm' value='$date'>"
+	            . "</div>"
+	            . "<div class='form-group'>"
+	            . "<label class='control-label'>Modal Awal</label>"
+	            . "<input type='number' class='form-control' id='nilaimodal'>"
+	            . "</div>"
+	            . "</form>"
+	            . "</div>"
+	            . "<div class='modal-footer'>"
+	            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
+	            . "<button onclick='simpanopenkasir()' type='button' class='btn btn-danger waves-effect waves-light'>Simpan</button>"
+	            . "</div>"
+	            . "</div>"
+	            . "</div>";
+
+	    return $ret;
+    }
+
     public function closekasir() {
     	$date = date('Y-m-d');
     	$ret = "<div class='modal-dialog'>"
@@ -663,6 +708,37 @@ class Kasir extends BaseController
 		exit();
     }
 
+    public function simpanopenkasir() {
+    	// $cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
+    	$jam = date('H:i:s');
+   //  	if (count($cekunclosed)>0) {
+   //  		$ret = "belumfinish";
+   //  	} else {
+    		
+			// $this->reportTopdf($closed_dttm);
+			// $this->sendingemail($closed_dttm);
+   //  	}
+
+    	$open_dttm = $this->request->getPost('open_dttm');
+    	$nilaimodal = $this->request->getPost('nilaimodal');
+    		
+	    	$data = [
+	    	  'modal' => $nilaimodal,
+			  'status_cd' => 'open',
+			  'open_dttm' => $open_dttm.' '.$jam,
+			  'open_user' => $this->session->user_id,
+			];
+			$res = $this->billingmodel->simpanopenkasir($data);
+			if ($res != "") {
+				$this->session->set('kasir_status_id',$res);
+				$ret = "true";
+			} else {
+				$ret = "false";
+			}
+    	
+		return $ret;
+    }
+
     public function simpanclosekasir() {
     	$cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
     	$jam = date('H:i:s');
@@ -731,11 +807,12 @@ class Kasir extends BaseController
 			$billing_cd = "LAV".$this->tambah_nol($code,4);
 
 			$data = [
-			  'meja_id' => $meja_id,
-			  'billing_cd' => $billing_cd,
-			  'status_cd' => 'verified',
-			  'created_dttm' => $date,
-			  'created_user' => $meja_id
+				'kasir_status_id' => $this->session->kasir_status_id,
+			  	'meja_id' => $meja_id,
+			  	'billing_cd' => $billing_cd,
+			  	'status_cd' => 'verified',
+			  	'created_dttm' => $date,
+			  	'created_user' => $meja_id
 			];
 			$billing_id = $this->billingmodel->simpanbilling($data);
 		}

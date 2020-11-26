@@ -73,6 +73,30 @@ $(document).ready(function(){
   
 });
 
+function openkasir() {
+  $.ajax({
+    url : "<?= base_url('kasir/openkasir') ?>",
+    beforeSend: function () { 
+      $("#loader-wrapper").removeClass("d-none")
+    },
+     success:function(data){
+      $("#loader-wrapper").addClass("d-none");
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
 function closekasir() {
   $.ajax({
     url : "<?= base_url('kasir/closekasir') ?>",
@@ -95,6 +119,63 @@ function closekasir() {
         })
     }
   });
+}
+
+function simpanopenkasir(){
+  var open_dttm = $('#open_dttm').val();
+  var nilaimodal = $('#nilaimodal').val();
+  Swal.fire({
+          title: 'Apakah anda yakin?',
+          text: "Setelah tekan yes, data tidak dapat dikembalikan",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, confirm it!'
+      }).then((result) => {
+          if (result.value == true) {
+              $.ajax({
+                 url : "<?= base_url('kasir/simpanopenkasir') ?>",
+                 type: "post",
+                 data: {open_dttm:open_dttm,nilaimodal:nilaimodal},
+                 success:function(data){
+                  if (data == "belumfinish") {
+                    Swal.fire({
+                        title:"Ada billing yang belum di selesaikan !!",
+                        text:"Silahkan selesaikan terlebih dahulu !!",
+                        type:"warning",
+                        showCancelButton:0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                  } else if (data == 'false') {
+                    Swal.fire({
+                        title:"Data tidak ada !!",
+                        text:"Silahkan refresh halaman !!",
+                        type:"warning",
+                        showCancelButton:0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                  } else {
+                    $('#modaltambahmember').modal('hide');
+                    listmejakasir();
+                  }
+                  
+                },
+                error:function(){
+                    Swal.fire({
+                        title:"Gagal!",
+                        text:"Data gagal disimpan!",
+                        type:"warning",
+                        showCancelButton:!0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                }
+              });
+          }
+       })
 }
 
 function simpanclosekasir(){
@@ -919,7 +1000,7 @@ function checkout(id,gt,btn) {
           showCancelButton: true,
           confirmButtonColor: '#3085d6',
           cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!'
+          confirmButtonText: 'Yes, confirm it!'
       }).then((result) => {
           if (result.value == true) {
               $.ajax({

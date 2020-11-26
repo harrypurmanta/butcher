@@ -145,6 +145,19 @@ class Billingmodel extends Model
                         ->get();
     }
 
+    public function getStatuskasir() {
+        return $this->db->table('kasir_status')
+                        ->limit(1)
+                        ->orderby('kasir_status_id','DESC')
+                        ->get();
+    }
+
+    public function simpanopenkasir($data) {
+        $this->db->table('kasir_status')
+                        ->insert($data);
+        return $this->db->insertID();
+    }
+
     public function simpanbilling($data) {
     	$builder = $this->db->table('billing');
         $builder->insert($data);
