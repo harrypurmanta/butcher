@@ -25,6 +25,7 @@ $this->session->start();
     <link href="<?=base_url() ?>/assets/plugins/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="<?=base_url() ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?=base_url() ?>/assets/css/custom.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
     <link href="<?=base_url() ?>/assets/css/colors/default-dark.css" id="theme" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

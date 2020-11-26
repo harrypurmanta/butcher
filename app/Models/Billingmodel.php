@@ -244,6 +244,13 @@ class Billingmodel extends Model
                         ->update();
     }
 
+    public function updatestatuskasir($kasir_status_id,$datastatuskasir) {
+        return $this->db->table('kasir_status')
+                        ->set($datastatuskasir)
+                        ->where('kasir_status_id',$kasir_status_id)
+                        ->update();
+    }
+
     public function removedckasir($id,$data){
         return $this->db->table('billing_discount')
                     ->set($data)

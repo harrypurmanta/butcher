@@ -759,7 +759,16 @@ class Kasir extends BaseController
     		$ret = "belumfinish";
     	} else {
     		$closed_dttm = $this->request->getPost('closed_dttm');
-    		
+			$kasir_status_id = $this->session->kasir_status_id;
+
+			$datastatuskasir = [
+				'status_cd' => 'closed',
+				'closed_dttm' => date('Y-m-d H:i:s'),
+				'closed_user' => $this->session->user_id,
+ 			];
+
+			$this->billingmodel->updatestatuskasir($kasir_status_id,$datastatuskasir);
+
 	    	$data = [
 			  'status_cd' => 'closed',
 			  'closed_dttm' => $closed_dttm.' '.$jam,
@@ -1476,6 +1485,8 @@ class Kasir extends BaseController
  					];
 					$insertpoin = $this->billingmodel->insertpoin($datapoin);
 				}
+
+
 
 			    /* Cut the receipt and open the cash drawer */
 			    // $this->printer->cut();

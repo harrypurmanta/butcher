@@ -138,6 +138,9 @@ function simpanopenkasir(){
                  url : "<?= base_url('kasir/simpanopenkasir') ?>",
                  type: "post",
                  data: {open_dttm:open_dttm,nilaimodal:nilaimodal},
+                 beforeSend: function () { 
+                    $("#loader-wrapper").removeClass("d-none")
+                  },
                  success:function(data){
                   if (data == "belumfinish") {
                     Swal.fire({
@@ -161,7 +164,7 @@ function simpanopenkasir(){
                     $('#modaltambahmember').modal('hide');
                     listmejakasir();
                   }
-                  
+                  $("#loader-wrapper").addClass("d-none");
                 },
                 error:function(){
                     Swal.fire({
@@ -194,6 +197,9 @@ function simpanclosekasir(){
                  url : "<?= base_url('kasir/simpanclosekasir') ?>",
                  type: "post",
                  data: {closed_dttm:closed_dttm},
+                 beforeSend: function () { 
+                    $("#loader-wrapper").removeClass("d-none")
+                  },
                  success:function(data){
                   if (data == "belumfinish") {
                     Swal.fire({
@@ -217,7 +223,7 @@ function simpanclosekasir(){
                     $('#modaltambahmember').modal('hide');
                     listmejakasir();
                   }
-                  
+                  $("#loader-wrapper").addClass("d-none");
                 },
                 error:function(){
                     Swal.fire({
@@ -344,6 +350,9 @@ function simpanproduk(produk_id) {
       url : "<?= base_url('kasir/addproduktobill') ?>",
       type: "POST",
       data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan},
+      beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+      },
       success:function(data){
         if (data == 'true') {
           showbillingbymeja(meja_id);
@@ -358,6 +367,7 @@ function simpanproduk(produk_id) {
               cancelButtonColor:"#f46a6a"
           })
         }
+        $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
           Swal.fire({
@@ -376,10 +386,14 @@ function formtambahmember() {
   $.ajax({
      url : "<?= base_url('kasir/formtambahmember') ?>",
      type: "post",
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+      },
      success:function(data){
       $('#modaltambahmember').html(data);
       $('#modaltambahmember').modal('show');
       $('#responsive-modal').modal('hide');
+      $("#loader-wrapper").addClass("d-none");
     },
     error:function(){
         Swal.fire({
@@ -397,10 +411,14 @@ function formtambahmember() {
 function formtambahdiskon() {
   $.ajax({
      url : "<?= base_url('kasir/formtambahdiskon') ?>",
+     beforeSend: function () { 
+      $("#loader-wrapper").removeClass("d-none")
+    },
      success:function(data){
       $('#modaltambahmember').html(data);
       $('#modaltambahmember').modal('show');
       $('#responsive-modal').modal('hide');
+      $("#loader-wrapper").addClass("d-none");
     },
     error:function(){
         Swal.fire({
@@ -553,6 +571,9 @@ function showbillingbymeja(id) {
      url : "<?= base_url('kasir/getbymejaidkasir') ?>",
      type: "post",
      data : {'id':id},
+     beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
      success:function(data){
       var _data = JSON.parse(data);
       if (_data.status == 'kategori') {
@@ -562,6 +583,7 @@ function showbillingbymeja(id) {
         $('#cardbodymeja').html(_data.produk);
         $('#cardbody').html(_data.billing);
       }
+      $("#loader-wrapper").addClass("d-none");
     },
     error:function(){
         Swal.fire({
@@ -580,9 +602,13 @@ function diskon() {
     $.ajax({
        url : "<?= base_url('kasir/discountkasir') ?>",
        type: "post",
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
        success:function(data){
         $('#responsive-modal').html(data);
         $('#responsive-modal').modal('show');
+        $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
           Swal.fire({
@@ -613,9 +639,13 @@ function showcheckout(id,gt) {
        url : "<?= base_url('kasir/showcheckout') ?>",
        type: "post",
        data: {id:id,gt:gt},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
        success:function(data){
         $('#responsive-modal').html(data);
         $('#responsive-modal').modal('show');
+        $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
           Swal.fire({
@@ -635,9 +665,13 @@ function member() {
    $.ajax({
        url : "<?= base_url('kasir/memberkasir') ?>",
        type: "post",
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+       },
        success:function(data){
         $('#responsive-modal').html(data);
         $('#responsive-modal').modal('show');
+        $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
           Swal.fire({
@@ -669,6 +703,9 @@ function addDiscount(di) {
        url : "<?= base_url('kasir/adddiscounttobill') ?>",
        type: "post",
        data: {id:id,di:di,bi:bi},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
        success:function(data){
         if (data == 'true') {
           showbillingbymeja(id);
@@ -692,6 +729,7 @@ function addDiscount(di) {
               cancelButtonColor:"#f46a6a"
           })
         }
+        $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
           Swal.fire({
@@ -725,6 +763,9 @@ function addmember(di){
        url : "<?= base_url('kasir/addmembertobill') ?>",
        type: "post",
        data: {id:id,di:di,bi:bi},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
        success:function(data){
         if (data == 'true') {
           showbillingbymeja(id);
@@ -738,8 +779,8 @@ function addmember(di){
               confirmButtonColor:"#556ee6",
               cancelButtonColor:"#f46a6a"
           })
-          
         }
+        $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
           Swal.fire({
@@ -763,6 +804,9 @@ function removedcmember(id,di,discount_id) {
      url : "<?= base_url('kasir/removedcmember') ?>",
      type: "post",
      data: {id:id,di:di,discount_id:discount_id},
+     beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
@@ -777,6 +821,7 @@ function removedcmember(id,di,discount_id) {
             cancelButtonColor:"#f46a6a"
         })
       }
+      $("#loader-wrapper").addClass("d-none");
     },
     error:function(){
         Swal.fire({
@@ -796,6 +841,9 @@ function removedc(id,di,discount_id) {
      url : "<?= base_url('kasir/removedc') ?>",
      type: "post",
      data: {id:id,di:di,discount_id:discount_id},
+     beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
@@ -809,6 +857,7 @@ function removedc(id,di,discount_id) {
             cancelButtonColor:"#f46a6a"
         })
       }
+      $("#loader-wrapper").addClass("d-none");
     },
     error:function(){
         Swal.fire({
@@ -828,6 +877,9 @@ function removemember(id,billing_id) {
      url : "<?= base_url('kasir/removemember') ?>",
      type: "post",
      data: {id:id,billing_id:billing_id},
+     beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
      success:function(data){
       if (data == 'true') {
         showbillingbymeja(id);
@@ -841,6 +893,7 @@ function removemember(id,billing_id) {
             cancelButtonColor:"#f46a6a"
         })
       }
+      $("#loader-wrapper").addClass("d-none");
     },
     error:function(){
         Swal.fire({
@@ -855,15 +908,6 @@ function removemember(id,billing_id) {
   });
 }
 
-function cetakmenu(id,btn) {
-  cetakmenudrinks(id,btn);
-  setTimeout(
-  function() 
-  {
-    cetakmenufood(id,btn);
-  }, 10000);
-}
-
 function cetakmenudrinks(id,btn) {
     b = $(btn);
       b.attr('data-old', b.text());
@@ -872,6 +916,9 @@ function cetakmenudrinks(id,btn) {
          url : "<?= base_url('kasir/cetakmenudrinks') ?>",
          type: "post",
          data: {id:id},
+         beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
          success:function(data){
           if (data == "false") {
               Swal.fire({
@@ -887,6 +934,7 @@ function cetakmenudrinks(id,btn) {
               showbillingbymeja(id);
           }
           b.text(b.attr('data-old'));
+          $("#loader-wrapper").addClass("d-none");
         },
         error:function(){
             Swal.fire({
@@ -909,6 +957,9 @@ function cetakmenufood(id,btn){
          url : "<?= base_url('kasir/cetakmenufood') ?>",
          type: "post",
          data: {id:id},
+         beforeSend: function () { 
+            $("#loader-wrapper").removeClass("d-none")
+        },
          success:function(data){
           if (data == "false") {
               Swal.fire({
@@ -924,6 +975,7 @@ function cetakmenufood(id,btn){
               showbillingbymeja(id);
           }
           b.text(b.attr('data-old'));
+          $("#loader-wrapper").addClass("d-none");
         },
         error:function(){
             Swal.fire({
@@ -947,10 +999,14 @@ var billing_id = $('#billing_id').val();
      url : "<?= base_url('kasir/cetakbilling') ?>",
      type: "post",
      data: {id:id,billing_id:billing_id},
+     beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
      success:function(data){
       showbillingbymeja(id);
       window.location.href = data;
       b.text(b.attr('data-old'));
+      $("#loader-wrapper").addClass("d-none");
     },
     error:function(){
         Swal.fire({
@@ -997,6 +1053,9 @@ function checkout(id,gt,btn) {
                  url : "<?= base_url('kasir/cetakcheckout') ?>",
                  type: "post",
                  data: {id:id,gt:gt,meja_id:meja_id,billing_id:billing_id,payplan_id:payplan_id,paid:paid},
+                 beforeSend: function () { 
+                    $("#loader-wrapper").removeClass("d-none")
+                },
                  success:function(data){
                   if (data == 'false') {
                     Swal.fire({
@@ -1011,8 +1070,8 @@ function checkout(id,gt,btn) {
                     $('#responsive-modal').modal('hide');
                     window.location.href = data;
                     b.text(b.attr('data-old'));
-                    showbillingbymeja(id);
-
+                    listmejakasir()
+                    $("#loader-wrapper").addClass("d-none");
                   }
                   
                 },
@@ -1029,19 +1088,6 @@ function checkout(id,gt,btn) {
               });
           }
        })
-
-  // if (gt > paid) {
-  //   Swal.fire({
-  //       title:"Nilai input terlalu kecil dari total billing !!",
-  //       text:"Error !!",
-  //       type:"warning",
-  //       showCancelButton:0,
-  //       confirmButtonColor:"#556ee6",
-  //       cancelButtonColor:"#f46a6a"
-  //   })
-  // } else {
-   
-  // }
 }
 
 function removeitem(meja_id,id) {
