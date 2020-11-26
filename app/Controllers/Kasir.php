@@ -792,6 +792,7 @@ class Kasir extends BaseController
 		$catatan 	= $this->request->getPost('catatan');
 		$date 		= date('Y-m-d H:i:s');
 		$getbill 	= $this->billingmodel->getbyMejaidkasir($meja_id)->getResult();
+		$kasirstatus = $this->session->kasir_status_id;
 		
 		if (count($getbill)>0) {
 			$billing_id = $getbill[0]->billing_id;
@@ -807,7 +808,7 @@ class Kasir extends BaseController
 			$billing_cd = "LAV".$this->tambah_nol($code,4);
 
 			$data = [
-				'kasir_status_id' => $this->session->kasir_status_id,
+				'kasir_status_id' => $kasirstatus,
 			  	'meja_id' => $meja_id,
 			  	'billing_cd' => $billing_cd,
 			  	'status_cd' => 'verified',
