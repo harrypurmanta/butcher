@@ -721,8 +721,13 @@ class Kasir extends BaseController
 			$billing_id = $getbill[0]->billing_id;
 		} else {
 			$desclimit 	= $this->billingmodel->getDesclim1()->getResult();
-			$number = preg_replace("/[^1-9]/", "", $desclimit[0]->billing_cd);
-			$code = $number + 1;
+			if (count($desclimit)>0) {
+				$number = preg_replace("/[^1-9]/", "", $desclimit[0]->billing_cd);
+				$code = $number + 1;
+			} else {
+				$code = 1;
+			}
+			
 			$billing_cd = "LAV".$this->tambah_nol($code,4);
 
 			$data = [
