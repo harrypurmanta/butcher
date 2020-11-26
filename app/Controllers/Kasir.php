@@ -1,14 +1,17 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\Controller;
+use App\Libraries\fpdf\fpdf;
 use App\Models\Usersmodel;
 use App\Models\Mejamodel;
 use App\Models\Billingmodel;
 use App\Models\Discountmodel;
 use App\Models\Membermodel;
 use App\Models\Payplanmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+use App\Models\Kategorimodel;
+use App\Models\Produkmodel;
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -24,6 +27,8 @@ class Kasir extends BaseController
 	protected $discountmodel;
 	protected $membermodel;
 	protected $payplanmodel;
+	protected $kategorimodel;
+	protected $produkmodel;
 	protected $connector;
 	protected $profile;
 	protected $printer;
@@ -35,6 +40,8 @@ class Kasir extends BaseController
 		$this->discountmodel = new Discountmodel();
 		$this->membermodel = new Membermodel();
 		$this->payplanmodel = new Payplanmodel();
+		$this->kategorimodel = new Kategorimodel();
+		$this->produkmodel = new Produkmodel();
 	}
 	
 	public function index() {
@@ -90,16 +97,43 @@ class Kasir extends BaseController
 	 return $akhir;
 	}
 
+	public function daftarkategorikasir() {
+		$res = $this->kategorimodel->getbyNormal()->getResult();
+		$ret = "<div>"
+			. "<button type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
+			. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH KATEGORI PRODUK</span>"
+			. "<hr/>"
+			. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
+				foreach ($res as $key) {
+					$ret .= "<div onclick='clickkategori($key->kategori_id)' class='m-t-10' style='background-color: #e9ecef; border-radius:5px; padding: .75rem 1rem;'><span style='font-size: 22px;'>$key->kategori_nm</span> <i style='float:right;' class='fas fa-chevron-right'></i></div>";
+				}
+		$ret .= "</div></div>";
+		return $ret;
+	}
+
+	public function getprodukbykategori() {
+		$id = $this->request->getPost('id');
+		$res = $this->produkmodel->getbyKatId($id)->getResult();
+		$ret = "<div>"
+			. "<button type='button' class='btn btn-danger' onclick='btntambahpesanan()'><i class='fas fa-chevron-left'></i></button>"
+			. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
+				foreach ($res as $key) {
+					$ret .= "<div onclick='addproduk($key->produk_id)' class='m-t-10' style='background-color: #e9ecef; border-radius:5px; padding: .75rem 1rem;'><span style='font-size: 22px;'>$key->produk_nm</span> <span style='font-size: 22px; float:right;'>Rp. ".number_format($key->produk_harga)."</span></i></div>";
+				}
+		$ret .= "</div></div>";
+		return $ret;
+	}
+
 	public function getbymejaidkasir() {
 		$id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
-		$discount_nmx = "";	 
-		$discount_valuex = "";
-		$discount = "";
-		$discount_nm = "";
-		$discount_value = "";
-		$subtotal = 0;
-		$amt_before_discount = 0;
+		$discount_nmx 			= "";	 
+		$discount_valuex 		= "";
+		$discount 				= "";
+		$discount_nm 			= "";
+		$discount_value 		= "";
+		$subtotal 				= 0;
+		$amt_before_discount 	= 0;
 		if (count($res)>0) {
 			$billing_id = $res[0]->billing_id;
 			if ($res[0]->member_nm != "") {
@@ -111,18 +145,19 @@ class Kasir extends BaseController
 		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
 		$resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
 		$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
-			$ret = "<div class='row col-md-12 m-0' id='div-item'>
+			$ret = "<div><div class='row col-md-12 m-0' id='div-item'>
 				<input type='hidden' id='meja_id' value='$id'/>
 				<input type='hidden' id='billing_id' value='$billing_id'/>
-						<div class='col-md-12 m-0' align='center' style='margin-top: 30px;'>
-							<p>
-								<span style='font-size: 16px;line-height: 0px !important;'>Butcher Steak & Pasta Palembang</span><br>
-								<span style='font-size: 16px;line-height: 0px !important;'>Jl. AKBP Cek Agus No. 284, Palembang</span><br>
-								<span style='font-size: 16px;line-height: 0px !important;'>Sumatera Selatan, 30114, 07115626366</span>
-							</p>
-						</div>
+						<!-- <div class='col-md-12 m-0 text-center' align='center' style='margin-top: 30px;'>
+							
+								<p style='font-size: 16px;margin-block-end: -5px;'>Butcher Steak & Pasta Palembang</p>
+								<p style='font-size: 16px;margin-block-end: -5px;'>Jl. AKBP Cek Agus No. 284, Palembang</p>
+								<p style='font-size: 16px;margin-block-end: -5px;'>Sumatera Selatan, 30114, 07115626366</p>
+							
+						</div> -->
 					</div>";
-			$ret .= "<div class='row col-md-12 m-0'><table width='100%' style='margin-top: 20px;font-size: 16px;'>
+			$ret .= "<div class='row col-md-12 m-0'>
+					  <table width='100%' style='font-size: 18px;'>
 				        <tr>
 				          <td align='left'>".panjang($dt)."</td>
 				          <td align='right'>".$tm."</td>
@@ -138,7 +173,8 @@ class Kasir extends BaseController
 				      </table>
 				      </div>
 				      <hr style='border: 1px solid red'>
-				      <div class='row col-md-12 m-0' style='overflow:auto;'><table class='active' style='font-size: 18px;' width='100%; '><tbody>";
+				      <div class='row col-md-12 m-0' style='overflow:auto;'>
+				      <table class='active' width='100%'><tbody>";
 			foreach ($res as $key) {
 				$total = $key->produk_harga * $key->qty;
 				$amt_before_discount = $amt_before_discount + $total;
@@ -161,14 +197,22 @@ class Kasir extends BaseController
 				} else {
 					$subtotal = $subtotal + $total;
 				}
+
+				if ($key->statusbilling == 'verified') {
+					$buttonqty = "<button onclick='minusitem($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px; margin-left:5px;'>-</button>
+					<button onclick='additem($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px;'>+</button>";
+				} else {
+					$buttonqty = "";
+				}
 				
 				$ret .= "<tr>
-				        <td colspan='3' align='left' style='font-weight: bold;font-size: 16px;'>
-				            <span>$key->produk_nm</span>
+				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
+				            <span>$key->produk_nm <a style='float: right;' onclick='removeitem($id,$key->billing_item_id)'><i style='color:red;' class='fas fa-times'></i></a></span>
 				          </td>
 				        </tr>
-				        <tr style='font-size: 16px;'>
-				          <td align='left' width='180'><span>$key->qty X</span><br>$discount_nmx $discount_valuex</td>
+				        <tr style='font-size: 18px;'>
+				        <input type='hidden' id='inputqty$key->billing_item_id' value='$key->qty'/>
+				          <td align='left' width='180'><span id='jumlahitem$key->billing_item_id'>$key->qty X $buttonqty</span><br>$discount_nmx $discount_valuex</td>
 				          <td align='center'><span>@".number_format($key->produk_harga)."</span></td>
 				          <td align='right'><span>".number_format($total)."<br>$discount</span></td>
 				        </tr>
@@ -183,7 +227,7 @@ class Kasir extends BaseController
 					 foreach ($notpersen as $dc) {
 						$discount_nm = $dc->discount_nm;
 						$discount_value = $dc->value;
-							$ret .= "<tr style='font-size: 16px;'>
+							$ret .= "<tr style='font-size: 18px;'>
 							        <td align='left' width='80'>$discount_nm </td>
 							        <td></td>
 							        <td align='right'>(".number_format($discount_value).") <a href='#' onclick='removedc($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a></td>
@@ -203,7 +247,7 @@ class Kasir extends BaseController
 				$ret .= "</tbody></table></div>
 						<hr style='border: 1px solid red'>";
 				        
-				$ret .= "<table style='font-size: 16px; margin-top:30px;' width='100%'>
+				$ret .= "<table style='font-size: 18px;' width='100%'>
 				        <tr>
 				          <td align='left'>Subtotal</td>
 				          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
@@ -238,10 +282,62 @@ class Kasir extends BaseController
 				$ret .= "<div class='m-t-20' align='center'>
 							<button onclick='showcheckout($id,$jmlbulat)' class='btn btn-success' style='font-size:20px;'>Payment</button>
 						</div>";
+				$return = $ret;
+
+				$res = $this->kategorimodel->getbyNormal()->getResult();
+				$produk = "<div><input type='hidden' id='meja_id' value='$id'/>"
+					. "<button type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
+					. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH KATEGORI PRODUK</span>"
+					. "<hr/>"
+					. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
+						foreach ($res as $key) {
+							$produk .= "<div onclick='clickkategori($key->kategori_id)' class='m-t-10' style='background-color: #e9ecef; border-radius:5px; padding: .75rem 1rem;'><span style='font-size: 22px;'>$key->kategori_nm</span> <i style='float:right;' class='fas fa-chevron-right'></i></div>";
+						}
+				$produk .= "</div></div></div>";
+				$return = array('status' => 'kategori','billing' => $ret, 'produk' => $produk);
 		} else {
-			$ret = "<div align='center'><h3>TIDAK ADA PESANAN !!</h3> <button class='meja-button' type='button' onclick='backtowaiters()'>Kembali</button></div>";
+			$res = $this->kategorimodel->getbyNormal()->getResult();
+			$produk = "<div><input type='hidden' id='meja_id' value='$id'/>"
+					. "<button type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
+					. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH KATEGORI PRODUK</span>"
+					. "<hr/>"
+					. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
+						foreach ($res as $key) {
+							$produk .= "<div onclick='clickkategori($key->kategori_id)' class='m-t-10' style='background-color: #e9ecef; border-radius:5px; padding: .75rem 1rem;'><span style='font-size: 22px;'>$key->kategori_nm</span> <i style='float:right;' class='fas fa-chevron-right'></i></div>";
+						}
+				$produk .= "</div></div>";
+				$return = array('status' => 'kategori','billing' => "", 'produk' => $produk);
 		}
-  		return $ret;
+		echo json_encode($return,JSON_UNESCAPED_SLASHES);
+  		// return $return;
+	}
+
+	public function updateqty() {
+		$id = $this->request->getPost('value');
+		$qty = $this->request->getPost('quanty');
+		$data = [
+			'qty' => $qty,
+			'update_dttm' => date('Y-m-d H:i:s'),
+			'update_user' => '1'
+		];
+
+		$update = $this->billingmodel->updateqty($id,$data);
+		if ($update) {
+			return 'true';
+		} else {
+			return 'false';
+		}
+		
+	}
+
+	public function setnullifieditem(){
+		$id = $this->request->getPost('value');
+		$res = $this->billingmodel->setnullifieditem($id);
+		if ($res) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public function discountkasir() {
@@ -434,6 +530,232 @@ class Kasir extends BaseController
 	            . "</div>";
 		
 		return $ret;	
+	}
+
+	public function showadddetail() {
+		$produk_id = $this->request->getPost('produk_id');
+			$ret = "<div class='modal-dialog modal-lg'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>----------</h4>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+	            . "<div class='col-md-6'>"
+	            // . "<form>"
+	            . "<div class='form-group'>"
+	            . "<label for='jumlah' class='control-label'>Jumlah </label>"
+	            . "<div class='input-group'>"
+                . "<input id='jumlah' class='form-control' type='number' value='1' name='jumlah' style='font-weight: bold; font-size: 20px;'>"
+                . "<button type='button' onclick='minusjumlah()' class='btn btn-success font-weight-bold' style='font-size: 40px; height: 40px; width: 40px; line-height: 25px; margin-left:5px;'>-</button>"
+                . "<button type='button' onclick='addjumlah()' class='btn btn-success font-weight-bold' style='font-size: 27px; height: 40px; width: 40px; line-height: 25px; margin-left: 5px;'>+</button>"
+                . "</div>"
+                . "<div class='form-group'>"
+	            . "<label for='jumlah' class='control-label'>Catatan </label>"
+	            . "<div class='input-group'>"
+                . "<textarea id='catatan' class='form-control' style='font-weight: bold; font-size: 20px;'></textarea>"
+                . "</div>"
+                . "</div>"
+                . "<div>"
+                . "<button onclick='simpanproduk($produk_id)' class='btn btn-info'>Simpan</button>"
+                . "</div>"
+                // . "</form>"
+                . "</div>"
+	       		. "</div>" // modal body
+	            . "</div>"
+	            . "</div>";
+		
+		return $ret;
+	}
+
+	public function tambah_nol($angka,$jumlah)
+    {
+       $jumlah_nol = strlen($angka);
+       $angka_nol = $jumlah - $jumlah_nol;
+       $nol = "";
+       for($i=1;$i<=$angka_nol;$i++)
+       {
+          $nol .= '0';
+       }
+       return $nol.$angka;
+    }
+
+    public function closekasir() {
+    	$date = date('Y-m-d');
+    	$ret = "<div class='modal-dialog'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>Close Kasir</h4>"
+	             . "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+	            . "<form>"
+	            . "<div class='form-group'>"
+	            . "<label for='namadiscount' class='control-label'>Tanggal Tutup</label>"
+	            . "<input type='date' class='form-control' id='closed_dttm' value='$date'>"
+	            . "</div>"
+	            // . "<div class='form-group'>"
+	            // . "<label class='control-label'>Nilai discount</label>"
+	            // . "<input type='text' class='form-control' id='nilaidiscount'>"
+	            // . "</div>"
+	            . "</form>"
+	            . "</div>"
+	            . "<div class='modal-footer'>"
+	            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
+	            . "<button onclick='simpanclosekasir()' type='button' class='btn btn-danger waves-effect waves-light'>Simpan</button>"
+	            . "</div>"
+	            . "</div>"
+	            . "</div>";
+
+	    return $ret;
+    }
+
+    public function reportTopdf($closed_dttm) {
+    	$totalbilling = $this->billingmodel->getTotalbill($closed_dttm)->getResult();
+    	$totalvoid = $this->billingmodel->getVoidbill($closed_dttm)->getResult();
+    	$totalitem = $this->billingmodel->getTotalitem($closed_dttm)->getResult();
+    	$pdf = new FPDF();
+        $pdf->AddPage('P', 'A4');
+		$pdf->SetFont('Arial','B',12);
+		$pdf->Image('images/lib/logo.png',10,6,30);
+		$pdf->SetX(45);
+		$pdf->Cell(40,5,'Butcher Steak & Pasta Palembang');
+		$pdf->SetX(45);
+		$pdf->Cell(40,15,'Jl. AKBP Cek Agus No. 284, Palembang');
+		$pdf->SetX(45);
+		$pdf->Cell(40,25,'Sumatera Selatan, 30114, 07115626366');
+		$pdf->SetLineWidth(0.5);
+        $pdf->Line(6.5, 35, 204, 35);
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial','B',14);
+        $pdf->SetX(70);
+		$pdf->Cell(40,50,'LAPORAN PENJUALAN',0,0,'c');
+		$pdf->Ln(10);
+		$pdf->SetFont('Arial','B',12);
+		$pdf->SetX(15);
+		$pdf->Cell(40,50,'SUMMARY',0,0,'L');
+		$pdf->SetFont('Arial','',12);
+		$pdf->SetX(15);
+		$pdf->Cell(20,65,'Billing',0,0,'L');
+		$pdf->Cell(5,65,':',0,0,'L');
+		$pdf->Cell(20,65,$totalbilling[0]->billing_id,0,0,'L');
+		$pdf->SetX(15);
+		$pdf->Cell(20,75,'Item',0,0,'L');
+		$pdf->Cell(5,75,':',0,0,'L');
+		$pdf->Cell(20,75,'Rp. '.number_format($totalitem[0]->price),0,0,'L');
+		$pdf->SetX(15);
+		$pdf->Cell(20,85,'Service',0,0,'L');
+		$pdf->Cell(5,85,':',0,0,'L');
+		$pdf->Cell(20,85,'total',0,0,'L');
+		$pdf->SetX(15);
+		$pdf->Cell(20,95,'Tax',0,0,'L');
+		$pdf->Cell(5,95,':',0,0,'L');
+		$pdf->Cell(20,95,'total',0,0,'L');
+		$pdf->SetX(15);
+		$pdf->Cell(20,105,'Void',0,0,'L');
+		$pdf->Cell(5,105,':',0,0,'L');
+		$pdf->Cell(20,105,$totalvoid[0]->billing_id,0,0,'L');
+		$pdf->SetX(15);
+		$pdf->Cell(20,115,'Revenue',0,0,'L');
+		$pdf->Cell(5,115,':',0,0,'L');
+		$pdf->Cell(20,115,'total',0,0,'L');
+		$pdf->Output('report/Laporan_penjualan_'.$closed_dttm.'.pdf', 'F');
+		exit();
+    }
+
+    public function simpanclosekasir() {
+    	$cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
+    	$jam = date('H:i:s');
+    	if (count($cekunclosed)>0) {
+    		$ret = "belumfinish";
+    	} else {
+    		$closed_dttm = $this->request->getPost('closed_dttm');
+    		
+	    	$data = [
+			  'status_cd' => 'closed',
+			  'closed_dttm' => $closed_dttm.' '.$jam,
+			  'closed_user' => $this->session->user_id,
+			];
+			$res = $this->billingmodel->closedkasir($data);
+			if ($res) {
+				$ret = "true";
+			} else {
+				$ret = "false";
+			}
+			$this->reportTopdf($closed_dttm);
+			$this->sendingemail($closed_dttm);
+    	}
+    	
+		return $ret;
+    }
+
+    public function sendingemail() {
+    	$email = \Config\Services::email();
+		$email->clear();
+		$config["protocol"] = "smtp";
+		$config["SMTPHost"]  = "smtp.gmail.com";
+		$config["SMTPUser"]  = "lavitabellakasir@gmail.com"; 
+		$config["SMTPPass"]  = "plerkaw321"; 
+		$config["SMTPPort"]  = 465;
+		$config["SMTPCrypto"] = "ssl";
+		 
+		$email_smtp->initialize($config);
+
+        $email->setTo('harrypurmanta@gmail.com');
+        $email->setFrom('cextor.phl@gmail.com');
+        $email->setSubject('Here is your info ');
+        $email->setMessage('Hi Here is the info you requested.');
+        $email->attach('report/Laporan_penjualan_'.$closed_dttm.'.pdf');
+        $email->send();
+    }
+
+	public function addproduktobill() {
+		$meja_id 	= $this->request->getPost('meja_id');
+		$produk_id 	= $this->request->getPost('produk_id');
+		$qty 		= $this->request->getPost('jumlah');
+		$catatan 	= $this->request->getPost('catatan');
+		$date 		= date('Y-m-d H:i:s');
+		$getbill 	= $this->billingmodel->getbyMejaidkasir($meja_id)->getResult();
+		
+		if (count($getbill)>0) {
+			$billing_id = $getbill[0]->billing_id;
+		} else {
+			$desclimit 	= $this->billingmodel->getDesclim1()->getResult();
+			$number = preg_replace("/[^1-9]/", "", $desclimit[0]->billing_cd);
+			$code = $number + 1;
+			$billing_cd = "LAV".$this->tambah_nol($code,4);
+
+			$data = [
+			  'meja_id' => $meja_id,
+			  'billing_cd' => $billing_cd,
+			  'status_cd' => 'verified',
+			  'created_dttm' => $date,
+			  'created_user' => $meja_id
+			];
+			$billing_id = $this->billingmodel->simpanbilling($data);
+		}
+
+		if ($billing_id != "") {
+			$produk = $this->produkmodel->getbyId($produk_id)->getResult();
+			$harga = $produk[0]->produk_harga * $qty;
+			$dataitem = [
+				'billing_id' 	=> $billing_id,
+				'item_dttm'  	=> $date,
+				'produk_id'  	=> $produk_id,
+				'produk_nm'  	=> $produk[0]->produk_nm,
+				'qty' 		 	=> $qty,
+				'price'		 	=> $harga,
+				'description' 	=> $catatan,
+				'status_cd' 	=> 'normal',
+				'created_dttm' 	=> $date,
+				'created_user' 	=> $meja_id
+			];
+			$bil_item = $this->billingmodel->simpanbillitem($dataitem);
+			return 'true';
+		} else {
+			return 'false';
+		}
+
 	}
 
 	public function adddiscounttobill() {
@@ -841,6 +1163,7 @@ class Kasir extends BaseController
 		$ttl_discount = 0;
 		$amt_before_discount = 0;
 		$poinmb = 0;
+		$nilaidiskon = 0;
 		if (count($data)>0) {
 			if ($data[0]->member_nm != "") {
 		        $member_nm = $data[0]->member_nm;

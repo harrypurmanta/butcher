@@ -33,25 +33,21 @@ class Produkmodel extends Model
     }
 
     public function getbyId($id){
-        $db = db_connect('default');
-        $builder = $db->table('produk a');
-        $builder->select('a.produk_id,a.produk_nm,a.created_dttm,b.kategori_nm,c.user_nm,a.status_cd,a.produk_harga');
-        $builder->join('kategori_produk b', 'b.kategori_id = a.kategori_id','left');
-        $builder->join('users c', 'c.user_id = a.created_user','left');
-        $builder->where('a.status_cd','normal');
-        $builder->where('a.produk_id',$id);
-        $query = $builder->get();
-        return $query;
+        return $this->db->table('produk a')
+                        ->select('a.produk_id,a.produk_nm,a.created_dttm,b.kategori_nm,c.user_nm,a.status_cd,a.produk_harga')
+                        ->join('kategori_produk b', 'b.kategori_id = a.kategori_id','left')
+                        ->join('users c', 'c.user_id = a.created_user','left')
+                        ->where('a.status_cd','normal')
+                        ->where('a.produk_id',$id)
+                        ->get();
     }
 
     public function getbyKatId($id){
-        $db = db_connect('default');
-        $builder = $db->table('produk a');
-        $builder->select('a.produk_id,a.produk_nm,a.created_dttm,a.status_cd,a.produk_harga,a.kategori_id');
-        $builder->where('a.status_cd','normal');
-        $builder->where('a.kategori_id',$id);
-        $query = $builder->get();
-        return $query;
+        return $this->db->table('produk a')
+                        ->select('a.produk_id,a.produk_nm,a.created_dttm,a.status_cd,a.produk_harga,a.kategori_id')
+                        ->where('a.status_cd','normal')
+                        ->where('a.kategori_id',$id)
+                        ->get();
     }
 
 }

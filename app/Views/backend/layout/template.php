@@ -187,7 +187,6 @@ $this->session->start();
     <!-- jQuery file upload -->
     <script src="<?=base_url() ?>/assets/plugins/dropify/dist/js/dropify.min.js"></script>
     <script>
-      
         $(function () {
             $('#myTable').DataTable();
             $(document).ready(function () {

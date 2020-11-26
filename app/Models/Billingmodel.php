@@ -14,6 +14,14 @@ class Billingmodel extends Model
     // protected $updatedField  = 'update_dttm';
     // protected $deletedField  = 'nullified_dttm';
 
+    public function getDesclim1() {
+        return $this->db->table('billing')
+                        ->select('billing_cd')
+                        ->limit(1)
+                        ->orderby('billing_id','DESC')
+                        ->get();
+    }
+
     public function getbyMejaid($id){
     	$query = $this->db->table('billing a');
     	$query->select('b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd as statusproduk,b.billing_item_id,a.billing_id,a.status_cd as statusbilling, a.created_dttm as created_dttm,a.member_id,f.meja_nm, g.person_nm as member_nm,h.person_nm as collected_nm');
@@ -57,7 +65,7 @@ class Billingmodel extends Model
         $query->join('meja f','f.meja_id=a.meja_id','left');
         $query->join('person g','g.person_id=e.person_id','left');
         $query->join('person h','h.person_id=a.verified_user','left');
-        $query->where('a.status_cd','verified');
+        $query->whereIn('a.status_cd',['verified','normal']);
         $query->where('b.status_cd','normal');
         $query->where('a.meja_id',$id);
         return $query->get();
@@ -107,6 +115,34 @@ class Billingmodel extends Model
                     ->where('a.billing_id',$bi)
                     ->where('a.discount_id',$di)
                     ->get();
+    }
+
+    public function getTotalitem($closed_dttm) {
+        return $this->db->table('billing a')
+                        ->selectSum('b.price')
+                        ->join('billing_item b','b.billing_id=a.billing_id')
+                        ->where('a.status_cd','closed')
+                        ->where('closed_dttm >=',$closed_dttm.' 00:00:00')
+                        ->where('closed_dttm <=',$closed_dttm.' 59:23:23')
+                        ->get();
+    }
+
+    public function getTotalbill($closed_dttm) {
+        return $this->db->table('billing')
+                        ->selectCount('billing_id')
+                        ->where('status_cd','closed')
+                        ->where('closed_dttm >=',$closed_dttm.' 00:00:00')
+                        ->where('closed_dttm <=',$closed_dttm.' 59:23:23')
+                        ->get();
+    }
+
+    public function getVoidbill($closed_dttm) {
+        return $this->db->table('billing')
+                        ->selectCount('billing_id')
+                        ->where('status_cd','nullified')
+                        ->where('closed_dttm >=',$closed_dttm.' 00:00:00')
+                        ->where('closed_dttm <=',$closed_dttm.' 59:23:23')
+                        ->get();
     }
 
     public function simpanbilling($data) {
@@ -202,6 +238,19 @@ class Billingmodel extends Model
         return $this->db->table('billing')
                         ->set($data)
                         ->where('billing_id',$id)
+                        ->update();
+    }
+
+    public function getbyunclosed() {
+        return $this->db->table('billing')
+                        ->whereIn('status_cd',['normal','waiting','verified'])
+                        ->get();
+    }
+
+    public function closedkasir($data) {
+        return $this->db->table('billing')
+                        ->set($data)
+                        ->where('status_cd','finish')
                         ->update();
     }
     

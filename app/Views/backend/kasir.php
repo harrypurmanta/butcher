@@ -9,27 +9,44 @@
             <!-- ============================================================== -->
             <div class="container-fluid">
                       <div class="row">
-                        <div class="col-md-5 col-sm-6">
-                            <div class="card" style="display: inline-block; padding-bottom: 20px;" align="center">
+                        <div class="col-md-6">
+                            <div class="card" style="padding-bottom: 20px;">
+                                <input type="hidden" id="value-meja"/>
                                 <div class="card-body" id="cardbodymeja">
                                 
                                 </div>
                                 <hr>
-                                 <button style="font-size: 20px; width: 40%;" type="button" onclick="diskon()" class="btn btn-rounded btn-warning">Diskon</button>
-                                 <button style="font-size: 20px; width: 40%;" type="button" onclick="member()" class="btn btn-rounded btn-primary">Member</button>
-                                <div style="margin-top: 10px;">
-                                  <button style="font-size: 20px; width: 40%;" type="button" onclick="trancshistori()" class="btn btn-rounded btn-info">Histori Transaksi</button>
-                                  <button style="font-size: 20px; width: 40%;" type="button" onclick="trancshistori()" class="btn btn-rounded btn-info">Histori Transaksi</button>
+                                <div align="center">
+                                  <div>
+                                   <button style="font-size: 20px; width: 40%;" type="button" onclick="diskon()" class="btn btn-rounded btn-warning">Diskon</button>
+                                   <button style="font-size: 20px; width: 40%;" type="button" onclick="member()" class="btn btn-rounded btn-primary">Member</button>
+                                  </div>
+                                 <!--  <div style="margin-top: 10px;">
+                                    <button style="font-size: 20px; width: 40%;" type="button" onclick="trancshistori()" class="btn btn-rounded btn-info">Histori Transaksi</button>
+                                    <button style="font-size: 20px; width: 40%;" type="button" onclick="trancshistori()" class="btn btn-rounded btn-info">Histori Transaksi</button>
+                                  </div> -->
                                 </div>
                             </div>
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="card">
+                                  <div class="card-body">
+                                    <button type="button" onclick="closekasir()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-file-archive fa-3x"></i></button>
+                                    <button class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-list fa-3x"></i></button>
+                                    
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                         </div>
-                        <div class="col-md-7 col-sm-6">
+                        <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body" id="cardbody"> 
                                 </div>
                             </div>
                         </div>
-                      </div>
+                    </div>
+                    
             </div>
             <div class="d-none" id='loader-wrapper'>
                 <div class="loader"></div>
@@ -46,11 +63,98 @@
             <!-- ============================================================== -->
             <!-- ============================================================== -->
             <script src="../assets/plugins/jquery/jquery.min.js"></script>
-
+            <!-- <script src="../assets/js/perfect-scrollbar.jquery.min.js"></script> -->
 <script type="text/javascript">
+// $('#cardbodymeja').perfectScrollbar();
 $(document).ready(function(){
-  setInterval(function(){ 
-    $.ajax({
+  // setInterval(function(){ 
+    listmejakasir();
+  // }, 2000);
+  
+});
+
+function closekasir() {
+  $.ajax({
+    url : "<?= base_url('kasir/closekasir') ?>",
+    beforeSend: function () { 
+      $("#loader-wrapper").removeClass("d-none")
+    },
+     success:function(data){
+      $("#loader-wrapper").addClass("d-none");
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function simpanclosekasir(){
+  var closed_dttm = $('#closed_dttm').val();
+  Swal.fire({
+          title: 'Apakah anda yakin?',
+          text: "Setelah tekan yes, data tidak dapat dikembalikan",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, confirm it!'
+      }).then((result) => {
+          if (result.value == true) {
+              $.ajax({
+                 url : "<?= base_url('kasir/simpanclosekasir') ?>",
+                 type: "post",
+                 data: {closed_dttm:closed_dttm},
+                 success:function(data){
+                  if (data == "belumfinish") {
+                    Swal.fire({
+                        title:"Ada billing yang belum di selesaikan !!",
+                        text:"Silahkan selesaikan terlebih dahulu !!",
+                        type:"warning",
+                        showCancelButton:0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                  } else if (data == 'false') {
+                    Swal.fire({
+                        title:"Data tidak ada !!",
+                        text:"Silahkan refresh halaman !!",
+                        type:"warning",
+                        showCancelButton:0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                  } else {
+                    $('#modaltambahmember').modal('hide');
+                    listmejakasir();
+                  }
+                  
+                },
+                error:function(){
+                    Swal.fire({
+                        title:"Gagal!",
+                        text:"Data gagal disimpan!",
+                        type:"warning",
+                        showCancelButton:!0,
+                        confirmButtonColor:"#556ee6",
+                        cancelButtonColor:"#f46a6a"
+                    })
+                }
+              });
+          }
+       })
+}
+
+function listmejakasir() {
+  $.ajax({
        url : "<?= base_url('kasir/cardbodymeja') ?>",
        beforeSend: function () { 
           $("#loader-wrapper").removeClass("d-none")
@@ -59,7 +163,7 @@ $(document).ready(function(){
         $('#cardbodymeja').html(data);
         $("#loader-wrapper").addClass("d-none");
       },
-      error:function(){meja
+      error:function(){
           Swal.fire({
               title:"Gagal!",
               text:"Data gagal disimpan!",
@@ -70,8 +174,122 @@ $(document).ready(function(){
           })
       }
     });
-  }, 3000);
-});
+}
+
+
+
+function btntambahpesanan(id) {
+  $.ajax({
+    url : "<?= base_url('kasir/daftarkategorikasir') ?>",
+    type: "post",
+    beforeSend: function () { 
+      $("#loader-wrapper").removeClass("d-none")
+    },
+     success:function(data){
+      $('#cardbodymeja').html(data);
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function clickkategori(id) {
+  var meja_id = $("#meja_id").val();
+  $("#value-meja").val(meja_id);
+  $.ajax({
+     url : "<?= base_url('kasir/getprodukbykategori') ?>",
+     type: "post",
+     data: {id:id},
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+    },
+     success:function(data){
+      $('#cardbodymeja').html(data);
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function addproduk(produk_id) {
+  $.ajax({
+     url : "<?= base_url('kasir/showadddetail') ?>",
+     type: "post",
+     data: {produk_id:produk_id},
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+    },
+     success:function(data){
+      $("#loader-wrapper").addClass("d-none");
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function simpanproduk(produk_id) {
+  var meja_id = $("#value-meja").val();
+  var jumlah = $("#jumlah").val();
+  var catatan = $("#catatan").val();
+  $.ajax({
+      url : "<?= base_url('kasir/addproduktobill') ?>",
+      type: "POST",
+      data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan},
+      success:function(data){
+        if (data == 'true') {
+          showbillingbymeja(meja_id);
+          $('#modaltambahmember').modal('hide');
+        } else {
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+        }
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+  });
+}
 
 function formtambahmember() {
   $.ajax({
@@ -151,6 +369,9 @@ function simpan() {
       data : ajaxData,
       contentType: false,
       processData: false,
+      beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
       success:function(data){
         if (data=='Error') {
           Swal.fire({
@@ -172,6 +393,7 @@ function simpan() {
           })
           $('#modaltambahmember').modal('hide');
         }
+        $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
           Swal.fire({
@@ -204,6 +426,9 @@ function simpandiskon() {
       url : "<?= base_url('discount/save') ?>",
       type: "post",
       data : {'discount_nm':discount_nm,'nilaidiscount':nilaidiscount},
+      beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
       success:function(_data){
         if (_data=='already') {
           Swal.fire({
@@ -225,28 +450,37 @@ function simpandiskon() {
           })
           $('#modaltambahmember').modal('hide');
         }
-            },
-            error:function(){
-                Swal.fire({
-                    title:"Gagal!",
-                    text:"Data gagal disimpan!",
-                    type:"warning",
-                    showCancelButton:!0,
-                    confirmButtonColor:"#556ee6",
-                    cancelButtonColor:"#f46a6a"
-                })
-            }
-            });
+        $("#loader-wrapper").addClass("d-none");
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
         }
+      });
+  }
 }
 
 function showbillingbymeja(id) {
+  $("#value-meja").val(id);
     $.ajax({
      url : "<?= base_url('kasir/getbymejaidkasir') ?>",
      type: "post",
      data : {'id':id},
      success:function(data){
-      $('#cardbody').html(data);
+      var _data = JSON.parse(data);
+      if (_data.status == 'kategori') {
+        $('#cardbodymeja').html(_data.produk);
+        $('#cardbody').html(_data.billing);
+      } else {
+        $('#cardbodymeja').html(_data.produk);
+        $('#cardbody').html(_data.billing);
+      }
     },
     error:function(){
         Swal.fire({
@@ -725,10 +959,158 @@ function checkout(id,gt,btn) {
           }
        })
   }
-  
-
-  
 }
+
+function removeitem(meja_id,id) {
+  Swal.fire({
+      title: 'Yakin menghapus item ini ?',
+      text: "item yang sudah dihapus tidak bisa dikembalikan lagi, tapi anda bisa memesan lagi",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yakin'
+  }).then((result) => {
+      if (result.value == true) {
+        $.ajax({
+         url : "<?= base_url('kasir/setnullifieditem')?>",
+         type : "POST",
+         data : {'value':id},
+         beforeSend: function () { 
+            $("#loader-wrapper").removeClass("d-none");
+         },
+         success:function(){
+            $("#loader-wrapper").addClass("d-none");
+          showbillingbymeja(meja_id);
+        },
+        error:function(){
+          Swal.fire(
+            'Gagal!',
+            'Silahkan Coba Lagi.',
+            'warning'
+          )
+        }
+      });
+        
+      }
+   });
+}
+
+function addjumlah(){
+  var currentVal = parseInt($("#jumlah").val());
+  if (!isNaN(currentVal)) {
+    $("#jumlah").val(currentVal + 1);
+  }
+};
+
+function minusjumlah(){
+  var currentVal = parseInt($("#jumlah").val());
+  if (!isNaN(currentVal)) {
+      if (currentVal == 0) {
+      } else {
+          $("#jumlah").val(currentVal - 1);
+      }
+  }
+  
+};
+
+function additem(value){
+  var currentVal = parseInt($("#inputqty"+value).val());
+  $("#inputqty"+value).val(currentVal + 1);
+  $("#jumlahqty"+value).val(currentVal + 1);
+  var id = $("#value-meja").val();
+  var quanty = currentVal + 1;
+  if (!isNaN(currentVal)) {
+      $.ajax({
+        url : "<?= base_url('kasir/updateqty') ?>",
+        type: "post",
+        data : {'value':value,'quanty':quanty},
+        beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none");
+        },
+        success:function(data){
+          $("#loader-wrapper").addClass("d-none");
+          showbillingbymeja(id);
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+        }
+      });
+      
+  }
+};
+
+function minusitem(value){
+    var currentVal = parseInt($("#inputqty"+value).val());
+    $("#inputqty"+value).val(currentVal - 1);
+    $("#jumlahitem"+value).val(currentVal - 1);  
+    var qty = currentVal - 1;     
+    var id = $("#value-meja").val();
+    if (qty==0) {
+        Swal.fire({
+            title: 'Yakin menghapus item ini ?',
+            text: "item yang sudah dihapus tidak bisa dikembalikan lagi, tapi anda bisa memesan lagi",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yakin'
+        }).then((result) => {
+            if (result.value == true) {
+              $.ajax({
+               url : "<?= base_url('kasir/setnullifieditem')?>",
+               type : "POST",
+               data : {'value':value},
+               beforeSend: function () { 
+                  $("#loader-wrapper").removeClass("d-none");
+               },
+               success:function(){
+                  $("#loader-wrapper").addClass("d-none");
+                showbillingbymeja(id);
+              },
+              error:function(){
+                Swal.fire(
+                  'Gagal!',
+                  'Silahkan Coba Lagi.',
+                  'warning'
+                )
+              }
+            });
+              
+            }
+         });
+    } else if (!isNaN(currentVal)) {
+        $.ajax({
+          url : "<?= base_url('kasir/updateqty') ?>",
+          type: "post",
+          data : {'value':value,'quanty':qty},
+          beforeSend: function () { 
+            $("#loader-wrapper").removeClass("d-none");
+          },
+          success:function(data){
+            $("#loader-wrapper").addClass("d-none");
+            showbillingbymeja(id);
+          },
+          error:function(){
+              Swal.fire({
+                  title:"Gagal!",
+                  text:"Data gagal disimpan!",
+                  type:"warning",
+                  showCancelButton:!0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              })
+          }
+        });
+    }
+};
 </script>
 
 <?= $this->endSection(); ?>
