@@ -983,8 +983,8 @@ class Kasir extends BaseController
     		 
     
     		    /* Cut the receipt and open the cash drawer */
-    		    $this->printer->cut();
-    		    $this->printer->pulse();
+    		    // $this->printer->cut();
+    		    // $this->printer->pulse();
     
     		} catch (Exception $e) {
     		    echo $e->getMessage();
@@ -1136,8 +1136,8 @@ class Kasir extends BaseController
 			    /*footer */
 			    
 			    /* Cut the receipt and open the cash drawer */
-			    $this->printer->cut();
-			    $this->printer->pulse();
+			    // $this->printer->cut();
+			    // $this->printer->pulse();
 
 			} catch (Exception $e) {
 			    // echo $e->getMessage();
@@ -1337,8 +1337,8 @@ class Kasir extends BaseController
 				}
 
 			    /* Cut the receipt and open the cash drawer */
-			    $this->printer->cut();
-			    $this->printer->pulse();
+			    // $this->printer->cut();
+			    // $this->printer->pulse();
 
 			} catch (Exception $e) {
 			    echo $e->getMessage();
