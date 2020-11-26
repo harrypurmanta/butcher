@@ -980,17 +980,7 @@ function checkout(id,gt,btn) {
     var payplan_id = paymen_tunai_id;
   }
 
-  if (gt > paid) {
-    Swal.fire({
-        title:"Nilai input terlalu kecil dari total billing !!",
-        text:"Error !!",
-        type:"warning",
-        showCancelButton:0,
-        confirmButtonColor:"#556ee6",
-        cancelButtonColor:"#f46a6a"
-    })
-  } else {
-    b = $(btn);
+   b = $(btn);
     b.attr('data-old', b.text());
     b.text('wait');
     Swal.fire({
@@ -1039,7 +1029,19 @@ function checkout(id,gt,btn) {
               });
           }
        })
-  }
+
+  // if (gt > paid) {
+  //   Swal.fire({
+  //       title:"Nilai input terlalu kecil dari total billing !!",
+  //       text:"Error !!",
+  //       type:"warning",
+  //       showCancelButton:0,
+  //       confirmButtonColor:"#556ee6",
+  //       cancelButtonColor:"#f46a6a"
+  //   })
+  // } else {
+   
+  // }
 }
 
 function removeitem(meja_id,id) {
