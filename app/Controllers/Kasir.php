@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -80,28 +80,26 @@ class Kasir extends BaseController
 					}
 					
 					$ret .= "<div style='display: inline-block; margin: 5px;'>
-								<button onclick='showbillingbymeja($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
+								<button onclick='clickmejabutton($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
 							</div>";	   
 				}
 			} else {
-				$ret .= "<div style='display: inline-block; margin: 5px;'>
+				$ret .= "<div align='center' style='display: inline-block; margin: 5px;'>
 							<button onclick='openkasir()' class='btn btn-info font-weight-bold' style='font-size: 20px; padding: 10px;'>OPEN KASIR</button>
 						</div>";	
 			}
 		} else {
-			$ret .= "<div style='display: inline-block; margin: 5px;'>
+			$ret .= "<div align='center' style='display: inline-block; margin: 5px;'>
 						<button onclick='openkasir()' class='btn btn-info font-weight-bold' style='font-size: 20px; padding: 10px;'>OPEN KASIR</button>
 					</div>";	
 		}
-
-		
 		return $ret;                       
 	}
 
 	public function pembulatanratusan($uang){
 	 $nilai = round($uang);
-	 $ratusan = substr($nilai, -2);
-	 $akhir = $uang + (100-$ratusan);
+	 $ratusan = substr($nilai, -3);
+	 $akhir = $uang + (1000-$ratusan);
 	 return $akhir;
 	}
 
@@ -115,7 +113,7 @@ class Kasir extends BaseController
 	public function daftarkategorikasir() {
 		$res = $this->kategorimodel->getbyNormal()->getResult();
 		$ret = "<div>"
-			. "<button type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
+			. "<button style='float: left !important;' type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
 			. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH KATEGORI PRODUK</span>"
 			. "<hr/>"
 			. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
@@ -130,7 +128,9 @@ class Kasir extends BaseController
 		$id = $this->request->getPost('id');
 		$res = $this->produkmodel->getbyKatId($id)->getResult();
 		$ret = "<div>"
-			. "<button type='button' class='btn btn-danger' onclick='btntambahpesanan()'><i class='fas fa-chevron-left'></i></button>"
+			. "<button style='float: left !important;' type='button' class='btn btn-danger' onclick='btntambahpesanan()'><i class='fas fa-chevron-left'></i></button>"
+			. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH ITEM</span>"
+			. "<hr/>"
 			. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
 				foreach ($res as $key) {
 					$ret .= "<div onclick='addproduk($key->produk_id)' class='m-t-10' style='background-color: #e9ecef; border-radius:5px; padding: .75rem 1rem;'><span style='font-size: 22px;'>$key->produk_nm</span> <span style='font-size: 22px; float:right;'>Rp. ".number_format($key->produk_harga)."</span></i></div>";
@@ -139,7 +139,7 @@ class Kasir extends BaseController
 		return $ret;
 	}
 
-	public function getbymejaidkasir() {
+	public function clickmejabutton() {
 		$id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
 		$discount_nmx 			= "";	 
@@ -154,15 +154,15 @@ class Kasir extends BaseController
 			if ($res[0]->member_nm != "") {
 		        $member_nm = "<span style='font-size: 16px;'>".$res[0]->member_nm."</span> <a href='#' onclick='removemember($id,$billing_id)'><i style='color:red;' class='fas fa-times'></i></a>";
 		    } else {
-		        $member_nm = "Meja ".$res[0]->meja_nm;
+		        $member_nm = "MEJA ".$res[0]->meja_nm;
 		    }
 		
-		list($dt,$tm) = explode(" ", $res[0]->created_dttm);
-		$resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
-		$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
+			list($dt,$tm) = explode(" ", $res[0]->created_dttm);
+			$resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
+			$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
 			$ret = "<div><div class='row col-md-12 m-0' id='div-item'>
-				<input type='hidden' id='meja_id' value='$id'/>
-				<input type='hidden' id='billing_id' value='$billing_id'/>
+					<input type='hidden' id='meja_id' value='$id'/>
+					<input type='hidden' id='billing_id' value='$billing_id'/>
 						<!-- <div class='col-md-12 m-0 text-center' align='center' style='margin-top: 30px;'>
 							
 								<p style='font-size: 16px;margin-block-end: -5px;'>Butcher Steak & Pasta Palembang</p>
@@ -252,18 +252,18 @@ class Kasir extends BaseController
 				} 
 				
 				    
-					$taxx = $amt_before_discount * 0.10;
-					if (strpos($taxx,'.') == TRUE) {
-						list($tax,$belakangkoma) = explode(".", $taxx);
-					} else {
-						$tax = $taxx;
-					}
-					
 					$servicex = $amt_before_discount * 0.05;
 					if (strpos($servicex,'.') == TRUE) {
 						list($service,$belakangkomas) = explode(".", $servicex);
 					} else {
 						$service = $servicex;
+					}
+
+					$taxx = ($amt_before_discount + $service) * 0.10;
+					if (strpos($taxx,'.') == TRUE) {
+						list($tax,$belakangkoma) = explode(".", $taxx);
+					} else {
+						$tax = $taxx;
 					}
 					
 					
@@ -278,24 +278,24 @@ class Kasir extends BaseController
 				$ret .= "<table style='font-size: 18px;' width='100%'>
 				        <tr>
 				          <td align='left'>Subtotal</td>
-				          <td colspan='2' align='right'>Rp. ".number_format($subtotal)."</td>
+				          <td colspan='2' align='right'>".number_format($subtotal)."</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Tax</td>
-				          <td colspan='2' align='right'>Rp. ".number_format($tax)."</td>
+				          <td colspan='2' align='right'>".number_format($tax)."</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Service</td>
-				          <td colspan='2' align='right'>Rp. ".number_format($service)."</td>
+				          <td colspan='2' align='right'>".number_format($service)."</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Rounding Amount</td>
-				          <td colspan='2' align='right'>Rp. ".number_format($nilaibulat)."</td>
+				          <td colspan='2' align='right'>".number_format($nilaibulat)."</td>
 				        </tr>
 
 				        <tr>
 				          <td align='left' style='font-weight:bold;'>Total</td>
-				          <td colspan='2' align='right'>Rp. ".number_format($jmlbulat)."</td>
+				          <td colspan='2' align='right'>".number_format($jmlbulat)."</td>
 				        </tr>
 						</table>
 						<hr style='border: 1px solid red;margin-bottom:20px;'>";
@@ -314,7 +314,7 @@ class Kasir extends BaseController
 
 				$res = $this->kategorimodel->getbyNormal()->getResult();
 				$produk = "<div><input type='hidden' id='meja_id' value='$id'/>"
-					. "<button type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
+					. "<button style='float: left;' type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
 					. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH KATEGORI PRODUK</span>"
 					. "<hr/>"
 					. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
@@ -322,11 +322,223 @@ class Kasir extends BaseController
 							$produk .= "<div onclick='clickkategori($key->kategori_id)' class='m-t-10' style='background-color: #e9ecef; border-radius:5px; padding: .75rem 1rem;'><span style='font-size: 22px;'>$key->kategori_nm</span> <i style='float:right;' class='fas fa-chevron-right'></i></div>";
 						}
 				$produk .= "</div></div></div>";
-				$return = array('status' => 'kategori','billing' => $ret, 'produk' => $produk);
+				$return = array('status' => 'billing','billing' => $ret, 'produk' => $produk);
+		} else {
+			$meja = $this->mejamodel->getbyid($id)->getResult();
+			$ret = "<div class='modal-dialog'>"
+		            . "<div class='modal-content'>"
+		            . "<div class='modal-header'>"
+		            . "<h4 class='modal-title'>Jumlah Tamu</h4>"
+		            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>x</button>"
+		            . "</div>"
+		            . "<div class='modal-body'>"
+		            . "<form>"
+		            . "<div class='form-group'>"
+		            . "<label for='jumlah_customer' class='control-label'>Masukkan jumlah tamu di <strong>MEJA ".$meja[0]->meja_nm."</strong></label>"
+		            . "<input type='number' class='form-control' id='jumlahtamu'>"
+		            . "</div>"
+		            . "</form>"
+		            . "</div>"
+		            . "<div class='modal-footer'>"
+		            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
+		            . "<button onclick='simpanjumlahcustomer($id)' type='button' class='btn btn-danger waves-effect waves-light'>Simpan</button>"
+		            . "</div>"
+		            . "</div>"
+		            . "</div>";
+
+		    $return = array('status' => 'form','form' => $ret);
+		}
+		echo json_encode($return,JSON_UNESCAPED_SLASHES);
+	}
+
+	public function getbymejaidkasir() {
+		$id = $this->request->getPost('id');
+		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
+		$discount_nmx 			= "";	 
+		$discount_valuex 		= "";
+		$discount 				= "";
+		$discount_nm 			= "";
+		$discount_value 		= "";
+		$subtotal 				= 0;
+		$amt_before_discount 	= 0;
+		if (count($res)>0) {
+			$billing_id = $res[0]->billing_id;
+			if ($res[0]->member_nm != "") {
+		        $member_nm = "<span style='font-size: 16px;'>".$res[0]->member_nm."</span> <a href='#' onclick='removemember($id,$billing_id)'><i style='color:red;' class='fas fa-times'></i></a>";
+		    } else {
+		        $member_nm = "MEJA ".$res[0]->meja_nm;
+		    }
+		
+			list($dt,$tm) = explode(" ", $res[0]->created_dttm);
+			$resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
+			$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
+			$ret = "<div><div class='row col-md-12 m-0' id='div-item'>
+					<input type='hidden' id='meja_id' value='$id'/>
+					<input type='hidden' id='billing_id' value='$billing_id'/>
+						<!-- <div class='col-md-12 m-0 text-center' align='center' style='margin-top: 30px;'>
+							
+								<p style='font-size: 16px;margin-block-end: -5px;'>Butcher Steak & Pasta Palembang</p>
+								<p style='font-size: 16px;margin-block-end: -5px;'>Jl. AKBP Cek Agus No. 284, Palembang</p>
+								<p style='font-size: 16px;margin-block-end: -5px;'>Sumatera Selatan, 30114, 07115626366</p>
+							
+						</div> -->
+					</div>";
+			$ret .= "<div class='row col-md-12 m-0'>
+					  <table width='100%' style='font-size: 18px;'>
+				        <tr>
+				          <td align='left'>".panjang($dt)."</td>
+				          <td align='right'>".$tm."</td>
+				        </tr>
+				        <tr>
+				          <td align='left'>Bill Name</td>
+				          <td align='right'>$member_nm</td>
+				        </tr>
+				        <tr>
+				          <td align='left'>Collected By</td>
+				          <td align='right'>".$res[0]->collected_nm."</td>
+				        </tr>
+				      </table>
+				      </div>
+				      <hr style='border: 1px solid red'>
+				      <div class='row col-md-12 m-0' style='overflow:auto;'>
+				      <table class='active' width='100%'><tbody>";
+			foreach ($res as $key) {
+				$total = $key->produk_harga * $key->qty;
+				$amt_before_discount = $amt_before_discount + $total;
+				if (count($resdc)>0) {
+					foreach ($resdc as $dc) {
+						$symb = substr($dc->value, -1);
+						if ($symb == "%") {
+							$percentega = str_replace("%", "", $dc->value);
+							$ptotal = ($percentega/100) * $total;
+							list($harga,$belakangkoma) = explode(".", $ptotal);
+							$discount = "<span style='font-size: 16px;'>(".number_format($harga).")</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
+							$afterdc = $total - $harga;
+							$subtotal = $subtotal + $afterdc;
+							$discount_nmx = $dc->discount_nm;
+							$discount_valuex = $dc->value;
+						} else {
+							$subtotal = $subtotal + $total;
+						}
+					} 
+				} else {
+					$subtotal = $subtotal + $total;
+				}
+
+				if ($key->statusbilling == 'verified') {
+					$buttonqty = "<button onclick='minusitem($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px; margin-left:5px;'>-</button>
+					<button onclick='additem($key->billing_item_id)' class='btn btn-success font-weight-bold' style='font-size: 25px; height: 25px; width: 35px; line-height: 0px;'>+</button>";
+				} else {
+					$buttonqty = "";
+				}
+				
+				$ret .= "<tr>
+				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
+				            <span>$key->produk_nm <a style='float: right;' onclick='removeitem($id,$key->billing_item_id)'><i style='color:red;' class='fas fa-times'></i></a></span>
+				          </td>
+				        </tr>
+				        <tr style='font-size: 18px;'>
+				        <input type='hidden' id='inputqty$key->billing_item_id' value='$key->qty'/>
+				          <td align='left' width='180'><span id='jumlahitem$key->billing_item_id'>$key->qty X $buttonqty</span><br>$discount_nmx $discount_valuex</td>
+				          <td align='center'><span>@".number_format($key->produk_harga)."</span></td>
+				          <td align='right'><span>".number_format($total)."<br>$discount</span></td>
+				        </tr>
+				        <tr style='line-height:12px;'>
+				        <td>&nbsp </td>
+				        <td></td>
+				        <td></td>
+				        </tr>";
+				 }
+				
+				if (count($notpersen)>0) {
+					 foreach ($notpersen as $dc) {
+						$discount_nm = $dc->discount_nm;
+						$discount_value = $dc->value;
+							$ret .= "<tr style='font-size: 18px;'>
+							        <td align='left' width='80'>$discount_nm </td>
+							        <td></td>
+							        <td align='right'>(".number_format($discount_value).") <a href='#' onclick='removedc($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a></td>
+							        </tr>";
+							$subtotal = $subtotal - $dc->value; 
+					}
+				} 
+				
+				    
+					$servicex = $amt_before_discount * 0.05;
+					if (strpos($servicex,'.') == TRUE) {
+						list($service,$belakangkomas) = explode(".", $servicex);
+					} else {
+						$service = $servicex;
+					}
+
+					$taxx = ($amt_before_discount + $service) * 0.10;
+					if (strpos($taxx,'.') == TRUE) {
+						list($tax,$belakangkoma) = explode(".", $taxx);
+					} else {
+						$tax = $taxx;
+					}
+					
+					
+					$grandtotal = $subtotal + $tax + $service;
+					$jmlbulat = $this->pembulatanratusan($grandtotal);
+					$nilaibulat = $jmlbulat - $grandtotal;
+					
+
+				$ret .= "</tbody></table></div>
+						<hr style='border: 1px solid red'>";
+				        
+				$ret .= "<table style='font-size: 18px;' width='100%'>
+				        <tr>
+				          <td align='left'>Subtotal</td>
+				          <td colspan='2' align='right'>".number_format($subtotal)."</td>
+				        </tr>
+				        <tr>
+				          <td align='left'>Tax</td>
+				          <td colspan='2' align='right'>".number_format($tax)."</td>
+				        </tr>
+				        <tr>
+				          <td align='left'>Service</td>
+				          <td colspan='2' align='right'>".number_format($service)."</td>
+				        </tr>
+				        <tr>
+				          <td align='left'>Rounding Amount</td>
+				          <td colspan='2' align='right'>".number_format($nilaibulat)."</td>
+				        </tr>
+
+				        <tr>
+				          <td align='left' style='font-weight:bold;'>Total</td>
+				          <td colspan='2' align='right'>".number_format($jmlbulat)."</td>
+				        </tr>
+						</table>
+						<hr style='border: 1px solid red;margin-bottom:20px;'>";
+
+				$ret .= "<div class='col-md-12' align='center' style='margin:0;padding:0;'>
+							<center>
+							<button onclick='cetakmenudrinks($id,this)' class='btn btn-warning' style='font-size:16px;width: 20%;'>Cetak Drinks</button>
+							<button onclick='cetakmenufood($id,this)' class='btn btn-danger' style='font-size:16px;width: 20%;'>Cetak Foods</button>
+							<button onclick='cetakbilling($id,this)' class='btn btn-info' style='font-size:16px;width: 40%;'>Cetak Billing</button>
+							</center>
+						</div>";
+				$ret .= "<div class='m-t-20' align='center'>
+							<button onclick='showcheckout($id,$jmlbulat)' class='btn btn-success' style='font-size:20px;'>Payment</button>
+						</div>";
+				$return = $ret;
+
+				$res = $this->kategorimodel->getbyNormal()->getResult();
+				$produk = "<div><input type='hidden' id='meja_id' value='$id'/>"
+					. "<button style='float: left;' type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
+					. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH KATEGORI PRODUK</span>"
+					. "<hr/>"
+					. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
+						foreach ($res as $key) {
+							$produk .= "<div onclick='clickkategori($key->kategori_id)' class='m-t-10' style='background-color: #e9ecef; border-radius:5px; padding: .75rem 1rem;'><span style='font-size: 22px;'>$key->kategori_nm</span> <i style='float:right;' class='fas fa-chevron-right'></i></div>";
+						}
+				$produk .= "</div></div></div>";
+				$return = array('status' => 'billing','billing' => $ret, 'produk' => $produk);
 		} else {
 			$res = $this->kategorimodel->getbyNormal()->getResult();
 			$produk = "<div><input type='hidden' id='meja_id' value='$id'/>"
-					. "<button type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
+					. "<button style='float: left;' type='button' class='btn btn-info' onclick='listmejakasir()'><i class='fas fa-chevron-left'></i></button>"
 					. "<span style='margin-left: 20px; font-size: 22px; font-weight: bold;'>PILIH KATEGORI PRODUK</span>"
 					. "<hr/>"
 					. "<div style='margin-top:20px; height: 350px; overflow:auto;'>";
@@ -337,7 +549,6 @@ class Kasir extends BaseController
 				$return = array('status' => 'kategori','billing' => "", 'produk' => $produk);
 		}
 		echo json_encode($return,JSON_UNESCAPED_SLASHES);
-  		// return $return;
 	}
 
 	public function updateqty() {
@@ -403,10 +614,10 @@ class Kasir extends BaseController
 	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
-	            . "<div><table width='100%'>";
+	            . "<div class='table-responsive'><table class='table table-bordered table-striped' width='100%'>";
 	            foreach ($res as $key) {
 	            $ret .= "<tr style='border-bottom: 1px solid #ccc; line-height: 60px; font-size: 25px; font-weight: bold;'>"
-	            	 . "<td align='left'><button onclick='addmember($key->member_id)' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->person_nm</button></td>"
+	            	 . "<td align='left'><button onclick='addmember($key->member_id);' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->person_nm</button></td>"
 	            	 . "<td align='right'>$key->cellphone</td>"
 	            	 . "</tr>";
 	            }
@@ -428,19 +639,25 @@ class Kasir extends BaseController
                         <form id='forms' method='POST' enctype='multipart/form-data'>
                         <div class='modal-body'>
                             	<div class='row p-t-20'>
-                                    <div class='col-md-4'>
+                                    <div class='col-md-3'>
                                         <div class='form-group'>
                                             <label class='control-label'>Nama Lengkap</label>
                                             <input type='text' id='person_nm' class='form-control' placeholder='Nama Lengkap' required=''>
                                         </div>
                                     </div>
-                                    <div class='col-md-4'>
+                                    <div class='col-md-3'>
                                         <div class='form-group'>
-                                            <label class='control-label'>No HP</label>
-                                            <input type='text' id='cellphone' class='form-control' placeholder='No HP' required=''>
+                                            <label class='control-label'>Kode Member</label>
+                                            <input type='text' id='member_cd' class='form-control' placeholder='Kode Member'>
                                         </div>
                                     </div>
-                                    <div class='col-md-4'>
+                                    <div class='col-md-3'>
+                                        <div class='form-group'>
+                                            <label class='control-label'>No HP</label>
+                                            <input type='text' id='cellphone' class='form-control' placeholder='No HP'>
+                                        </div>
+                                    </div>
+                                    <div class='col-md-3'>
                                         <div class='form-group'>
                                             <label class='control-label'>Jenis Kelamin</label>
                                             <select id='gender_cd' class='form-control' required=''>
@@ -538,11 +755,8 @@ class Kasir extends BaseController
 	            $ret .= "<label class='btn btn-outline-primary' style='margin:5px !important; color:black !important;'>
                             <input type='radio' name='payplan' id='tunai1' data-payplan-id='1' value='".number_format($gt)."' autocomplete='off'>".number_format($gt)."
                         </label>";
-                // $ret .= "<label for='tunai2' class='btn btn-outline-primary' style='margin:5px !important; color:black !important;'>
-                //             <input type='radio' name='payplan' id='tunai2' data-payplan-id='1' value='".$this->pembulatanratusanribu($gt)."' autocomplete='off'>".$this->pembulatanratusanribu($gt)."
-                //         </label> ";
                 $ret .= "<label class='btn btn-outline-primary' style='margin:0 !important; color:black !important;'>
-                            <input type='number' name='paymen_tunai' id='tunai3' data-paymen-id='1' placeholder='Nilai Lain'>
+                            <input type='text' name='paymen_tunai' id='tunai3' data-paymen-id='1' placeholder='0' data-mask='#.##0' data-mask-reverse='true' data-mask-maxlength='false'>
                         </label>";
                 $ret .= "<div style='margin-top: 20px;'><label style='color:black !important;'>EDC</label></div>";
 	            foreach ($res as $key) {
@@ -556,6 +770,7 @@ class Kasir extends BaseController
 	       		. "</div>"
 	            . "</div>"
 	            . "</div>";
+	        $ret .= "<script src='../assets/js/jquery.mask.js'></script>";
 		
 		return $ret;	
 	}
@@ -565,7 +780,7 @@ class Kasir extends BaseController
 			$ret = "<div class='modal-dialog modal-lg'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
-	            . "<h4 class='modal-title'>----------</h4>"
+	            . "<h4 class='modal-title'>MASUKKAN JUMLAH ITEM</h4>"
 	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
@@ -596,6 +811,116 @@ class Kasir extends BaseController
 		return $ret;
 	}
 
+	public function billinghistoryfinish() {
+		$history = $this->billingmodel->getbyfinish()->getResult();
+		$ret = "";
+		$no = 1;
+		if (count($history)>0) {
+			$ret .= "<div class='modal-dialog modal-xl'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>History Transaksi</h4>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+				 . "<div class='row'>"
+				 . "<div class='col-md-12'>"
+				 . "<div class='card'>"
+                 . "<div class='card-body'>"
+				 . "<table width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<thead>"
+				 . "<tr>"
+				 . "<th>No.</th>"
+				 . "<th>Billing Kode</th>"
+				 . "<th>Meja</th>"
+				 . "<th>Grand Total</th>"
+				 . "<th>Action</th>"
+				 . "</tr>"
+				 . "</thead>"
+				 . "<tbody>";
+				 foreach ($history as $key) {
+				 	$ret .= "<tr>"
+						 . "<td>".$no++."</td>"
+						 . "<td>$key->billing_cd</td>"
+						 . "<td>$key->meja_nm</td>"
+						 . "<td>$key->ttl_amount</td>"
+						 . "<td>Button</td>"
+						 . "</tr>";
+				 }
+
+			$ret .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+				 . "</div>" // row
+	       		. "</div>" // modal body
+	            . "</div>"
+	            . "</div>";
+
+	        $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
+		} else {
+			$ret .= "";
+		}
+
+		return $ret;
+	}
+
+	public function billinghistoryverified() {
+		$history = $this->billingmodel->getbyverified()->getResult();
+		$ret = "";
+		$no = 1;
+		if (count($history)>0) {
+			$ret .= "<div class='modal-dialog modal-xl'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>History Transaksi</h4>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+				 . "<div class='row'>"
+				 . "<div class='col-md-12'>"
+				 . "<div class='card'>"
+                 . "<div class='card-body'>"
+				 . "<table width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<thead>"
+				 . "<tr>"
+				 . "<th>No.</th>"
+				 . "<th>Billing Kode</th>"
+				 . "<th>Meja</th>"
+				 . "<th>Grand Total</th>"
+				 . "<th>Action</th>"
+				 . "</tr>"
+				 . "</thead>"
+				 . "<tbody>";
+				 foreach ($history as $key) {
+				 	$ret .= "<tr>"
+						 . "<td>".$no++."</td>"
+						 . "<td>$key->billing_cd</td>"
+						 . "<td>$key->meja_nm</td>"
+						 . "<td>$key->ttl_amount</td>"
+						 . "<td>Button</td>"
+						 . "</tr>";
+				 }
+
+			$ret .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+				 . "</div>" // row
+	       		. "</div>" // modal body
+	            . "</div>"
+	            . "</div>";
+
+	        $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
+		} else {
+			$ret .= "";
+		}
+
+		return $ret;
+	}
+
 	public function tambah_nol($angka,$jumlah)
     {
        $jumlah_nol = strlen($angka);
@@ -617,14 +942,14 @@ class Kasir extends BaseController
 	             . "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
-	            . "<form>"
+	            . "<form id='openkasir'>"
 	            . "<div class='form-group'>"
 	            . "<label for='namadiscount' class='control-label'>Tanggal Buka</label>"
 	            . "<input type='date' class='form-control' id='open_dttm' value='$date'>"
 	            . "</div>"
 	            . "<div class='form-group'>"
 	            . "<label class='control-label'>Modal Awal</label>"
-	            . "<input type='number' class='form-control' id='nilaimodal'>"
+	            . "<input type='text' placeholder='0' class='form-control' id='nilaimodal' data-mask='#.##0' data-mask-reverse='true' data-mask-maxlength='false'>"
 	            . "</div>"
 	            . "</form>"
 	            . "</div>"
@@ -634,7 +959,7 @@ class Kasir extends BaseController
 	            . "</div>"
 	            . "</div>"
 	            . "</div>";
-
+	    $ret .= "<script src='../assets/js/jquery.mask.js'></script>";
 	    return $ret;
     }
 
@@ -722,19 +1047,9 @@ class Kasir extends BaseController
     }
 
     public function simpanopenkasir() {
-    	// $cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
     	$jam = date('H:i:s');
-   //  	if (count($cekunclosed)>0) {
-   //  		$ret = "belumfinish";
-   //  	} else {
-    		
-			// $this->reportTopdf($closed_dttm);
-			// $this->sendingemail($closed_dttm);
-   //  	}
-
     	$open_dttm = $this->request->getPost('open_dttm');
-    	$nilaimodal = $this->request->getPost('nilaimodal');
-    		
+    	$nilaimodal = str_replace(".", "", $this->request->getPost('nilaimodal'));
 	    	$data = [
 	    	  'modal' => $nilaimodal,
 			  'status_cd' => 'open',
@@ -808,31 +1123,33 @@ class Kasir extends BaseController
     }
 
 	public function addproduktobill() {
-		$meja_id 	= $this->request->getPost('meja_id');
-		$produk_id 	= $this->request->getPost('produk_id');
-		$qty 		= $this->request->getPost('jumlah');
-		$catatan 	= $this->request->getPost('catatan');
-		$date 		= date('Y-m-d H:i:s');
-		$getbill 	= $this->billingmodel->getbyMejaidkasir($meja_id)->getResult();
-		$kasirstatus = $this->session->kasir_status_id;
+		$meja_id 			= $this->request->getPost('meja_id');
+		$produk_id 			= $this->request->getPost('produk_id');
+		$qty 				= $this->request->getPost('jumlah');
+		$catatan 			= $this->request->getPost('catatan');
+		$jumlah_customer 	= $this->request->getPost('jumlah_customer');
+		$date 				= date('Y-m-d H:i:s');
+		$getbill 			= $this->billingmodel->getbyMejaidkasir($meja_id)->getResult();
+		$kasirstatus 		= $this->session->kasir_status_id;
 		
 		if (count($getbill)>0) {
 			$billing_id = $getbill[0]->billing_id;
 		} else {
 			$desclimit 	= $this->billingmodel->getDesclim1()->getResult();
 			if (count($desclimit)>0) {
-				$number = preg_replace("/[^1-9]/", "", $desclimit[0]->billing_cd);
-				$code = $number + 1;
+				$code = $desclimit[0]->billing_id + 1;
 			} else {
 				$code = 1;
 			}
-			
-			$billing_cd = "LAV".$this->tambah_nol($code,4);
+
+			$zero = str_pad($code, 4, "0", STR_PAD_LEFT);
+			$billing_cd = "LAV$zero";
 
 			$data = [
 				'kasir_status_id' => $kasirstatus,
 			  	'meja_id' => $meja_id,
 			  	'billing_cd' => $billing_cd,
+			  	'jumlah_customer' => $jumlah_customer,
 			  	'status_cd' => 'verified',
 			  	'created_dttm' => $date,
 			  	'created_user' => $meja_id
@@ -974,57 +1291,37 @@ class Kasir extends BaseController
     		$this->profile = CapabilityProfile::load("POS-5890");
     		$this->connector = new RawbtPrintConnector();
     		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
-    		if ($data[0]->member_nm != "") {
-		        $member_nm = $data[0]->member_nm;
-		    } else {
-		        $member_nm = "Meja ".$data[0]->meja_nm;
-		    }
+    		$member_nm = "Meja ".$data[0]->meja_nm;
+		    
     
     		$this->printer = new Printer($this->connector);
     		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
     		// Make sure you load a Star print connector or you may get gibberish.
     		try {
     
-    		    /* Information for the receipt */
-    		    /* Date is kept the same for testing */
-    		$date = date('l jS \of F Y h:i:s A');
-    		   
-    
-    		    /* Start the printer */
-    		    // $logo = EscposImage::load("images/lib/logoa.png", false);
-    		    // $this->printer = new Printer($this->connector, $this->profile);
-    
-    
-    		    /* Print top logo */
-    		    // if ($this->profile->getSupportsGraphics()) {
-    		    //     $this->printer->graphics($logo);
-    		    // }
-    		    // if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
-    		    //     $this->printer->bitImage($logo);
-    		    // }
-    
-    		    /* Name of shop */
+    		$date = date('Y-m-d H:i:s');
     		   
     		    /* Items */
-    		    
+    		    $this->printer->feed(20);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
-    		    $this->printer->setTextSize(1, 1);
-    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->text($date."\n");
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
-    		        $this->printer->text($item->produk_nm."\n");
+    		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
-    		        $this->printer->text($this->getAsString(32,$item->qty."x","","")); // for 58mm Font A
-    		        
+    		        $this->printer->text($this->getAsString(32,$item->qty."x","",$item->produk_nm)); // for 58mm Font A
+    		        $this->printer->text($item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		   
-    
+    		    $this->printer->feed(20);
+    			
     		    /* Cut the receipt and open the cash drawer */
     		    // $this->printer->cut();
     		    // $this->printer->pulse();
@@ -1047,11 +1344,7 @@ class Kasir extends BaseController
     		$this->profile = CapabilityProfile::load("POS-5890");
     		$this->connector = new RawbtPrintConnector();
     		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
-    		if ($data[0]->member_nm != "") {
-		        $member_nm = $data[0]->member_nm;
-		    } else {
-		        $member_nm = "Meja ".$data[0]->meja_nm;
-		    }
+    		$member_nm = "Meja ".$data[0]->meja_nm;
     
     		$this->printer = new Printer($this->connector);
     		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
@@ -1060,43 +1353,27 @@ class Kasir extends BaseController
     
     		    /* Information for the receipt */
     		    /* Date is kept the same for testing */
-    		$date = date('l jS \of F Y h:i:s A');
-    		   
-    
-    		    /* Start the printer */
-    		    // $logo = EscposImage::load("images/lib/logoa.png", false);
-    		    // $this->printer = new Printer($this->connector, $this->profile);
-    
-    
-    		    /* Print top logo */
-    		    // if ($this->profile->getSupportsGraphics()) {
-    		    //     $this->printer->graphics($logo);
-    		    // }
-    		    // if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
-    		    //     $this->printer->bitImage($logo);
-    		    // }
-    
-    		    /* Name of shop */
-    		   
-    
+    		$date = date('Y-m-d H:i:s');
     		    /* Items */
-    		    
+    		    $this->printer->feed(20);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
-    		    $this->printer->setTextSize(1, 1);
-    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->text($date."\n");
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
-    		        $this->printer->text($item->produk_nm."\n");
+    		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
-    		        $this->printer->text($this->getAsString(32,$item->qty."x","","")); // for 58mm Font A
+    		        $this->printer->text($this->getAsString(32,$item->qty."x","",$item->produk_nm)); // for 58mm Font A
+    		        $this->printer->text($item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		    
+    		     $this->printer->feed(20);
     		 
     
     		    /* Cut the receipt and open the cash drawer */
@@ -1129,11 +1406,7 @@ class Kasir extends BaseController
 		$nilaidiskon = "";
 
 		if (count($data)>0) {
-			if ($data[0]->member_nm != "") {
-		        $member_nm = $data[0]->member_nm;
-		    } else {
-		        $member_nm = "Meja ".$data[0]->meja_nm;
-		    }
+			$member_nm = "Meja ".$data[0]->meja_nm;
 
 		    list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		    $resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
@@ -1148,25 +1421,6 @@ class Kasir extends BaseController
 			$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
 			// Make sure you load a Star print connector or you may get gibberish.
 			try {
-
-			    /* Information for the receipt */
-			    /* Date is kept the same for testing */
-			$date = date('l jS \of F Y h:i:s A');
-			   
-
-			    /* Start the printer */
-			    // $logo = EscposImage::load("images/lib/logoa.png", false);
-			    // $this->printer = new Printer($this->connector, $this->profile);
-
-
-			    /* Print top logo */
-			    // if ($this->profile->getSupportsGraphics()) {
-			    //     $this->printer->graphics($logo);
-			    // }
-			    // if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
-			    //     $this->printer->bitImage($logo);
-			    // }
-
 			    /* Name of shop */
 			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
 			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
@@ -1239,13 +1493,6 @@ class Kasir extends BaseController
 				// list($tax,$belakangkoma) = explode(".", $taxx);
 				// $servicex = $amt_before_discount * 0.05;
 				// list($service,$belakangkoma) = explode(".", $servicex);
-				$taxx = $amt_before_discount * 0.10;
-				if (strpos($taxx,'.') == TRUE) {
-					list($tax,$belakangkoma) = explode(".", $taxx);
-				} else {
-					$tax = $taxx;
-				}
-				
 				$servicex = $amt_before_discount * 0.05;
 				if (strpos($servicex,'.') == TRUE) {
 					list($service,$belakangkomas) = explode(".", $servicex);
@@ -1253,21 +1500,29 @@ class Kasir extends BaseController
 					$service = $servicex;
 				}
 
+				$taxx = ($amt_before_discount + $service) * 0.10;
+				if (strpos($taxx,'.') == TRUE) {
+					list($tax,$belakangkoma) = explode(".", $taxx);
+				} else {
+					$tax = $taxx;
+				}
+
 				$grandtotal = $subtotal + $tax + $service;
 				$jmlbulat = $this->pembulatanratusan($grandtotal);
 				$nilaibulat = $jmlbulat - $grandtotal;
 						
 			    $this->printer->setEmphasis(false);
-				$this->printer->text($this->buatBaris4Kolom("Subtotal","","Rp ".number_format($subtotal))); 
-				$this->printer->text($this->buatBaris4Kolom("Tax","","Rp ".number_format($tax))); 
-				$this->printer->text($this->buatBaris4Kolom("Service","","Rp ".number_format($service))); 
-				$this->printer->text($this->buatBaris4Kolom("Rounding Amount","","Rp ".number_format($nilaibulat))); 
+				$this->printer->text($this->buatBaris4Kolom("Subtotal","",number_format($subtotal))); 
+				$this->printer->text($this->buatBaris4Kolom("Tax","",number_format($tax))); 
+				$this->printer->text($this->buatBaris4Kolom("Service","",number_format($service))); 
+				$this->printer->text($this->buatBaris4Kolom("Rounding","",number_format($nilaibulat))); 
 			    $this->printer->text("--------------------------------\n");
 			    $this->printer->setEmphasis(true);
-				$this->printer->text($this->buatBaris4Kolom("Total","","Rp ".number_format($jmlbulat))); 
+				$this->printer->text($this->buatBaris4Kolom("Total","",number_format($jmlbulat))); 
 			    $this->printer->setEmphasis(false);
 			    /*footer */
-			    
+			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    $this->printer->text("TERIMA KASIH\n");
 			    /* Cut the receipt and open the cash drawer */
 			    // $this->printer->cut();
 			    // $this->printer->pulse();
@@ -1302,13 +1557,10 @@ class Kasir extends BaseController
 		$ttl_discount = 0;
 		$amt_before_discount = 0;
 		$poinmb = 0;
-		$nilaidiskon = 0;
+		$nilaidiskon = "";
 		if (count($data)>0) {
-			if ($data[0]->member_nm != "") {
-		        $member_nm = $data[0]->member_nm;
-		    } else {
-		        $member_nm = "Meja ".$data[0]->meja_nm;
-		    }
+			
+		    $member_nm = "Meja ".$data[0]->meja_nm;
 		    list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		    $resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
 			$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
@@ -1325,7 +1577,7 @@ class Kasir extends BaseController
 
 			    /* Information for the receipt */
 			    /* Date is kept the same for testing */
-			$date = date('l jS \of F Y h:i:s A');
+			// $date = date('l jS \of F Y h:i:s A');
 			   
 
 			    /* Start the printer */
@@ -1407,63 +1659,54 @@ class Kasir extends BaseController
 						$ttl_discount = $ttl_discount + $dc->value; 
 					}
 				} 
-
-			 //    foreach ($resdc as $dc) {
-				// 	$symb = substr($dc->value, -1);
-				// 	if ($symb != "%") {
-				// 		$discount_nm = $dc->discount_nm;
-				// 		$discount_value = $dc->value;
-			 //        $this->printer->text($this->getAsString(32,$discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
-				// 	$subtotal = $subtotal - $dc->value;
-				// 	$ttl_discount = $ttl_discount + $dc->value;
-				// 	} 
-				// }
 			    $this->printer->setEmphasis(false);
 			    $this->printer->text("--------------------------------\n");
 			    $this->printer->setEmphasis(false);
 			    $this->printer->feed();
 
-			 //    $taxx = $amt_before_discount * 0.10;
-			 //    list($tax,$belakangkomax) = explode(".", $taxx);
-				// $servicex = $amt_before_discount * 0.05;
-				// list($service,$belakangkomas) = explode(".", $servicex);
-			    $taxx = $amt_before_discount * 0.10;
-				if (strpos($taxx,'.') == TRUE) {
-					list($tax,$belakangkoma) = explode(".", $taxx);
-				} else {
-					$tax = $taxx;
-				}
-				
-				$servicex = $amt_before_discount * 0.05;
+			    $servicex = $amt_before_discount * 0.05;
 				if (strpos($servicex,'.') == TRUE) {
 					list($service,$belakangkomas) = explode(".", $servicex);
 				} else {
 					$service = $servicex;
 				}
 
-				$grandtotal = $subtotal + $tax + $service;
-				$jmlbulat = $this->pembulatanratusan($grandtotal);
-				$nilaibulat = $jmlbulat - $grandtotal;
+				$taxx = ($amt_before_discount + $service) * 0.10;
+				if (strpos($taxx,'.') == TRUE) {
+					list($tax,$belakangkoma) = explode(".", $taxx);
+				} else {
+					$tax = $taxx;
+				}
 
-			    $this->printer->setEmphasis(false);
-				$this->printer->text($this->buatBaris4Kolom("Subtotal","","Rp ".number_format($subtotal))); 
-				$this->printer->text($this->buatBaris4Kolom("Tax","","Rp ".number_format($tax))); 
-				$this->printer->text($this->buatBaris4Kolom("Service","","Rp ".number_format($service))); 
-				$this->printer->text($this->buatBaris4Kolom("Rounding Amount","","Rp ".number_format($nilaibulat))); 
-			    $this->printer->text("--------------------------------\n");
-			    $this->printer->setEmphasis(true);
-				$this->printer->text($this->buatBaris4Kolom("Total","","Rp ".number_format($jmlbulat))); 
-			    $this->printer->setEmphasis(false);
-			    /*footer */
-			    $this->printer->feed(2);
-			    // $this->printer->text($date . "\n");
-			    if ($payplan_id == 1) {
+				if ($payplan_id == 1) {
 					$ttlpaid = $paid;
 				} else {
 					$ttlpaid = $jmlbulat;
 				}
 
 				$ttl_paid = str_replace(",","",$ttlpaid);
+				
+				
+
+				$grandtotal = $subtotal + $tax + $service;
+				$jmlbulat = $this->pembulatanratusan($grandtotal);
+				$nilaibulat = $jmlbulat - $grandtotal;
+				$kembalian = $ttl_paid - $jmlbulat;
+			    $this->printer->setEmphasis(false);
+				$this->printer->text($this->buatBaris4Kolom("Subtotal","",number_format($subtotal))); 
+				$this->printer->text($this->buatBaris4Kolom("Tax","",number_format($tax))); 
+				$this->printer->text($this->buatBaris4Kolom("Service","",number_format($service))); 
+				$this->printer->text($this->buatBaris4Kolom("Rounding","",number_format($nilaibulat))); 
+			    $this->printer->text("--------------------------------\n");
+			    $this->printer->setEmphasis(true);
+				$this->printer->text($this->buatBaris4Kolom("Total","",number_format($jmlbulat))); 
+				$this->printer->text($this->buatBaris4Kolom($data[0]->payplan_nm,"",""));
+				$this->printer->text($this->buatBaris4Kolom("Kembalian","",number_format($kembalian)));
+			    $this->printer->setEmphasis(false);
+			    /*footer */
+			    $this->printer->feed(2);
+			    // $this->printer->text($date . "\n");
+			    
 			    $updatebill = [
 					'payplan_id' => $payplan_id,
 					'ttl_paid' => $ttl_paid,
@@ -1487,7 +1730,8 @@ class Kasir extends BaseController
 				}
 
 
-
+				$this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    $this->printer->text("TERIMA KASIH\n");
 			    /* Cut the receipt and open the cash drawer */
 			    // $this->printer->cut();
 			    // $this->printer->pulse();

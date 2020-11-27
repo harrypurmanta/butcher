@@ -12,7 +12,8 @@
                         <div class="col-md-6">
                             <div class="card" style="padding-bottom: 20px;">
                                 <input type="hidden" id="value-meja"/>
-                                <div class="card-body" id="cardbodymeja">
+                                <input type="hidden" id="jumlah_customer"/>
+                                <div class="card-body" id="cardbodymeja" align="center">
                                 
                                 </div>
                                 <hr>
@@ -32,8 +33,8 @@
                                 <div class="card">
                                   <div class="card-body">
                                     <button type="button" onclick="closekasir()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-file-archive fa-3x"></i></button>
-                                    <button class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-list fa-3x"></i></button>
-                                    
+                                    <button type="button" onclick="billinghistoryfinish()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-check fa-3x"></i></button>
+                                    <button type="button" onclick="billinghistoryverified()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-list fa-3x"></i></button>
                                   </div>
                                 </div>
                               </div>
@@ -45,32 +46,27 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="modaltambahmember" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+                        </div>
                     </div>
-                    
             </div>
             <div class="d-none" id='loader-wrapper'>
                 <div class="loader"></div>
             </div>
-            <div id="responsive-modal" class="modal modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+            <div id="responsive-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
                               
             </div>
-
-            <div id="modaltambahmember" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-                              
-            </div>
+            
             <!-- ============================================================== -->
             <!-- End Container fluid  -->
             <!-- ============================================================== -->
             <!-- ============================================================== -->
             <script src="../assets/plugins/jquery/jquery.min.js"></script>
+
             <!-- <script src="../assets/js/perfect-scrollbar.jquery.min.js"></script> -->
 <script type="text/javascript">
-// $('#cardbodymeja').perfectScrollbar();
-$(document).ready(function(){
-  // setInterval(function(){ 
+$(document).ready(function($){
     listmejakasir();
-  // }, 2000);
-  
 });
 
 function openkasir() {
@@ -248,6 +244,7 @@ function listmejakasir() {
        },
        success:function(data){
         $('#cardbodymeja').html(data);
+        $('#cardbody').empty();
         $("#loader-wrapper").addClass("d-none");
       },
       error:function(){
@@ -342,20 +339,127 @@ function addproduk(produk_id) {
   });
 }
 
+function clickmejabutton(id) {
+  $("#value-meja").val(id);
+  $.ajax({
+     url : "<?= base_url('kasir/clickmejabutton') ?>",
+     type: "post",
+     data: {id:id},
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+     },
+     success:function(data){
+      var _data = JSON.parse(data);
+      if (_data.status == 'form') {
+        $('#modaltambahmember').html(data);
+        $('#modaltambahmember').modal('show');
+        $('#cardbody').empty();
+      } else {
+        $('#cardbodymeja').html(_data.produk);
+        $('#cardbody').html(_data.billing);
+      }
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+    });
+}
+
+function simpanjumlahcustomer(id) {
+  var jumlahcustomer = $('#jumlahtamu').val();
+  $("#jumlah_customer").val(jumlahcustomer);
+  $('#modaltambahmember').modal('hide');
+  showbillingbymeja(id);
+
+}
+
+function showbillingbymeja(id) {
+    $.ajax({
+     url : "<?= base_url('kasir/getbymejaidkasir') ?>",
+     type: "post",
+     data : {'id':id},
+     beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
+     success:function(data){
+      var _data = JSON.parse(data);
+      if (_data.status == 'kategori') {
+        $('#cardbodymeja').html(_data.produk);
+        $('#cardbody').html(_data.billing);
+      } else {
+        $('#cardbodymeja').html(_data.produk);
+        $('#cardbody').html(_data.billing);
+      }
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+    });
+}
+
+function showbillingbymeja2(id) {
+  $("#value-meja").val(id);
+    $.ajax({
+     url : "<?= base_url('kasir/getbymejaidkasir') ?>",
+     type: "post",
+     data : {'id':id},
+     beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
+     success:function(data){
+      var _data = JSON.parse(data);
+      if (_data.status == 'kategori') {
+        $('#cardbodymeja').html(_data.produk);
+        $('#cardbody').html(_data.billing);
+      } else {
+        $('#cardbody').html(_data.billing);
+      }
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+    });
+}
+
 function simpanproduk(produk_id) {
   var meja_id = $("#value-meja").val();
   var jumlah = $("#jumlah").val();
   var catatan = $("#catatan").val();
+  var jumlah_customer = $("#jumlah_customer").val();
   $.ajax({
       url : "<?= base_url('kasir/addproduktobill') ?>",
       type: "POST",
-      data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan},
+      data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan,jumlah_customer:jumlah_customer},
       beforeSend: function () { 
         $("#loader-wrapper").removeClass("d-none")
       },
       success:function(data){
         if (data == 'true') {
-          showbillingbymeja(meja_id);
+          showbillingbymeja2(meja_id);
           $('#modaltambahmember').modal('hide');
         } else {
           Swal.fire({
@@ -379,6 +483,56 @@ function simpanproduk(produk_id) {
               cancelButtonColor:"#f46a6a"
           })
       }
+  });
+}
+
+function billinghistoryfinish() {
+  $.ajax({
+     url : "<?= base_url('kasir/billinghistoryfinish') ?>",
+     type: "post",
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+      },
+     success:function(data){
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function billinghistoryverified() {
+  $.ajax({
+     url : "<?= base_url('kasir/billinghistoryverified') ?>",
+     type: "post",
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+      },
+     success:function(data){
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
   });
 }
 
@@ -435,6 +589,7 @@ function formtambahdiskon() {
 
 function simpan() {
   var person_nm   = $("#person_nm").val();
+  var member_cd   = $("#member_cd").val();
   var cellphone   = $("#cellphone").val();
   var gender_cd   = $("#gender_cd").val();
   var email       = $("#email").val();
@@ -455,6 +610,7 @@ function simpan() {
       var ajaxData = new FormData();
       ajaxData.append('action','forms');
       ajaxData.append('person_nm',person_nm);
+      ajaxData.append('member_cd',member_cd);
       ajaxData.append('cellphone',cellphone);
       ajaxData.append('gender_cd',gender_cd);
       ajaxData.append('email',email);
@@ -563,39 +719,6 @@ function simpandiskon() {
         }
       });
   }
-}
-
-function showbillingbymeja(id) {
-  $("#value-meja").val(id);
-    $.ajax({
-     url : "<?= base_url('kasir/getbymejaidkasir') ?>",
-     type: "post",
-     data : {'id':id},
-     beforeSend: function () { 
-          $("#loader-wrapper").removeClass("d-none")
-      },
-     success:function(data){
-      var _data = JSON.parse(data);
-      if (_data.status == 'kategori') {
-        $('#cardbodymeja').html(_data.produk);
-        $('#cardbody').html(_data.billing);
-      } else {
-        $('#cardbodymeja').html(_data.produk);
-        $('#cardbody').html(_data.billing);
-      }
-      $("#loader-wrapper").addClass("d-none");
-    },
-    error:function(){
-        Swal.fire({
-            title:"Gagal!",
-            text:"Data gagal disimpan!",
-            type:"warning",
-            showCancelButton:!0,
-            confirmButtonColor:"#556ee6",
-            cancelButtonColor:"#f46a6a"
-        })
-    }
-    });
 }
 
 function diskon() {
@@ -1240,6 +1363,7 @@ function minusitem(value){
         });
     }
 };
+
 </script>
 
 <?= $this->endSection(); ?>

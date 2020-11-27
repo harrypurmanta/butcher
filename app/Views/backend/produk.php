@@ -41,7 +41,7 @@
                             </div>
                             <div class="card-body">
                                <div class="table-responsive">
-                                    <table id="myTable" class="table table-bordered table-striped">
+                                    <table id="tableproduk" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th class="text-center">No</th>
@@ -121,6 +121,7 @@
 
 
     function simpan() {
+        var table = $('#tableproduk').DataTable();
         var produk_id = $('#produk_id').val();
         var produk_nm = $('#produk_nm').val();
         var harga = $('#harga').val();

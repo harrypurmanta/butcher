@@ -16,7 +16,7 @@ class Billingmodel extends Model
 
     public function getDesclim1() {
         return $this->db->table('billing')
-                        ->select('billing_cd')
+                        ->select('billing_id')
                         ->limit(1)
                         ->orderby('billing_id','DESC')
                         ->get();
@@ -56,7 +56,7 @@ class Billingmodel extends Model
 
     public function getbyMejaidkasir($id){
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm');
+        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -65,6 +65,7 @@ class Billingmodel extends Model
         $query->join('meja f','f.meja_id=a.meja_id','left');
         $query->join('person g','g.person_id=e.person_id','left');
         $query->join('person h','h.person_id=a.verified_user','left');
+        $query->join('payplan j','j.payplan_id=a.payplan_id','left');
         $query->whereIn('a.status_cd',['verified','normal']);
         $query->where('b.status_cd','normal');
         $query->where('a.meja_id',$id);
@@ -82,7 +83,7 @@ class Billingmodel extends Model
 
     public function getdrinkmenu($id) {
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm');
+        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm,b.description');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -98,7 +99,7 @@ class Billingmodel extends Model
 
     public function getfoodmenu($id) {
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm');
+        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm,b.description');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -153,6 +154,40 @@ class Billingmodel extends Model
         return $this->db->table('kasir_status')
                         ->limit(1)
                         ->orderby('kasir_status_id','DESC')
+                        ->get();
+    }
+
+    public function getbyfinish() {
+        return $this->db->table('billing a')
+                        ->join('billing_item b','b.billing_id=a.billing_id','left')
+                        ->join('produk c','c.produk_id=b.produk_id','left')
+                        ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
+                        ->join('member e','e.member_id=a.member_id','left')
+                        ->join('meja f','f.meja_id=a.meja_id','left')
+                        ->join('person g','g.person_id=e.person_id','left')
+                        ->join('person h','h.person_id=a.verified_user','left')
+                        ->join('payplan i','i.payplan_id=a.payplan_id','left')
+                        ->where('a.status_cd','finish')
+                        ->where('b.status_cd','normal')
+                        ->orderby('a.billing_id','DESC')
+                        ->groupby('a.billing_id')
+                        ->get();
+    }
+
+    public function getbyverified() {
+        return $this->db->table('billing a')
+                        ->join('billing_item b','b.billing_id=a.billing_id','left')
+                        ->join('produk c','c.produk_id=b.produk_id','left')
+                        ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
+                        ->join('member e','e.member_id=a.member_id','left')
+                        ->join('meja f','f.meja_id=a.meja_id','left')
+                        ->join('person g','g.person_id=e.person_id','left')
+                        ->join('person h','h.person_id=a.verified_user','left')
+                        ->join('payplan i','i.payplan_id=a.payplan_id','left')
+                        ->where('a.status_cd','verified')
+                        ->where('b.status_cd','normal')
+                        ->orderby('a.billing_id','DESC')
+                        ->groupby('a.billing_id')
                         ->get();
     }
 

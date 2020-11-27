@@ -54,6 +54,13 @@ $uri = current_url(true);
 <script src="<?=base_url() ?>/assets/plugins/sweetalert2/dist/sweetalert2.all.min.js"></script>
 <script src="<?=base_url() ?>/assets/plugins/sweetalert2/sweet-alert.init.js"></script>
 <script type="text/javascript">
+
+  // Jquery Dependency
+
+
+
+
+
 function add(value){
   var currentVal = parseInt($("#qty" + value).val());
   $("#qty" + value).val(currentVal + 1);

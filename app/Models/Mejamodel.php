@@ -23,6 +23,12 @@ class Mejamodel extends Model
                     ->get();
     }
 
+    public function getbyid($id) {
+        return $this->db->table('meja')
+                        ->where('meja_id',$id)
+                        ->get();
+    }
+
     public function simpan($data) {
                $this->db->table('meja')
                         ->insert($data);

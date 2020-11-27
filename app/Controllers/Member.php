@@ -223,6 +223,7 @@ class member extends BaseController
 			if ($person_id != "") {
 				$empdata = [
 					'person_id' => $person_id,
+					'member_cd' => $this->request->getPost('member_cd'),
 					'status_cd' => 'normal',
 					'created_dttm' => date('Y-m-d H:i:s'),
 					'created_user' => $this->session->user_id

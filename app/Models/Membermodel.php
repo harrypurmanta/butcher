@@ -14,6 +14,7 @@ class membermodel extends Model
         			->join('person b','b.person_id=a.person_id')
         			->where('a.status_cd','normal')
                     ->where('b.status_cd','normal')
+                    ->orderby('b.person_nm','ASC')
         			->get();
     }
 
