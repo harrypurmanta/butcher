@@ -1690,7 +1690,7 @@ class Kasir extends BaseController
 
 				if ($payplan_id == 1) {
 					$ttlpaid = $paid;
-					$ttl_paid = str_replace(",","",$ttlpaid);
+					$ttl_paid = str_replace(".","",$ttlpaid);
 				} else {
 					$ttlpaid = $jmlbulat;
 					$ttl_paid = $ttlpaid;
