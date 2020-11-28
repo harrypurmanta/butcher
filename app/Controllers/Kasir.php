@@ -1304,12 +1304,12 @@ class Kasir extends BaseController
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
-    		    $this->printer->setTextSize(1, 2;
+    		    $this->printer->setTextSize(1, 2);
     		    	$this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
-    		    $this->printer->setTextSize(2, 1;
+    		    $this->printer->setTextSize(2, 1);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
@@ -1365,7 +1365,7 @@ class Kasir extends BaseController
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
-    		    $this->printer->setTextSize(2, 1;
+    		    $this->printer->setTextSize(2, 1);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
