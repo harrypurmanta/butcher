@@ -1425,20 +1425,21 @@ class Kasir extends BaseController
 			$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
 			// Make sure you load a Star print connector or you may get gibberish.
 			try {
+				$logo = EscposImage::load("images/lib/logo.png", false);
 			    /* Name of shop */
 			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
 			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-			    $this->printer->setFont(Printer::FONT_B);
-			    $this->printer->text("Butcher Steak & Pasta Palembang\n");
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text("Butcher Steak & Pasta\n");
 			    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
-			    $this->printer->text("Sumatera Selatan, 30114, 07115626366\n");
+			    $this->printer->text("07115626366\n");
 			    $this->printer->selectPrintMode();
 			    $this->printer->feed();
 			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
 			    $this->printer->setFont(Printer::FONT_A);
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,6)));
-			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_nm, 0,6))."\n");
+			    // $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_nm, 0,6))."\n");
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");
@@ -1585,7 +1586,7 @@ class Kasir extends BaseController
 			   
 
 			    /* Start the printer */
-			    $logo = EscposImage::load("images/lib/logo.png", false);
+			    // $logo = EscposImage::load("images/lib/logo.png", false);
 			    // $this->printer = new Printer($this->connector, $this->profile);
 
 
@@ -1602,17 +1603,17 @@ class Kasir extends BaseController
 			    /* Name of shop */
 			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
 			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-			    $this->printer->setFont(Printer::FONT_B);
-			    $this->printer->text("Butcher Steak & Pasta Palembang\n");
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text("Butcher Steak & Pasta\n");
 			    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
-			    $this->printer->text("Sumatera Selatan, 30114, 07115626366\n");
+			    $this->printer->text("07115626366\n");
 			    $this->printer->selectPrintMode();
 			    $this->printer->feed();
 			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
 			    $this->printer->setFont(Printer::FONT_A);
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,6)));
-			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_nm, 0,6))."\n");
+			    // $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_nm, 0,6))."\n");
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");
