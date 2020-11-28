@@ -1690,13 +1690,13 @@ class Kasir extends BaseController
 
 				if ($payplan_id == 1) {
 					$ttlpaid = $paid;
+					$ttl_paid = str_replace(",","",$ttlpaid);
 				} else {
 					$ttlpaid = $jmlbulat;
+					$ttl_paid = $ttlpaid;
 				}
-
-				$ttl_paid = str_replace(",","",$ttlpaid);
 				$kembalian = $ttl_paid - $jmlbulat;
-				
+
 			    $this->printer->setEmphasis(false);
 				$this->printer->text($this->buatBaris4Kolom("Subtotal","",number_format($subtotal))); 
 				$this->printer->text($this->buatBaris4Kolom("Tax","",number_format($tax))); 
