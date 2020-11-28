@@ -1797,7 +1797,7 @@ class Kasir extends BaseController
     public function barisdapur($kolom1, $kolom2) {
             // Mengatur lebar setiap kolom (dalam satuan karakter)
             $lebar_kolom_1 = 4;
-            $lebar_kolom_2 = 150;
+            $lebar_kolom_2 = 30;
  
             // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
             $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
