@@ -1300,16 +1300,16 @@ class Kasir extends BaseController
     		$date = date('Y-m-d H:i:s');
     		   
     		    /* Items */
-    		    $this->printer->feed(10);
+    		    $this->printer->feed(7);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
-    		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->setTextSize(2, 1);
     		    	$this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
-    		    $this->printer->setTextSize(2, 1);
+    		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
@@ -1321,7 +1321,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->feed(10);
+    		    $this->printer->feed(8);
     			
     		    /* Cut the receipt and open the cash drawer */
     		    // $this->printer->cut();
@@ -1356,16 +1356,16 @@ class Kasir extends BaseController
     		    /* Date is kept the same for testing */
     		$date = date('Y-m-d H:i:s');
     		    /* Items */
-    		    $this->printer->feed(10);
+    		    $this->printer->feed(7);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
-    		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->setTextSize(2, 1);
     		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
-    		    $this->printer->setTextSize(2, 1);
+    		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
@@ -1377,7 +1377,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		     $this->printer->feed(10);
+    		     $this->printer->feed(8);
     		 
     
     		    /* Cut the receipt and open the cash drawer */
