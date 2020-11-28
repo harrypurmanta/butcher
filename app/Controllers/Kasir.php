@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -746,21 +746,19 @@ class Kasir extends BaseController
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
 	            . "<h4 class='modal-title'>Pilih Cara Bayar</h4>"
-	            . "<button type='button' class='close-xl' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
 	            . "<form>"
 	            . "<div><label style='color:black !important;'>TUNAI</label></div>"
 	            . "<div class='btn-group btn-group-toggle' data-toggle='buttons' style='display:block !important;'>";
-	            $ret .= "<label class='btn btn-outline-primary' style='margin:5px !important; color:black !important;'>
-                            <input type='radio' name='payplan' id='tunai1' data-payplan-id='1' value='".number_format($gt)."' autocomplete='off'>".number_format($gt)."
+	            $ret .= "<label class='btn btn-outline-primary' style='font-size: 20px; margin:5px !important; color:black !important;'>
+                            <input class='radiopayment' type='radio' name='payplan' id='tunai1' data-payplan-id='1' value='".number_format($gt)."' autocomplete='off'>".number_format($gt)."
                         </label>";
-                $ret .= "<label class='btn btn-outline-primary' style='margin:0 !important; color:black !important;'>
-                            <input type='text' name='paymen_tunai' id='tunai3' data-paymen-id='1' placeholder='0' data-mask='#.##0' data-mask-reverse='true' data-mask-maxlength='false'>
-                        </label>";
+                $ret .= "<input style='height:45px; border-radius: 5px; margin-left: 10px; font-size: 20px; text-align: center;' type='text' name='paymen_tunai' id='tunai3' data-paymen-id='1' placeholder='0' data-mask='#.##0' data-mask-reverse='true' data-mask-maxlength='false'/>";
                 $ret .= "<div style='margin-top: 20px;'><label style='color:black !important;'>EDC</label></div>";
 	            foreach ($res as $key) {
-	            $ret .= "<label style='width: 100px; height: 70px; margin: 5px; color:black !important;' class='btn btn-outline-primary'>
+	            $ret .= "<label style='width: 100px; height: 70px; margin: 5px; color:black !important;' class='btn btn-outline-primary radiopayment'>
                             <input type='radio' name='payplan' data-payplan-id='$key->payplan_id' value='".number_format($gt)."' id='edc$key->payplan_id' autocomplete='off'><span style='justify-content:center; display:flex;  align-items:center; width:100%; height:100%;'>$key->payplan_nm</span>
                         </label> ";
 	            }
@@ -1302,13 +1300,16 @@ class Kasir extends BaseController
     		$date = date('Y-m-d H:i:s');
     		   
     		    /* Items */
-    		    $this->printer->feed(20);
+    		    $this->printer->feed(10);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
-    		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->setTextSize(1, 2;
+    		    	$this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->setTextSize(2, 1;
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
@@ -1320,7 +1321,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->feed(20);
+    		    $this->printer->feed(10);
     			
     		    /* Cut the receipt and open the cash drawer */
     		    // $this->printer->cut();
@@ -1344,7 +1345,7 @@ class Kasir extends BaseController
     		$this->profile = CapabilityProfile::load("POS-5890");
     		$this->connector = new RawbtPrintConnector();
     		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
-    		$member_nm = "Meja ".$data[0]->meja_nm;
+    		$member_nm = "MEJA ".$data[0]->meja_nm;
     
     		$this->printer = new Printer($this->connector);
     		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
@@ -1355,13 +1356,16 @@ class Kasir extends BaseController
     		    /* Date is kept the same for testing */
     		$date = date('Y-m-d H:i:s');
     		    /* Items */
-    		    $this->printer->feed(20);
+    		    $this->printer->feed(10);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
     		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->setTextSize(2, 1;
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);
@@ -1373,7 +1377,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		     $this->printer->feed(20);
+    		     $this->printer->feed(10);
     		 
     
     		    /* Cut the receipt and open the cash drawer */
@@ -1522,7 +1526,7 @@ class Kasir extends BaseController
 			    $this->printer->setEmphasis(false);
 			    /*footer */
 			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
-			    $this->printer->text("TERIMA KASIH\n");
+			    // $this->printer->text("TERIMA KASIH\n");
 			    /* Cut the receipt and open the cash drawer */
 			    // $this->printer->cut();
 			    // $this->printer->pulse();
@@ -1686,8 +1690,6 @@ class Kasir extends BaseController
 
 				$ttl_paid = str_replace(",","",$ttlpaid);
 				
-				
-
 				$grandtotal = $subtotal + $tax + $service;
 				$jmlbulat = $this->pembulatanratusan($grandtotal);
 				$nilaibulat = $jmlbulat - $grandtotal;

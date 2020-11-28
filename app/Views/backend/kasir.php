@@ -67,6 +67,13 @@
 <script type="text/javascript">
 $(document).ready(function($){
     listmejakasir();
+    $(".radiopayment").click(function(){
+      $(':radio').each(function () {
+              $(this).removeAttr('checked');
+              $('input[type="radio"]').attr('checked', false);
+          })
+    }); 
+
 });
 
 function openkasir() {
