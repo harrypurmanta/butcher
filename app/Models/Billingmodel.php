@@ -108,7 +108,7 @@ class Billingmodel extends Model
         $query->join('person g','g.person_id=e.person_id','left');
         $query->where('a.status_cd','verified');
         $query->where('b.status_cd','normal');
-        $query->whereIn('d.kategori_id',[1,2,3,4,5,6]);
+        $query->whereIn('d.kategori_id',[1,2,3,4,5,6,12,13,14,15,16,17]);
         $query->where('a.meja_id',$id);
         return $query->get();
     }
