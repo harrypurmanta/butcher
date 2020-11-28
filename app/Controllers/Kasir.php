@@ -1668,6 +1668,8 @@ class Kasir extends BaseController
 			    $this->printer->setEmphasis(false);
 			    $this->printer->feed();
 
+
+
 			    $servicex = $amt_before_discount * 0.05;
 				if (strpos($servicex,'.') == TRUE) {
 					list($service,$belakangkomas) = explode(".", $servicex);
@@ -1682,6 +1684,10 @@ class Kasir extends BaseController
 					$tax = $taxx;
 				}
 
+				$grandtotal = $subtotal + $tax + $service;
+				$jmlbulat = $this->pembulatanratusan($grandtotal);
+				$nilaibulat = $jmlbulat - $grandtotal;
+
 				if ($payplan_id == 1) {
 					$ttlpaid = $paid;
 				} else {
@@ -1689,11 +1695,8 @@ class Kasir extends BaseController
 				}
 
 				$ttl_paid = str_replace(",","",$ttlpaid);
-				
-				$grandtotal = $subtotal + $tax + $service;
-				$jmlbulat = $this->pembulatanratusan($grandtotal);
-				$nilaibulat = $jmlbulat - $grandtotal;
 				$kembalian = $ttl_paid - $jmlbulat;
+				
 			    $this->printer->setEmphasis(false);
 				$this->printer->text($this->buatBaris4Kolom("Subtotal","",number_format($subtotal))); 
 				$this->printer->text($this->buatBaris4Kolom("Tax","",number_format($tax))); 
