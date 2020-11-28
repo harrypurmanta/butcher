@@ -1829,7 +1829,7 @@ class Kasir extends BaseController
 
 	public function getAsString($width = 48,$qty,$produk_nm)
     {
-        $rightCols = 2;
+        $rightCols = 10;
         $leftCols = 2;
         $left = str_pad($qty, $leftCols);
         $right = str_pad($produk_nm, $rightCols, ' ', STR_PAD_LEFT);
