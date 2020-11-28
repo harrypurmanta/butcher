@@ -1297,7 +1297,7 @@ class Kasir extends BaseController
     		// Make sure you load a Star print connector or you may get gibberish.
     		try {
     
-    		$date = date('Y-m-d H:i:s');
+    		$date = date('Y-m-d H:i');
     		   
     		    /* Items */
     		    $this->printer->feed(7);
@@ -1354,7 +1354,7 @@ class Kasir extends BaseController
     
     		    /* Information for the receipt */
     		    /* Date is kept the same for testing */
-    		$date = date('Y-m-d H:i:s');
+    		$date = date('Y-m-d H:i');
     		    /* Items */
     		    $this->printer->feed(7);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
