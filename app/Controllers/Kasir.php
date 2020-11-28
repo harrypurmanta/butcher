@@ -222,7 +222,7 @@ class Kasir extends BaseController
 				
 				$ret .= "<tr>
 				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
-				            <span>$key->produk_nm <a style='float: right;' onclick='removeitem($id,$key->billing_item_id)'><i style='color:red;' class='fas fa-times'></i></a></span>
+				            <span>".strtoupper($key->produk_nm)." <a style='float: right;' onclick='removeitem($id,$key->billing_item_id)'><i style='color:red;' class='fas fa-times'></i></a></span>
 				          </td>
 				        </tr>
 				        <tr style='font-size: 18px;'>
@@ -1289,7 +1289,7 @@ class Kasir extends BaseController
     		$this->profile = CapabilityProfile::load("POS-5890");
     		$this->connector = new RawbtPrintConnector();
     		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
-    		$member_nm = "Meja ".$data[0]->meja_nm;
+    		$member_nm = "MEJA ".$data[0]->meja_nm;
 		    
     
     		$this->printer = new Printer($this->connector);
@@ -1315,8 +1315,8 @@ class Kasir extends BaseController
     		    	$this->printer->setEmphasis(true);
     		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
-    		        $this->printer->text($this->getAsString(32,$item->qty."x","",$item->produk_nm)); // for 58mm Font A
-    		        $this->printer->text($item->description."\n");
+    		        $this->printer->text($this->buatBaris4Kolom($item->qty."x"," ",strtoupper($item->produk_nm))); // for 58mm Font A
+    		        $this->printer->text("Note : ".$item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
@@ -1371,8 +1371,8 @@ class Kasir extends BaseController
     		    	$this->printer->setEmphasis(true);
     		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
-    		        $this->printer->text($this->getAsString(32,$item->qty."x","",$item->produk_nm)); // for 58mm Font A
-    		        $this->printer->text($item->description."\n");
+    		        $this->printer->text($this->buatBaris4Kolom($item->qty."x","",strtoupper($item->produk_nm))); // for 58mm Font A
+    		        $this->printer->text("Note : ".$item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
@@ -1473,7 +1473,7 @@ class Kasir extends BaseController
 					} else {
 						$subtotal = $subtotal + $total;
 					}
-			        $this->printer->text($item->produk_nm."\n");
+			        $this->printer->text(strtoupper($item->produk_nm)."\n");
 			        $this->printer->setEmphasis(false);
 			        $this->printer->text($this->buatBaris4Kolom($item->qty."x","@".number_format($item->produk_harga),number_format($total))); // for 58mm Font A
 			        $this->printer->text($this->buatBaris4Kolom($discount_nmx."".$discount_valuex," ",$nilaidiskon)."\n");
@@ -1565,7 +1565,7 @@ class Kasir extends BaseController
 		$nilaidiskon = "";
 		if (count($data)>0) {
 			
-		    $member_nm = "Meja ".$data[0]->meja_nm;
+		    $member_nm = "MEJA ".$data[0]->meja_nm;
 		    list($dt,$tm) = explode(" ", $data[0]->created_dttm);
 		    $resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
 			$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
@@ -1649,7 +1649,7 @@ class Kasir extends BaseController
 						$subtotal = $subtotal + $total;
 					}
 
-			        $this->printer->text($item->produk_nm."\n");
+			        $this->printer->text(strtoupper($item->produk_nm)."\n");
 			        $this->printer->setEmphasis(false);
 			        $this->printer->text($this->buatBaris4Kolom($item->qty."x","@".number_format($item->produk_harga),number_format($total))); // for 58mm Font A
 			        $this->printer->text($this->buatBaris4Kolom($discount_nmx."".$discount_valuex," ",$nilaidiskon)."\n");
