@@ -1316,7 +1316,7 @@ class Kasir extends BaseController
     		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
     		        $this->printer->text($this->barisdapur($item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
-    		        $this->printer->text("Note : ".$item->description."\n");
+    		        $this->printer->text($item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
@@ -1372,7 +1372,7 @@ class Kasir extends BaseController
     		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
     		        $this->printer->text($this->barisdapur($item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
-    		        $this->printer->text("Note : ".$item->description."\n");
+    		        $this->printer->text($item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
@@ -1797,7 +1797,7 @@ class Kasir extends BaseController
     public function barisdapur($kolom1, $kolom2) {
             // Mengatur lebar setiap kolom (dalam satuan karakter)
             $lebar_kolom_1 = 4;
-            $lebar_kolom_2 = 12;
+            $lebar_kolom_2 = 150;
  
             // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
             $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
