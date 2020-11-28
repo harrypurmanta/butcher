@@ -1315,7 +1315,7 @@ class Kasir extends BaseController
     		    	$this->printer->setEmphasis(true);
     		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
-    		        $this->printer->text($this->barisdapur($item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
+    		        $this->printer->text($this->getAsString(32,$item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
     		        $this->printer->text($item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
@@ -1371,7 +1371,7 @@ class Kasir extends BaseController
     		    	$this->printer->setEmphasis(true);
     		        // $this->printer->text($item->produk_nm."\n");
     		        $this->printer->setEmphasis(false);
-    		        $this->printer->text($this->barisdapur($item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
+    		        $this->printer->text($this->getAsString(32,$item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
     		        $this->printer->text($item->description."\n");
     		    }
     		    $this->printer->setEmphasis(false);
@@ -1827,19 +1827,15 @@ class Kasir extends BaseController
             return implode("\n",$hasilBaris) . "\n";
         }
 
-	public function getAsString($width = 48,$produk_nm,$produk_harga="",$total)
+	public function getAsString($width = 48,$qty,$produk_nm)
     {
         $rightCols = 15;
-        $centerCols = 10;
-        $leftCols = $width - $centerCols - $rightCols;
+        $leftCols = $width - $rightCols;
         if ($produk_harga == "") {
-            // $leftCols = $leftCols/2 - $centerCols/2 - $rightCols/2;
             $leftCols = $leftCols - $rightCols / 2;
-            $centerCols = 0;
         }
         $left = str_pad($produk_nm, $leftCols);
-        $center = str_pad($produk_harga,$centerCols, ' ', STR_PAD_LEFT);
         $right = str_pad($total, $rightCols, ' ', STR_PAD_LEFT);
-        return "$left$center$right\n";
+        return "$left$right\n";
     }
 }
