@@ -13,6 +13,8 @@
                             <div class="card" style="padding-bottom: 20px;">
                                 <input type="hidden" id="value-meja"/>
                                 <input type="hidden" id="jumlah_customer"/>
+                                <input type="hidden" id="collecteduser"/>
+                                <input type="hidden" id="billtype"/>
                                 <div class="card-body" id="cardbodymeja" align="center">
                                 
                                 </div>
@@ -382,7 +384,17 @@ function clickmejabutton(id) {
 
 function simpanjumlahcustomer(id) {
   var jumlahcustomer = $('#jumlahtamu').val();
+  // var collecteduser = $('#collected_user').val();
+  // var billtype = "";
+  // if ($('#takeaway').is(':checked')) {
+  //   billtype = "takeaway";
+  // } else {
+  //   billtype = "onsite";
+  // }
+
   $("#jumlah_customer").val(jumlahcustomer);
+  // $("#collecteduser").val(collecteduser);
+  // $("#billtype").val(billtype);
   $('#modaltambahmember').modal('hide');
   showbillingbymeja(id);
 

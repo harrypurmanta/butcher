@@ -191,6 +191,38 @@ class Billingmodel extends Model
                         ->get();
     }
 
+    public function getReport($kasir_status_id) {
+        return $this->db->table('billing')
+                        ->select('SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount')
+                        ->where('status_cd','finish')
+                        ->where('kasir_status_id',1)
+                        ->get();
+    }
+
+    public function getTopitem($kasir_status_id) {
+        return $this->db->query('SELECT b.produk_id, SUM(b.qty) AS totalqty, SUM(b.price) as totalprice, c.produk_nm
+                                FROM billing a 
+                                INNER JOIN billing_item b ON b.billing_id=a.billing_id 
+                                INNER JOIN produk c ON c.produk_id=b.produk_id
+                                WHERE a.kasir_status_id = 1
+                                AND a.status_cd = "finish"
+                                AND b.status_cd = "normal"
+                                GROUP BY produk_id 
+                                ORDER BY SUM(b.qty) DESC
+                                LIMIT 5');
+    }
+
+    public function getPayplan($kasir_status_id) {
+        return $this->db->query('SELECT a.payplan_id, SUM(a.ttl_amount) AS ttlamount, COUNT(a.billing_id) AS totalpayplan, b.payplan_nm
+                                FROM billing a 
+                                INNER JOIN payplan b ON b.payplan_id=a.payplan_id 
+                                WHERE a.kasir_status_id = 1
+                                AND a.status_cd = "finish"
+                                GROUP BY payplan_id 
+                                ORDER BY SUM(a.ttl_amount) DESC
+                                LIMIT 5');
+    }
+
     public function simpanopenkasir($data) {
         $this->db->table('kasir_status')
                         ->insert($data);

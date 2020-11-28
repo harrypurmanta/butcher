@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -333,15 +333,35 @@ class Kasir extends BaseController
 		            . "</div>"
 		            . "<div class='modal-body'>"
 		            . "<form>"
-		            . "<div class='form-group'>"
+		            . "<div class='col-md-12'>"
+		            . "<div class='row'>"
+		            . "<div class='form-group col-md-12'>"
 		            . "<label for='jumlah_customer' class='control-label'>Masukkan jumlah tamu di <strong>MEJA ".$meja[0]->meja_nm."</strong></label>"
-		            . "<input type='number' class='form-control' id='jumlahtamu'>"
+		            . "<div class='input-group col-md-8'>"
+		            . "<input type='number' class='form-control' id='jumlahtamu' placeholder='0'>"
 		            . "</div>"
+		            . "</div>"
+
+		            // . "<div class='form-group col-md-12'>"
+		            // . "<label for='jumlah_customer' class='control-label'><strong>PETUGAS :</strong></label>"
+		            // . "<div class='row' style='align-items: center;'>"
+		            // . "<div class='input-group col-md-8'>"
+		            // . "<input type='number' class='form-control' id='collected_user' placeholder='nama'>"
+		            // . "</div>"
+		            // . "<div class='input-group col-md-4'>"
+		            // . "<input type='checkbox' id='takeaway' class='filled-in' />"
+              //       . "<label for='takeaway'>Takeaway</label>"
+		            // . "</div>"
+		            // . "</div>"
+		            // . "</div>"
+
+		            . "</div>"
+		            . "</div>" //row
 		            . "</form>"
 		            . "</div>"
 		            . "<div class='modal-footer'>"
 		            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
-		            . "<button onclick='simpanjumlahcustomer($id)' type='button' class='btn btn-danger waves-effect waves-light'>Simpan</button>"
+		            . "<button onclick='simpanjumlahcustomer($id)' type='button' class='btn btn-info waves-effect waves-light'>Simpan</button>"
 		            . "</div>"
 		            . "</div>"
 		            . "</div>";
@@ -962,28 +982,120 @@ class Kasir extends BaseController
     }
 
     public function closekasir() {
+    	$topitem = $this->billingmodel->getTopitem($this->session->kasir_status_id)->getResult();
+    	$toppayplan = $this->billingmodel->getPayplan($this->session->kasir_status_id)->getResult();
+    	$getReport = $this->billingmodel->getReport($this->session->kasir_status_id)->getResult();
+    	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+		$ret = "";
+		$no = 1;
+		$nopayplan = 1;
     	$date = date('Y-m-d');
-    	$ret = "<div class='modal-dialog'>"
+    	$ret = "<div class='modal-dialog modal-xl'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
 	            . "<h4 class='modal-title'>Close Kasir</h4>"
 	             . "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
+	            . "<div class='col-md-4'>"
 	            . "<form>"
 	            . "<div class='form-group'>"
 	            . "<label for='namadiscount' class='control-label'>Tanggal Tutup</label>"
 	            . "<input type='date' class='form-control' id='closed_dttm' value='$date'>"
 	            . "</div>"
-	            // . "<div class='form-group'>"
-	            // . "<label class='control-label'>Nilai discount</label>"
-	            // . "<input type='text' class='form-control' id='nilaidiscount'>"
-	            // . "</div>"
+	            . "</div>" //col-md-4
+	            . "<hr/>"
+	            . "<div class='row'>"
+				 . "<div class='col-md-6'>"
+				 . "<div class='card'>"
+                 . "<div class='card-body'>"
+                 . "<h3><strong>SALES</strong></h3>"
+                 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;'  data-toggle='table' data-height='250' data-mobile-responsive='true'>"
+				 . "<tbody>";
+				 	$ret .= "<tr>"
+						 . "<td width='200'>Gross Sales</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='200'>Discounts</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttldiscount)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='200'>Net Sales</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($netsales)."</td>"
+						 . "</tr>";
+				 
+
+			$ret .= "</tbody>"
+				 . "</table>"
+
+				 . "</div>" // card-body
+				 . "<div class='card-body'>"
+				 . "<h3><strong>TOP PAYMENT TYPE</strong></h3>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 // . "<thead>"
+				 // . "<tr>"
+				 // . "<th>No.</th>"
+				 // . "<th>Billing Kode</th>"
+				 // . "<th>Meja</th>"
+				 // . "<th>Grand Total</th>"
+				 // . "<th>Action</th>"
+				 // . "</tr>"
+				 // . "</thead>"
+				 . "<tbody>";
+				 foreach ($toppayplan as $payplan) {
+					 	$ret .= "<tr>"
+							 . "<td width='20'>".$nopayplan++.".</td>"
+							 . "<td width='50%'>$payplan->payplan_nm</td>"
+							 . "<td align='right'>$payplan->totalpayplan</td>"
+							 . "<td align='right'>Rp. ".number_format($payplan->ttlamount)."</td>"
+							 . "</tr>";
+					}
+				 
+
+			$ret .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body
+
+
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+
+				. "<div class='col-md-6'>"
+				 . "<div class='card' style='margin-bottom: 0px !important;'>"
+                 . "<div class='card-body'>"
+                 . "<h3><strong>TOP ITEMS</strong></h3>"
+                 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($topitem as $key) {
+				 	$ret .= "<tr>"
+						 . "<td width='20'>".$no++.".</td>"
+						 . "<td width='50%'>$key->produk_nm</td>"
+						 . "<td>$key->totalqty X</td>"
+						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
+						 . "</tr>";
+				}
+				 
+
+			$ret .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+				 . "</div>" // row
 	            . "</form>"
 	            . "</div>"
 	            . "<div class='modal-footer'>"
 	            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
-	            . "<button onclick='simpanclosekasir()' type='button' class='btn btn-danger waves-effect waves-light'>Simpan</button>"
+	            . "<button onclick='simpanclosekasir()' type='button' class='btn btn-danger waves-effect waves-light'>Tutup Kasir</button>"
 	            . "</div>"
 	            . "</div>"
 	            . "</div>";
