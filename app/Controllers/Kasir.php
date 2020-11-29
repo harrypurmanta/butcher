@@ -1042,7 +1042,7 @@ class Kasir extends BaseController
 	            . "<div class='modal-body'>"
 
 	            . "<div class='row'>"
-				 . "<div class='col-4'>"
+				 . "<div class='col-5'>"
 				 . "<div class='card'>"
                  . "<div class='card-body'>"
                  . "<h3><strong>SALES</strong></h3>"
@@ -1075,7 +1075,7 @@ class Kasir extends BaseController
 				 . "</div>" // card
 				 . "</div>" // col-md-12
 
-				. "<div class='col-md-8'>"
+				. "<div class='col-md-7'>"
 				 . "<div class='card' style='margin-bottom: 0px !important;'>"
                  . "<div class='card-body'>"
                  . "<h3><strong>TOP ITEMS</strong></h3>"
