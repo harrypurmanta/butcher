@@ -92,6 +92,7 @@ class Billingmodel extends Model
         $query->join('person g','g.person_id=e.person_id','left');
         $query->where('a.status_cd','verified');
         $query->where('b.status_cd','normal');
+        $query->where('b.print_status','normal');
         $query->whereIn('d.kategori_id',[7,8,9,10,11]);
         $query->where('a.meja_id',$id);
         return $query->get();
@@ -108,6 +109,7 @@ class Billingmodel extends Model
         $query->join('person g','g.person_id=e.person_id','left');
         $query->where('a.status_cd','verified');
         $query->where('b.status_cd','normal');
+        $query->where('b.print_status','normal');
         $query->whereIn('d.kategori_id',[1,2,3,4,5,6,12,13,14,15,16,17]);
         $query->where('a.meja_id',$id);
         return $query->get();
@@ -149,6 +151,8 @@ class Billingmodel extends Model
                         ->where('closed_dttm <=',$closed_dttm.' 59:23:23')
                         ->get();
     }
+
+    
 
     public function getStatuskasir() {
         return $this->db->table('kasir_status')
@@ -195,7 +199,7 @@ class Billingmodel extends Model
         return $this->db->table('billing')
                         ->select('SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount')
                         ->where('status_cd','finish')
-                        ->where('kasir_status_id',1)
+                        ->where('kasir_status_id',$kasir_status_id)
                         ->get();
     }
 
@@ -204,7 +208,7 @@ class Billingmodel extends Model
                                 FROM billing a 
                                 INNER JOIN billing_item b ON b.billing_id=a.billing_id 
                                 INNER JOIN produk c ON c.produk_id=b.produk_id
-                                WHERE a.kasir_status_id = 1
+                                WHERE a.kasir_status_id = $kasir_status_id
                                 AND a.status_cd = "finish"
                                 AND b.status_cd = "normal"
                                 GROUP BY produk_id 
@@ -215,12 +219,11 @@ class Billingmodel extends Model
     public function getPayplan($kasir_status_id) {
         return $this->db->query('SELECT a.payplan_id, SUM(a.ttl_amount) AS ttlamount, COUNT(a.billing_id) AS totalpayplan, b.payplan_nm
                                 FROM billing a 
-                                INNER JOIN payplan b ON b.payplan_id=a.payplan_id 
-                                WHERE a.kasir_status_id = 1
+                                LEFT JOIN payplan b ON b.payplan_id=a.payplan_id 
+                                WHERE a.kasir_status_id = $kasir_status_id
                                 AND a.status_cd = "finish"
                                 GROUP BY payplan_id 
-                                ORDER BY SUM(a.ttl_amount) DESC
-                                LIMIT 5');
+                                ORDER BY SUM(a.ttl_amount) DESC');
     }
 
     public function simpanopenkasir($data) {
@@ -239,10 +242,6 @@ class Billingmodel extends Model
     public function simpanbillitem($data) {
     	$builder = $this->db->table('billing_item');
         return $builder->insert($data);
-    }
-
-    public function getKategoriid(){
-
     }
 
     public function setnullifieditem($id){
@@ -309,6 +308,47 @@ class Billingmodel extends Model
                         ->set($updatebill)
                         ->where('billing_id',$billing_id)
                         ->update();
+    }
+
+    public function updateStatusfoodmenu($meja_id) {
+        return $this->db->table('billing a')
+                        ->join('billing_item b','b.billing_id=a.billing_id','left')
+                        ->join('produk c','c.produk_id=b.produk_id','left')
+                        ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
+                        ->set('b.print_status','printed')
+                        ->where('a.status_cd','verified')
+                        ->where('b.status_cd','normal')
+                        ->where('b.print_status','normal')
+                        ->where('a.meja_id',$meja_id)
+                        ->whereIn('d.kategori_id',[1,2,3,4,5,6,12,13,14,15,16,17])
+                        ->update();
+    }
+
+    public function updateStatusdrinkmenu($meja_id) {
+        return $this->db->query("UPDATE a SET a.print_status='printed' 
+                                FROM billing_item a 
+                                INNER JOIN billing b ON b.billing_id=a.billing_id
+                                INNER JOIN produk c ON c.produk_id=a.produk_id
+                                INNER JOIN kategori_produk d ON d.kategori_id=c.kategori_id
+                                WHERE b.status_cd = 'verified'
+                                AND a.status_cd = 'normal'
+                                AND a.print_status = 'normal'
+                                AND d.kategori_id IN (7,8,9,10,11)
+                                AND b.meja_id = '$meja_id'");
+
+
+        // return $this->db->table('billing a')
+        //                 ->select('*')
+        //                 ->join('billing_item b','b.billing_id=a.billing_id')
+        //                 ->join('produk c','c.produk_id=b.produk_id')
+        //                 ->join('kategori_produk d','d.kategori_id=c.kategori_id')
+        //                 ->where('a.status_cd','verified')
+        //                 ->where('b.status_cd','normal')
+        //                 ->where('b.print_status','normal')
+        //                 ->where('a.meja_id',$meja_id)
+        //                 ->whereIn('d.kategori_id',[7,8,9,10,11])
+        //                 ->set('b.print_status','printed')
+        //                 ->update();
     }
 
     public function updatestatuskasir($kasir_status_id,$datastatuskasir) {
