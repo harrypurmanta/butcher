@@ -2058,7 +2058,7 @@ class Kasir extends BaseController
 			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
 			    $this->printer->setFont(Printer::FONT_A);
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
-			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,6)));
+			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
 			    // $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_nm, 0,6))."\n");
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
