@@ -199,7 +199,7 @@ class Billingmodel extends Model
         return $this->db->table('billing')
                         ->select('SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount')
                         ->where('status_cd','finish')
-                        ->where('kasir_status_id','$kasir_status_id')
+                        ->where('kasir_status_id',2)
                         ->get();
     }
 
@@ -208,7 +208,7 @@ class Billingmodel extends Model
                                 FROM billing a 
                                 INNER JOIN billing_item b ON b.billing_id=a.billing_id 
                                 INNER JOIN produk c ON c.produk_id=b.produk_id
-                                WHERE a.kasir_status_id = "$kasir_status_id"
+                                WHERE a.kasir_status_id = 2
                                 AND a.status_cd = "finish"
                                 AND b.status_cd = "normal"
                                 GROUP BY produk_id 
@@ -220,7 +220,7 @@ class Billingmodel extends Model
         return $this->db->query('SELECT a.payplan_id, SUM(a.ttl_amount) AS ttlamount, COUNT(a.billing_id) AS totalpayplan, b.payplan_nm
                                 FROM billing a 
                                 LEFT JOIN payplan b ON b.payplan_id=a.payplan_id 
-                                WHERE a.kasir_status_id = "$kasir_status_id"
+                                WHERE a.kasir_status_id = 2
                                 AND a.status_cd = "finish"
                                 GROUP BY payplan_id 
                                 ORDER BY SUM(a.ttl_amount) DESC');
