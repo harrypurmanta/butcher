@@ -397,10 +397,11 @@ class Billingmodel extends Model
                         ->get();
     }
 
-    public function closedkasir($data) {
+    public function closedkasir($kasir_status_id,$data) {
         return $this->db->table('billing')
                         ->set($data)
                         ->where('status_cd','finish')
+                        ->where('kasir_status_id',$kasir_status_id)
                         ->update();
     }
     

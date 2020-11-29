@@ -1235,7 +1235,7 @@ class Kasir extends BaseController
 			  'closed_dttm' => $closed_dttm.' '.$jam,
 			  'closed_user' => $this->session->user_id,
 			];
-			$res = $this->billingmodel->closedkasir($data);
+			$res = $this->billingmodel->closedkasir($getlastkasirstatus[0]->kasir_status_id,$data);
 			if ($res) {
 				$ret = "true";
 			} else {
