@@ -1452,7 +1452,7 @@ class Kasir extends BaseController
     		$date = date('Y-m-d H:i');
     		   
     		    /* Items */
-    		    $this->printer->feed(7);
+    		    $this->printer->feed(5);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
@@ -1475,7 +1475,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->feed(8);
+    		    $this->printer->feed(7);
     			
     		    /* Cut the receipt and open the cash drawer */
     		    // $this->printer->cut();
@@ -1511,7 +1511,7 @@ class Kasir extends BaseController
     		    /* Date is kept the same for testing */
     		$date = date('Y-m-d H:i');
     		    /* Items */
-    		    $this->printer->feed(7);
+    		    $this->printer->feed(5);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
@@ -1533,7 +1533,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		     $this->printer->feed(8);
+    		     $this->printer->feed(7);
     		 
     
     		    /* Cut the receipt and open the cash drawer */
@@ -1570,7 +1570,7 @@ class Kasir extends BaseController
     		    /* Date is kept the same for testing */
     		$date = date('Y-m-d H:i');
     		    /* Items */
-    		    $this->printer->feed(7);
+    		    $this->printer->feed(5);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
@@ -1591,7 +1591,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->feed(8);
+    		    $this->printer->feed(7);
     		 
     
     		    /* Cut the receipt and open the cash drawer */
@@ -1626,7 +1626,7 @@ class Kasir extends BaseController
     		    /* Date is kept the same for testing */
     		$date = date('Y-m-d H:i');
     		    /* Items */
-    		    $this->printer->feed(7);
+    		    $this->printer->feed(5);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
@@ -1647,7 +1647,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->feed(8);
+    		    $this->printer->feed(7);
     		 
     
     		    /* Cut the receipt and open the cash drawer */
@@ -2160,14 +2160,16 @@ class Kasir extends BaseController
 			    // $this->printer->text($date . "\n");
 			    
 			    $updatebill = [
-					'payplan_id' => $payplan_id,
-					'ttl_paid' => $ttl_paid,
-					'ttl_amount' => $jmlbulat,
-					'ttl_discount' => $ttl_discount,
-					'amt_before_discount' => $amt_before_discount,
-					'finish_dttm' => date('Y-m-d H:i:s'),
-					'finish_user' => $this->session->user_id,
-					'status_cd' => 'finish'
+					'payplan_id' 			=> $payplan_id,
+					'ttl_paid' 				=> $ttl_paid,
+					'ttl_amount' 			=> $jmlbulat,
+					'ttl_discount' 			=> $ttl_discount,
+					'amt_before_discount' 	=> $amt_before_discount,
+					'tax' 					=> $tax,
+					'service' 				=> $service,
+					'finish_dttm' 			=> date('Y-m-d H:i:s'),
+					'finish_user' 			=> $this->session->user_id,
+					'status_cd' 			=> 'finish'
 				];
 				$updatebill = $this->billingmodel->updateafterpayment($billing_id,$updatebill);
 
