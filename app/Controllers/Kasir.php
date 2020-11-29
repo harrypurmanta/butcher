@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -183,7 +183,7 @@ class Kasir extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Collected By</td>
-				          <td align='right'>".$res[0]->collected_nm."</td>
+				          <td align='right'>".$res[0]->collected_user."</td>
 				        </tr>
 				      </table>
 				      </div>
@@ -342,18 +342,14 @@ class Kasir extends BaseController
 		            . "</div>"
 		            . "</div>"
 
-		            // . "<div class='form-group col-md-12'>"
-		            // . "<label for='jumlah_customer' class='control-label'><strong>PETUGAS :</strong></label>"
-		            // . "<div class='row' style='align-items: center;'>"
-		            // . "<div class='input-group col-md-8'>"
-		            // . "<input type='number' class='form-control' id='collected_user' placeholder='nama'>"
-		            // . "</div>"
-		            // . "<div class='input-group col-md-4'>"
-		            // . "<input type='checkbox' id='takeaway' class='filled-in' />"
-              //       . "<label for='takeaway'>Takeaway</label>"
-		            // . "</div>"
-		            // . "</div>"
-		            // . "</div>"
+		            . "<div class='form-group col-md-12'>"
+		            . "<label for='jumlah_customer' class='control-label'><strong>PETUGAS :</strong></label>"
+		            . "<div class='row' style='align-items: center;'>"
+		            . "<div class='input-group col-md-8'>"
+		            . "<input type='text' class='form-control' id='collected_user' placeholder='nama'>"
+		            . "</div>"
+		            . "</div>"
+		            . "</div>"
 
 		            . "</div>"
 		            . "</div>" //row
@@ -372,8 +368,8 @@ class Kasir extends BaseController
 	}
 
 	public function getbymejaidkasir() {
-		$id = $this->request->getPost('id');
-		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
+		$id 	= $this->request->getPost('id');
+		$res 	= $this->billingmodel->getbyMejaidkasir($id)->getResult();
 		$discount_nmx 			= "";	 
 		$discount_valuex 		= "";
 		$discount 				= "";
@@ -415,7 +411,7 @@ class Kasir extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Collected By</td>
-				          <td align='right'>".$res[0]->collected_nm."</td>
+				          <td align='right'>".$res[0]->collected_user."</td>
 				        </tr>
 				      </table>
 				      </div>
@@ -852,7 +848,7 @@ class Kasir extends BaseController
 				 . "<th>Billing Kode</th>"
 				 . "<th>Meja</th>"
 				 . "<th>Grand Total</th>"
-				 . "<th>Action</th>"
+				 . "<th>Cetak Payments</th>"
 				 . "</tr>"
 				 . "</thead>"
 				 . "<tbody>";
@@ -860,9 +856,9 @@ class Kasir extends BaseController
 				 	$ret .= "<tr>"
 						 . "<td>".$no++."</td>"
 						 . "<td>$key->billing_cd</td>"
-						 . "<td>$key->meja_nm</td>"
-						 . "<td>$key->ttl_amount</td>"
-						 . "<td>Button</td>"
+						 . "<td>MEJA - $key->meja_nm</td>"
+						 . "<td>".number_format($key->ttl_amount)."</td>"
+						 . "<td><button onclick='cetakulangcheckout($key->meja_id,$key->billing_id,this)' class='btn btn-info'>Cetak Payments</button></td>"
 						 . "</tr>";
 				 }
 
@@ -878,7 +874,25 @@ class Kasir extends BaseController
 
 	        $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
 		} else {
-			$ret .= "";
+			$ret .= "<div class='modal-dialog modal-xl'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>History Transaksi</h4>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+				 . "<div class='row'>"
+				 . "<div class='col-md-12'>"
+				 . "<div class='card'>"
+                 . "<div class='card-body'>"
+				 . "<div align='center'><h3><strong>BELUM ADA HISTORY ORDER</strong></h3></div>"
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+				 . "</div>" // row
+	       		. "</div>" // modal body
+	            . "</div>"
+	            . "</div>";
 		}
 
 		return $ret;
@@ -907,7 +921,8 @@ class Kasir extends BaseController
 				 . "<th>Billing Kode</th>"
 				 . "<th>Meja</th>"
 				 . "<th>Grand Total</th>"
-				 . "<th>Action</th>"
+				 . "<th>Drinks</th>"
+				 . "<th>Foods</th>"
 				 . "</tr>"
 				 . "</thead>"
 				 . "<tbody>";
@@ -915,9 +930,10 @@ class Kasir extends BaseController
 				 	$ret .= "<tr>"
 						 . "<td>".$no++."</td>"
 						 . "<td>$key->billing_cd</td>"
-						 . "<td>$key->meja_nm</td>"
+						 . "<td>MEJA - $key->meja_nm</td>"
 						 . "<td>$key->ttl_amount</td>"
-						 . "<td>Button</td>"
+						 . "<td align='center'><button onclick='cetakulangdrinks($key->meja_id,$key->billing_id,this)' class='btn btn-warning'>Cetak Drinks</button></td>"
+						 . "<td><button onclick='cetakulangfoods($key->meja_id,$key->billing_id,this)' class='btn btn-danger'>Cetak Foods</button></td>"
 						 . "</tr>";
 				 }
 
@@ -933,7 +949,25 @@ class Kasir extends BaseController
 
 	        $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
 		} else {
-			$ret .= "";
+			$ret .= "<div class='modal-dialog modal-xl'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>History Transaksi</h4>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+				 . "<div class='row'>"
+				 . "<div class='col-md-12'>"
+				 . "<div class='card'>"
+                 . "<div class='card-body'>"
+				 . "<div align='center'><h3><strong>BELUM ADA ACTIVITY</strong></h3></div>"
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+				 . "</div>" // row
+	       		. "</div>" // modal body
+	            . "</div>"
+	            . "</div>";
 		}
 
 		return $ret;
@@ -982,9 +1016,10 @@ class Kasir extends BaseController
     }
 
     public function closekasir() {
-    	$topitem = $this->billingmodel->getTopitem($this->session->kasir_status_id)->getResult();
-    	$toppayplan = $this->billingmodel->getPayplan($this->session->kasir_status_id)->getResult();
-    	$getReport = $this->billingmodel->getReport($this->session->kasir_status_id)->getResult();
+    	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
+    	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
+    	$toppayplan = $this->billingmodel->getPayplan($kasir_status[0]->kasir_status_id)->getResult();
+    	$getReport = $this->billingmodel->getReport($kasir_status[0]->kasir_status_id)->getResult();
     	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
 		$ret = "";
 		$no = 1;
@@ -993,20 +1028,21 @@ class Kasir extends BaseController
     	$ret = "<div class='modal-dialog modal-xl'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
-	            . "<h4 class='modal-title'>Close Kasir</h4>"
-	             . "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            // . "<h4 class='modal-title'>Close Kasir</h4>"
+	            . "<h4 for='namadiscount' class='control-label modal-title'>Tanggal Tutup</h4>"
+	            . "<div class='col-md-3'>"
+	            . "<form>"
+	            . "<div>"
+	            . "<input style='font-size: 20px; font-weight: bold;' type='date' class='form-control' id='closed_dttm' value='$date'>"
+	            . "</div>"
+	            . "</form>"
+	            . "</div>" //col-md-4
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
-	            . "<div class='col-md-4'>"
-	            . "<form>"
-	            . "<div class='form-group'>"
-	            . "<label for='namadiscount' class='control-label'>Tanggal Tutup</label>"
-	            . "<input type='date' class='form-control' id='closed_dttm' value='$date'>"
-	            . "</div>"
-	            . "</div>" //col-md-4
-	            . "<hr/>"
+
 	            . "<div class='row'>"
-				 . "<div class='col-md-6'>"
+				 . "<div class='col-4'>"
 				 . "<div class='card'>"
                  . "<div class='card-body'>"
                  . "<h3><strong>SALES</strong></h3>"
@@ -1014,19 +1050,19 @@ class Kasir extends BaseController
 				 . "<table style='font-size:22px;'  data-toggle='table' data-height='250' data-mobile-responsive='true'>"
 				 . "<tbody>";
 				 	$ret .= "<tr>"
-						 . "<td width='200'>Gross Sales</td>"
+						 . "<td width='150'>Gross Sales</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
 						 . "</tr>"
 
 						 . "<tr>"
-						 . "<td width='200'>Discounts</td>"
+						 . "<td width='150'>Discounts</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttldiscount)."</td>"
 						 . "</tr>"
 
 						 . "<tr>"
-						 . "<td width='200'>Net Sales</td>"
+						 . "<td width='150'>Net Sales</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($netsales)."</td>"
 						 . "</tr>";
@@ -1036,8 +1072,32 @@ class Kasir extends BaseController
 				 . "</table>"
 
 				 . "</div>" // card-body
-				 . "<div class='card-body'>"
-				 . "<h3><strong>TOP PAYMENT TYPE</strong></h3>"
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+
+				. "<div class='col-md-8'>"
+				 . "<div class='card' style='margin-bottom: 0px !important;'>"
+                 . "<div class='card-body'>"
+                 . "<h3><strong>TOP ITEMS</strong></h3>"
+                 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($topitem as $key) {
+				 	$ret .= "<tr>"
+						 . "<td width='20'>".$no++.".</td>"
+						 . "<td width='50%'>$key->produk_nm</td>"
+						 . "<td>$key->totalqty X</td>"
+						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
+						 . "</tr>";
+				}
+				 
+
+			$ret .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body
+
+				 . "<div class='card-body'>" // card-body paypaln
+				 . "<h3><strong>PAYMENT</strong></h3>"
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 // . "<thead>"
@@ -1062,36 +1122,11 @@ class Kasir extends BaseController
 
 			$ret .= "</tbody>"
 				 . "</table>"
-				 . "</div>" // card-body
+				 . "</div>" // card-body paypaln
 
-
-				 . "</div>" // card
-				 . "</div>" // col-md-12
-
-				. "<div class='col-md-6'>"
-				 . "<div class='card' style='margin-bottom: 0px !important;'>"
-                 . "<div class='card-body'>"
-                 . "<h3><strong>TOP ITEMS</strong></h3>"
-                 . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
-				 . "<tbody>";
-				 foreach ($topitem as $key) {
-				 	$ret .= "<tr>"
-						 . "<td width='20'>".$no++.".</td>"
-						 . "<td width='50%'>$key->produk_nm</td>"
-						 . "<td>$key->totalqty X</td>"
-						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
-						 . "</tr>";
-				}
-				 
-
-			$ret .= "</tbody>"
-				 . "</table>"
-				 . "</div>" // card-body
 				 . "</div>" // card
 				 . "</div>" // col-md-12
 				 . "</div>" // row
-	            . "</form>"
 	            . "</div>"
 	            . "<div class='modal-footer'>"
 	            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
@@ -1178,13 +1213,14 @@ class Kasir extends BaseController
     }
 
     public function simpanclosekasir() {
+    	$getlastkasirstatus = $this->billingmodel->getStatuskasir()->getResult();
     	$cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
     	$jam = date('H:i:s');
     	if (count($cekunclosed)>0) {
     		$ret = "belumfinish";
     	} else {
     		$closed_dttm = $this->request->getPost('closed_dttm');
-			$kasir_status_id = $this->session->kasir_status_id;
+			$kasir_status_id = $getlastkasirstatus[0]->kasir_status_id;
 
 			$datastatuskasir = [
 				'status_cd' => 'closed',
@@ -1192,7 +1228,7 @@ class Kasir extends BaseController
 				'closed_user' => $this->session->user_id,
  			];
 
-			$this->billingmodel->updatestatuskasir($kasir_status_id,$datastatuskasir);
+			$this->billingmodel->updatestatuskasir($getlastkasirstatus[0]->kasir_status_id,$datastatuskasir);
 
 	    	$data = [
 			  'status_cd' => 'closed',
@@ -1238,9 +1274,11 @@ class Kasir extends BaseController
 		$qty 				= $this->request->getPost('jumlah');
 		$catatan 			= $this->request->getPost('catatan');
 		$jumlah_customer 	= $this->request->getPost('jumlah_customer');
+		$collected_user 	= $this->request->getPost('collected_user');
 		$date 				= date('Y-m-d H:i:s');
 		$getbill 			= $this->billingmodel->getbyMejaidkasir($meja_id)->getResult();
-		$kasirstatus 		= $this->session->kasir_status_id;
+		$kasir_status 		= $this->billingmodel->getStatuskasir()->getResult();
+		$kasirstatus 		= $kasir_status[0]->kasir_status_id;
 		
 		if (count($getbill)>0) {
 			$billing_id = $getbill[0]->billing_id;
@@ -1261,6 +1299,7 @@ class Kasir extends BaseController
 			  	'billing_cd' => $billing_cd,
 			  	'jumlah_customer' => $jumlah_customer,
 			  	'status_cd' => 'verified',
+			  	'collected_user' => $collected_user,
 			  	'created_dttm' => $date,
 			  	'created_user' => $meja_id
 			];
@@ -1396,6 +1435,7 @@ class Kasir extends BaseController
 	}
 
 	private function _getFoodsmenu($id) {
+		$billing_item_id = array();
 		$data = $this->billingmodel->getfoodmenu($id)->getResult();
 		if  (count($data)>0) {
     		$this->profile = CapabilityProfile::load("POS-5890");
@@ -1429,6 +1469,8 @@ class Kasir extends BaseController
     		        $this->printer->setEmphasis(false);
     		        $this->printer->text($this->getAsString(32,$item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
     		        $this->printer->text($item->description."\n");
+    		        $billing_item_id[] = $item->billing_item_id;
+
     		    }
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
@@ -1438,12 +1480,13 @@ class Kasir extends BaseController
     		    /* Cut the receipt and open the cash drawer */
     		    // $this->printer->cut();
     		    // $this->printer->pulse();
-    
+    		$this->billingmodel->updateStatusfoodmenu($billing_item_id);
     		} catch (Exception $e) {
     		    echo $e->getMessage();
     		} finally {
     		    $this->printer->close();
     		}
+    		
 		} else {
 		    echo json_encode(false);
 		}
@@ -1451,8 +1494,67 @@ class Kasir extends BaseController
 	}
 
 	public function _getDrinksmenu($id) {
-
+		$billing_item_id = array();
 		$data = $this->billingmodel->getdrinkmenu($id)->getResult();
+		if (count($data)>0) {
+    		$this->profile = CapabilityProfile::load("POS-5890");
+    		$this->connector = new RawbtPrintConnector();
+    		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
+    		$member_nm = "MEJA ".$data[0]->meja_nm;
+    
+    		$this->printer = new Printer($this->connector);
+    		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+    		// Make sure you load a Star print connector or you may get gibberish.
+    		try {
+    
+    		    /* Information for the receipt */
+    		    /* Date is kept the same for testing */
+    		$date = date('Y-m-d H:i');
+    		    /* Items */
+    		    $this->printer->feed(7);
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->setFont(Printer::FONT_A);
+    		    $this->printer->setEmphasis(true);
+    		    $this->printer->setTextSize(2, 1);
+    		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
+    		    $this->printer->text($date."\n");
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->text($member_nm."\n");
+    		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->text("--------------------------------\n");
+    		    foreach ($data as $item) {
+    		    	$this->printer->setEmphasis(true);
+    		        // $this->printer->text($item->produk_nm."\n");
+    		        $this->printer->setEmphasis(false);
+    		        $this->printer->text($this->getAsString(32,$item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
+    		        $this->printer->text($item->description."\n");
+    		        $billing_item_id[] = $item->billing_item_id;
+    		    }
+    		    $this->printer->setEmphasis(false);
+    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->setEmphasis(false);
+    		     $this->printer->feed(8);
+    		 
+    
+    		    /* Cut the receipt and open the cash drawer */
+    		    // $this->printer->cut();
+    		    // $this->printer->pulse();
+    		$this->billingmodel->updateStatusdrinkmenu($billing_item_id);
+    		} catch (Exception $e) {
+    		    echo $e->getMessage();
+    		} finally {
+    		    $this->printer->close();
+    		}
+    		
+		} else {
+		    echo json_encode(false);
+		}
+		
+	}
+
+	public function cetakulangdrinks() {
+		$billing_id = $this->request->getPost('bi');
+		$data = $this->billingmodel->cetakulangdrinks($billing_id)->getResult();
 		if (count($data)>0) {
     		$this->profile = CapabilityProfile::load("POS-5890");
     		$this->connector = new RawbtPrintConnector();
@@ -1489,22 +1591,254 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		     $this->printer->feed(8);
+    		    $this->printer->feed(8);
     		 
     
     		    /* Cut the receipt and open the cash drawer */
     		    // $this->printer->cut();
     		    // $this->printer->pulse();
-    
     		} catch (Exception $e) {
     		    echo $e->getMessage();
     		} finally {
     		    $this->printer->close();
     		}
+    		
 		} else {
 		    echo json_encode(false);
 		}
-		
+	}
+
+	public function cetakulangfoods() {
+		$billing_id = $this->request->getPost('bi');
+		$data = $this->billingmodel->cetakulangfoods($billing_id)->getResult();
+		if (count($data)>0) {
+    		$this->profile = CapabilityProfile::load("POS-5890");
+    		$this->connector = new RawbtPrintConnector();
+    		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
+    		$member_nm = "MEJA ".$data[0]->meja_nm;
+    
+    		$this->printer = new Printer($this->connector);
+    		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+    		// Make sure you load a Star print connector or you may get gibberish.
+    		try {
+    
+    		    /* Information for the receipt */
+    		    /* Date is kept the same for testing */
+    		$date = date('Y-m-d H:i');
+    		    /* Items */
+    		    $this->printer->feed(7);
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->setFont(Printer::FONT_A);
+    		    $this->printer->setEmphasis(true);
+    		    $this->printer->setTextSize(2, 1);
+    		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
+    		    $this->printer->text($date."\n");
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->text($member_nm."\n");
+    		    $this->printer->setTextSize(1, 2);
+    		    $this->printer->text("--------------------------------\n");
+    		    foreach ($data as $item) {
+    		    	$this->printer->setEmphasis(true);
+    		        // $this->printer->text($item->produk_nm."\n");
+    		        $this->printer->setEmphasis(false);
+    		        $this->printer->text($this->getAsString(32,$item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
+    		        $this->printer->text($item->description."\n");
+    		    }
+    		    $this->printer->setEmphasis(false);
+    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->setEmphasis(false);
+    		    $this->printer->feed(8);
+    		 
+    
+    		    /* Cut the receipt and open the cash drawer */
+    		    // $this->printer->cut();
+    		    // $this->printer->pulse();
+    		} catch (Exception $e) {
+    		    echo $e->getMessage();
+    		} finally {
+    		    $this->printer->close();
+    		}
+    		
+		} else {
+		    echo json_encode(false);
+		}
+	}
+
+	public function cetakulangcheckout() {
+		$billing_id = $this->request->getPost('bi');
+		$data = $this->billingmodel->cetakulangcheckout($billing_id)->getResult();
+		$discount_nmx = "";	 
+		$discount_valuex = "";
+		$discount = "";
+		$discount_nm = "";
+		$subtotal = 0;
+		$ptotal = "";
+		$ttl_discount = 0;
+		$amt_before_discount = 0;
+		$poinmb = 0;
+		$nilaidiskon = "";
+		if (count($data)>0) {
+			
+		    $member_nm = "MEJA ".$data[0]->meja_nm;
+		    list($dt,$tm) = explode(" ", $data[0]->created_dttm);
+		    $resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
+			$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
+			
+			$this->profile = CapabilityProfile::load("POS-5890");
+			$this->connector = new RawbtPrintConnector();
+			// $this->connector = new FilePrintConnector("/dev/usb/lp0");
+
+
+			$this->printer = new Printer($this->connector);
+			$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+			// Make sure you load a Star print connector or you may get gibberish.
+			try {
+
+			    /* Information for the receipt */
+			    /* Date is kept the same for testing */
+			// $date = date('l jS \of F Y h:i:s A');
+			   
+
+			    /* Start the printer */
+			    // $logo = EscposImage::load("images/lib/logo.png", false);
+			    // $this->printer = new Printer($this->connector, $this->profile);
+
+
+			    /* Print top logo */
+			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    
+			    // if ($this->profile->getSupportsGraphics()) {
+			    //     $this->printer->graphics($logo);
+			    // }
+			    // if ($this->profile->getSupportsBitImageRaster() && !$this->profile->getSupportsGraphics()) {
+			    //     $this->printer->bitImage($logo);
+			    // }
+
+			    /* Name of shop */
+			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text("Butcher Steak & Pasta\n");
+			    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
+			    $this->printer->text("07115626366\n");
+			    $this->printer->selectPrintMode();
+			    $this->printer->feed();
+			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
+			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,6)));
+			    // $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_nm, 0,6))."\n");
+			    /* Title of receipt */
+			    $this->printer->setEmphasis(true);
+			    $this->printer->text("--------------------------------\n");
+			    $this->printer->feed(1);
+			    
+
+			    /* Items */
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+			    foreach ($data as $item) {
+			    	$this->printer->setEmphasis(true);
+					$total = $item->produk_harga * $item->qty;
+					$amt_before_discount = $amt_before_discount + $total;
+					if (count($resdc)>0) {
+						foreach ($resdc as $dc) {
+							$symb = substr($dc->value, -1);
+							if ($symb == "%") {
+								$percentega = str_replace("%", "", $dc->value);
+								$ptotal = ($percentega/100) * $total;
+								list($harga,$belakangkoma) = explode(".", $ptotal);
+								$nilaidiskon = "(".$harga.")";
+								$afterdc = $total - $harga;
+								$subtotal = $subtotal + $afterdc;
+								$discount_nmx = $dc->discount_nm;
+								$discount_valuex = $dc->value;
+								$ttl_discount = $ttl_discount + $ptotal; 
+								$poinmb = $poinmb + $harga;
+							} else {
+								$subtotal = $subtotal + $total;
+							}
+						} 
+					} else {
+						$subtotal = $subtotal + $total;
+					}
+
+			        $this->printer->text(strtoupper($item->produk_nm)."\n");
+			        $this->printer->setEmphasis(false);
+			        $this->printer->text($this->buatBaris4Kolom($item->qty."x","@".number_format($item->produk_harga),number_format($total))); // for 58mm Font A
+			        $this->printer->text($this->buatBaris4Kolom($discount_nmx."".$discount_valuex," ",$nilaidiskon)."\n");
+			    }
+
+			    if (count($notpersen)>0) {
+					foreach ($notpersen as $dc) {
+						$discount_nm = $dc->discount_nm;
+						$discount_value = $dc->value;
+						$this->printer->text($this->buatBaris4Kolom($discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
+						$subtotal = $subtotal - $dc->value;
+						$ttl_discount = $ttl_discount + $dc->value; 
+					}
+				} 
+			    $this->printer->setEmphasis(false);
+			    $this->printer->text("--------------------------------\n");
+			    $this->printer->setEmphasis(false);
+			    $this->printer->feed();
+
+
+
+			    $servicex = $amt_before_discount * 0.05;
+				if (strpos($servicex,'.') == TRUE) {
+					list($service,$belakangkomas) = explode(".", $servicex);
+				} else {
+					$service = $servicex;
+				}
+
+				$taxx = ($amt_before_discount + $service) * 0.10;
+				if (strpos($taxx,'.') == TRUE) {
+					list($tax,$belakangkoma) = explode(".", $taxx);
+				} else {
+					$tax = $taxx;
+				}
+
+				$grandtotal = $subtotal + $tax + $service;
+				$jmlbulat = $this->pembulatanratusan($grandtotal);
+				$nilaibulat = $jmlbulat - $grandtotal;
+
+				if ($data[0]->payplan_id == 1) {
+					$ttl_paid = $data[0]->ttl_paid;
+				} else {
+					$ttl_paid = $jmlbulat;
+				}
+
+				$kembalian = $ttl_paid - $jmlbulat;
+
+			    $this->printer->setEmphasis(false);
+				$this->printer->text($this->buatBaris4Kolom("Subtotal","",number_format($subtotal))); 
+				$this->printer->text($this->buatBaris4Kolom("Tax","",number_format($tax))); 
+				$this->printer->text($this->buatBaris4Kolom("Service","",number_format($service))); 
+				$this->printer->text($this->buatBaris4Kolom("Rounding","",number_format($nilaibulat))); 
+			    $this->printer->text("--------------------------------\n");
+			    $this->printer->setEmphasis(true);
+				$this->printer->text($this->buatBaris4Kolom("Total","",number_format($jmlbulat))); 
+				$this->printer->text($this->buatBaris4Kolom($data[0]->payplan_nm,"",""));
+				$this->printer->text($this->buatBaris4Kolom("Kembalian","",number_format($kembalian)));
+			    $this->printer->setEmphasis(false);
+			    /*footer */
+			    $this->printer->feed(2);
+			    // $this->printer->text($date . "\n");
+				$this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    $this->printer->text("TERIMA KASIH\n");
+			    /* Cut the receipt and open the cash drawer */
+			    // $this->printer->cut();
+			    // $this->printer->pulse();
+
+			} catch (Exception $e) {
+			    echo $e->getMessage();
+			} finally {
+			    $this->printer->close();
+			}
+		} else {
+			return 'false';
+		}
 	}
 
 	public function cetakbilling() {
@@ -1862,8 +2196,6 @@ class Kasir extends BaseController
 		} else {
 			return 'false';
 		}
-		
-		
 	}
 	
 	public function buatBaris4Kolom($kolom1, $kolom2, $kolom3) {

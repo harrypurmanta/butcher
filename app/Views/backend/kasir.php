@@ -14,7 +14,6 @@
                                 <input type="hidden" id="value-meja"/>
                                 <input type="hidden" id="jumlah_customer"/>
                                 <input type="hidden" id="collecteduser"/>
-                                <input type="hidden" id="billtype"/>
                                 <div class="card-body" id="cardbodymeja" align="center">
                                 
                                 </div>
@@ -34,9 +33,9 @@
                               <div class="col-md-12">
                                 <div class="card">
                                   <div class="card-body">
-                                    <button type="button" onclick="closekasir()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-file-archive fa-3x"></i></button>
-                                    <button type="button" onclick="billinghistoryfinish()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-check fa-3x"></i></button>
-                                    <button type="button" onclick="billinghistoryverified()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-list fa-3x"></i></button>
+                                    <button type="button" onclick="closekasir()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-file-archive"></i> Closing</button>
+                                    <button type="button" onclick="billinghistoryfinish()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-check"></i> History</button>
+                                    <button type="button" onclick="billinghistoryverified()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-list"></i> Activity</button>
                                   </div>
                                 </div>
                               </div>
@@ -384,17 +383,9 @@ function clickmejabutton(id) {
 
 function simpanjumlahcustomer(id) {
   var jumlahcustomer = $('#jumlahtamu').val();
-  // var collecteduser = $('#collected_user').val();
-  // var billtype = "";
-  // if ($('#takeaway').is(':checked')) {
-  //   billtype = "takeaway";
-  // } else {
-  //   billtype = "onsite";
-  // }
-
+  var collecteduser = $('#collected_user').val();
   $("#jumlah_customer").val(jumlahcustomer);
-  // $("#collecteduser").val(collecteduser);
-  // $("#billtype").val(billtype);
+  $("#collecteduser").val(collecteduser);
   $('#modaltambahmember').modal('hide');
   showbillingbymeja(id);
 
@@ -465,17 +456,16 @@ function showbillingbymeja2(id) {
 }
 
 function simpanproduk(produk_id) {
+  $("#loader-wrapper").removeClass("d-none")
   var meja_id = $("#value-meja").val();
   var jumlah = $("#jumlah").val();
   var catatan = $("#catatan").val();
   var jumlah_customer = $("#jumlah_customer").val();
+  var collected_user = $("#collecteduser").val();
   $.ajax({
       url : "<?= base_url('kasir/addproduktobill') ?>",
       type: "POST",
-      data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan,jumlah_customer:jumlah_customer},
-      beforeSend: function () { 
-        $("#loader-wrapper").removeClass("d-none")
-      },
+      data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan,jumlah_customer:jumlah_customer,collected_user:collected_user},
       success:function(data){
         if (data == 'true') {
           showbillingbymeja2(meja_id);
@@ -1064,8 +1054,8 @@ function cetakmenudrinks(id,btn) {
          success:function(data){
           if (data == "false") {
               Swal.fire({
-                title:"Tidak ada order Minuman!",
-                text:"Data tidak di print!",
+                title:"Item sudah di print / Tidak ada order Minuman!",
+                text:"Print ulang di Activity",
                 type:"warning",
                 showCancelButton:!0,
                 confirmButtonColor:"#556ee6",
@@ -1105,8 +1095,8 @@ function cetakmenufood(id,btn){
          success:function(data){
           if (data == "false") {
               Swal.fire({
-                title:"Tidak ada order Makanan!",
-                text:"Data tidak di print!",
+                title:"Item sudah di print / Tidak ada order Makanan!",
+                text:"Print ulang di Activity",
                 type:"warning",
                 showCancelButton:!0,
                 confirmButtonColor:"#556ee6",
@@ -1115,6 +1105,122 @@ function cetakmenufood(id,btn){
           } else {
               window.location.href = data;
               showbillingbymeja(id);
+          }
+          b.text(b.attr('data-old'));
+          $("#loader-wrapper").addClass("d-none");
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+        }
+      });
+}
+
+function cetakulangdrinks(mi,bi,btn) {
+  $("#loader-wrapper").removeClass("d-none")
+  b = $(btn);
+      b.attr('data-old', b.text());
+      b.text('wait');
+      $.ajax({
+         url : "<?= base_url('kasir/cetakulangdrinks') ?>",
+         type: "post",
+         data: {bi:bi},
+         success:function(data){
+          if (data == "false") {
+              Swal.fire({
+                title:"Tidak ada order Minuman!",
+                text:"Data tidak di print",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+          } else {
+              window.location.href = data;
+              // showbillingbymeja(mi);
+          }
+          b.text(b.attr('data-old'));
+          $("#loader-wrapper").addClass("d-none");
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+        }
+      });
+
+}
+
+function cetakulangfoods(mi,bi,btn) {
+  $("#loader-wrapper").removeClass("d-none")
+  b = $(btn);
+      b.attr('data-old', b.text());
+      b.text('wait');
+      $.ajax({
+         url : "<?= base_url('kasir/cetakulangfoods') ?>",
+         type: "post",
+         data: {bi:bi},
+         success:function(data){
+          if (data == "false") {
+              Swal.fire({
+                title:"Tidak ada order Makanan!",
+                text:"Data tidak di print",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+          } else {
+              window.location.href = data;
+          }
+          b.text(b.attr('data-old'));
+          $("#loader-wrapper").addClass("d-none");
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+        }
+      });
+}
+
+function cetakulangcheckout(mi,bi,btn) {
+  $("#loader-wrapper").removeClass("d-none")
+  b = $(btn);
+      b.attr('data-old', b.text());
+      b.text('wait');
+      $.ajax({
+         url : "<?= base_url('kasir/cetakulangcheckout') ?>",
+         type: "post",
+         data: {bi:bi},
+         success:function(data){
+          if (data == "false") {
+              Swal.fire({
+                title:"Error!",
+                text:"Data tidak di print",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+          } else {
+              window.location.href = data;
           }
           b.text(b.attr('data-old'));
           $("#loader-wrapper").addClass("d-none");
