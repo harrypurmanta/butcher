@@ -63,7 +63,9 @@
             <!-- ============================================================== -->
             <!-- ============================================================== -->
             <script src="../assets/plugins/jquery/jquery.min.js"></script>
-
+            <script src="../assets/plugins/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
+    <script src="../assets/plugins/bootstrap-select/bootstrap-select.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="../assets/plugins/multiselect/js/jquery.multi-select.js"></script>
             <!-- <script src="../assets/js/perfect-scrollbar.jquery.min.js"></script> -->
 <script type="text/javascript">
 $(document).ready(function($){
@@ -75,6 +77,8 @@ $(document).ready(function($){
           })
     }); 
 
+// $(".select2").select2();
+// $('.selectpicker').selectpicker();
 });
 
 function openkasir() {
@@ -1310,7 +1314,7 @@ function checkout(id,gt,btn) {
 
     b = $(btn);
     b.attr('data-old', b.text());
-    b.text('wait');
+    b.text('wait . . .');
     Swal.fire({
           title: 'Apakah anda yakin?',
           text: "Setelah tekan yes, data tidak dapat dikembalikan",
@@ -1362,7 +1366,7 @@ function checkout(id,gt,btn) {
        })
 }
 
-function removeitem(meja_id,id) {
+function removeitem(meja_id,id,billing_id,btn) {
   Swal.fire({
       title: 'Yakin menghapus item ini ?',
       text: "item yang sudah dihapus tidak bisa dikembalikan lagi, tapi anda bisa memesan lagi",
@@ -1376,7 +1380,7 @@ function removeitem(meja_id,id) {
         $.ajax({
          url : "<?= base_url('kasir/setnullifieditem')?>",
          type : "POST",
-         data : {'value':id},
+         data : {'value':id,billing_id:billing_id},
          beforeSend: function () { 
             $("#loader-wrapper").removeClass("d-none");
          },

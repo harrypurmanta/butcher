@@ -290,10 +290,25 @@ class Billingmodel extends Model
         return $builder->insert($data);
     }
 
+    public function getCountitem($billing_id) {
+        return $this->db->table('billing_item')
+                        ->select('COUNT(billing_item_id) as jumlahitem')
+                        ->where('status_cd','normal')
+                        ->where('billing_id',$billing_id)
+                        ->get();
+    }
+
     public function setnullifieditem($id){
         $query = $this->db->table('billing_item');
         $query->set('status_cd','nullified');
         $query->where('billing_item_id',$id);
+        return $query->update();
+    }
+
+    public function setnullifiedbilling($id){
+        $query = $this->db->table('billing');
+        $query->set('status_cd','nullified');
+        $query->where('billing_id',$id);
         return $query->update();
     }
 

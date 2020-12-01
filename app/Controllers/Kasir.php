@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -222,7 +222,7 @@ class Kasir extends BaseController
 				
 				$ret .= "<tr>
 				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
-				            <span>".strtoupper($key->produk_nm)." <a style='float: right;' onclick='removeitem($id,$key->billing_item_id)'><i style='color:red;' class='fas fa-times'></i></a></span>
+				            <span>".strtoupper($key->produk_nm)." <a style='float: right;' onclick='removeitem($id,$key->billing_item_id,$billing_id,this)'><i style='color:red;' class='fas fa-times'></i></a></span>
 				          </td>
 				        </tr>
 				        <tr style='font-size: 18px;'>
@@ -450,7 +450,7 @@ class Kasir extends BaseController
 				
 				$ret .= "<tr>
 				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
-				            <span>$key->produk_nm <a style='float: right;' onclick='removeitem($id,$key->billing_item_id)'><i style='color:red;' class='fas fa-times'></i></a></span>
+				            <span>$key->produk_nm <a style='float: right;' onclick='removeitem($id,$key->billing_item_id,$billing_id,this)'><i style='color:red;' class='fas fa-times'></i></a></span>
 				          </td>
 				        </tr>
 				        <tr style='font-size: 18px;'>
@@ -587,12 +587,27 @@ class Kasir extends BaseController
 
 	public function setnullifieditem(){
 		$id = $this->request->getPost('value');
-		$res = $this->billingmodel->setnullifieditem($id);
-		if ($res) {
-			return true;
+		$billing_id = $this->request->getPost('billing_id');
+
+		$data = $this->billingmodel->getCountitem($billing_id)->getResult();
+		echo json_encode($billing_id);
+		if ($data[0]->jumlahitem <= "1") {
+			$res = $this->billingmodel->setnullifiedbilling($billing_id);
+			if ($res) {
+				$res = $this->billingmodel->setnullifieditem($id);
+				return true;
+			} else {
+				return false;
+			}
 		} else {
-			return false;
+			$res = $this->billingmodel->setnullifieditem($id);
+			if ($res) {
+				return true;
+			} else {
+				return false;
+			}
 		}
+		
 	}
 
 	public function discountkasir() {
@@ -631,11 +646,18 @@ class Kasir extends BaseController
 	            . "</div>"
 	            . "<div class='modal-body'>"
 	            . "<div class='row'>"
-                . "<div class='col-12'>"
+                . "<div class='col-md-12'>"
 	            . "<div class='card'>"
                 . "<div class='card-body'>"
-	            . "<div class='table-responsive'>"
-	            . "<table id='myTable' class='table table-bordered table-striped'>"
+                . "<div class='col-md-12'>"
+                . "<div class='table-responsive'>"
+	            . "<table width='100%' class='table-striped' data-toggle='table' data-height='300' data-mobile-responsive='true'>"
+	            . "<thead>"
+	            . "<tr>"
+	            . "<th>NAMA</th>"
+	            . "<th>NO HP</th>"
+	            . "</tr>"
+	            . "</thead>"
 	            . "<tbody>";
 	            foreach ($res as $key) {
 	            $ret .= "<tr style='font-size: 20px; font-weight: bold;'>"
@@ -643,20 +665,32 @@ class Kasir extends BaseController
 	            	 . "<td align='right'>$key->cellphone</td>"
 	            	 . "</tr>";
 	            }
-	       $ret .= "</tbody></table></div>"
+	       $ret .= "</tbody></table>"
+	       		. "</div>" // class table-responsive
+                // . "<div class='form-group' style='margin-bottom: 10px;'>"
+                // . "<select class='select2 form-control custom-select' style='width: 100%; height:36px;'>";
+                // foreach ($res as $key) {
+                // 	$ret .= "<option value='$key->member_id'>$key->person_nm</option>";
+                // }
+                // $ret .= "</select>"
+                // . "</div>"
+                . "</div>"
 	            . "</div>"
 	            . "</div>" //card
 	            . "</div>"
-
 	            . "</div>" //row
 
 	       		. "</div>" //modal-body
 	            . "</div>"
 	            . "</div>";
-	        $ret .= "<script src='".base_url()."/assets/plugins/datatables.net/js/jquery.dataTables.min.js'></script>";
-		
+	            $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
+			// $ret .= "<script src='../assets/plugins/select2/dist/js/select2.full.min.js'></script>"
+			// 	. "<script src='../assets/plugins/bootstrap-select/bootstrap-select.min.js'></script>"
+			// 	. "<script src='../assets/plugins/multiselect/js/jquery.multi-select.js'></script>"
+			// 	. "<script>$('.select2').select2()</script>";
 		return $ret;
 	}
+
 
 	public function formtambahmember() {
 		$ret = "<div class='modal-dialog modal-xl'>

@@ -188,8 +188,13 @@ $this->session->start();
     <script src="<?=base_url() ?>/assets/plugins/sparkline/jquery.sparkline.min.js"></script>
     <!-- jQuery file upload -->
     <script src="<?=base_url() ?>/assets/plugins/dropify/dist/js/dropify.min.js"></script>
+    <script src='<?=base_url() ?>/assets/plugins/select2/dist/js/select2.full.min.js'></script>
+    <script src="../assets/plugins/bootstrap-select/bootstrap-select.min.js" type="text/javascript"></script>
     <script>
         $(function () {
+            $('.select2').select2();
+            $('.selectpicker').selectpicker();
+
             $('#myTable').DataTable();
             $(document).ready(function () {
                 var table = $('#example').DataTable({
