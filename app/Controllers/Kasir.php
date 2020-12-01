@@ -792,7 +792,7 @@ class Kasir extends BaseController
                         </label> ";
 	            }
 	            $ret .= "</div> ";
-	       $ret .= "<div align='right'><button data-dismiss='modal' aria-hidden='true' type='button' class='btn btn-secondary'>Batal</button> <button onclick='checkout($id,$gt)' class='btn btn-success' type='button'>Simpan</button></div>"
+	       $ret .= "<div align='right'><button data-dismiss='modal' aria-hidden='true' type='button' class='btn btn-secondary'>Batal</button> <button onclick='checkout($id,$gt,this)' class='btn btn-success' type='button'>Simpan</button></div>"
 	       		. "</form>"
 	       		. "</div>"
 	            . "</div>"

@@ -384,11 +384,30 @@ function clickmejabutton(id) {
 function simpanjumlahcustomer(id) {
   var jumlahcustomer = $('#jumlahtamu').val();
   var collecteduser = $('#collected_user').val();
-  $("#jumlah_customer").val(jumlahcustomer);
-  $("#collecteduser").val(collecteduser);
-  $('#modaltambahmember').modal('hide');
-  showbillingbymeja(id);
-
+  if (jumlahcustomer == "") {
+    Swal.fire({
+        title:"JUMLAH TAMU HARI DIISI !",
+        text:"Data gagal disimpan!",
+        type:"warning",
+        showCancelButton:!0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else if (collecteduser == "") {
+    Swal.fire({
+        title:"PETUGAS HARUS DIISI !",
+        text:"Data gagal disimpan!",
+        type:"warning",
+        showCancelButton:!0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else {
+    $("#jumlah_customer").val(jumlahcustomer);
+    $("#collecteduser").val(collecteduser);
+    $('#modaltambahmember').modal('hide');
+    showbillingbymeja(id);
+  }
 }
 
 function showbillingbymeja(id) {
@@ -1280,6 +1299,7 @@ function checkout(id,gt,btn) {
   var paymen_tunai_id = $("input[name=paymen_tunai]").data('paymen-id');
   var payplan_value = $("input[name='payplan']").val();
   var payplan_value_id = $("input[name=payplan]:checked").data('payplan-id');
+  alert(paymen_tunai);
   if (paymen_tunai == "") {
     var paid = payplan_value;
     var payplan_id = payplan_value_id;
@@ -1288,7 +1308,7 @@ function checkout(id,gt,btn) {
     var payplan_id = paymen_tunai_id;
   }
 
-   b = $(btn);
+    b = $(btn);
     b.attr('data-old', b.text());
     b.text('wait');
     Swal.fire({
