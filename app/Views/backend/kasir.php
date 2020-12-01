@@ -455,7 +455,10 @@ function showbillingbymeja2(id) {
     });
 }
 
-function simpanproduk(produk_id) {
+function simpanproduk(produk_id,btn) {
+  b = $(btn);
+  b.attr('data-old', b.text());
+  b.text('wait');
   $("#loader-wrapper").removeClass("d-none")
   var meja_id = $("#value-meja").val();
   var jumlah = $("#jumlah").val();
@@ -480,6 +483,7 @@ function simpanproduk(produk_id) {
               cancelButtonColor:"#f46a6a"
           })
         }
+        b.text(b.attr('data-old'));
         $("#loader-wrapper").addClass("d-none");
       },
       error:function(){

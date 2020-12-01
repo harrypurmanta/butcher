@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -622,25 +622,38 @@ class Kasir extends BaseController
 
 	public function memberkasir() {
 		$res = $this->membermodel->getbyNormal()->getResult();
-			$ret = "<div class='modal-dialog modal-lg'>"
+			$ret = "<div class='modal-dialog modal-xl'>"
 	            . "<div class='modal-content'>"
 	            . "<div class='modal-header'>"
 	            . "<button type='button' class='btn btn-info' onclick='formtambahmember()' style='font-size: 25px;'>+</button>"
-	            . "<h4 class='modal-title'>Silahkan Pilih Member</h4>"
+	            . "<h2 class='modal-title'>SILAHKAN PILIH MEMBER</h2>"
 	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
-	            . "<div class='table-responsive'><table class='table table-bordered table-striped' width='100%'>";
+	            . "<div class='row'>"
+                . "<div class='col-12'>"
+	            . "<div class='card'>"
+                . "<div class='card-body'>"
+	            . "<div class='table-responsive'>"
+	            . "<table id='myTable' class='table table-bordered table-striped'>"
+	            . "<tbody>";
 	            foreach ($res as $key) {
-	            $ret .= "<tr style='border-bottom: 1px solid #ccc; line-height: 60px; font-size: 25px; font-weight: bold;'>"
-	            	 . "<td align='left'><button onclick='addmember($key->member_id);' class='btn btn-outline-primary' style='font-size: 20px; color: black; font-weight: bold;'>$key->person_nm</button></td>"
+	            $ret .= "<tr style='font-size: 20px; font-weight: bold;'>"
+	            	 . "<td align='left'><button onclick='addmember($key->member_id);' class='btn btn-outline-primary' style='font-size: 16px; color: black; font-weight: bold;'>$key->person_nm</button></td>"
 	            	 . "<td align='right'>$key->cellphone</td>"
 	            	 . "</tr>";
 	            }
-	       $ret .= "</table></div>"
-	       		. "</div>"
+	       $ret .= "</tbody></table></div>"
+	            . "</div>"
+	            . "</div>" //card
+	            . "</div>"
+
+	            . "</div>" //row
+
+	       		. "</div>" //modal-body
 	            . "</div>"
 	            . "</div>";
+	        $ret .= "<script src='".base_url()."/assets/plugins/datatables.net/js/jquery.dataTables.min.js'></script>";
 		
 		return $ret;
 	}
@@ -814,7 +827,7 @@ class Kasir extends BaseController
                 . "</div>"
                 . "</div>"
                 . "<div>"
-                . "<button onclick='simpanproduk($produk_id)' class='btn btn-info'>Simpan</button>"
+                . "<button onclick='simpanproduk($produk_id,this)' class='btn btn-info'>Simpan</button>"
                 . "</div>"
                 // . "</form>"
                 . "</div>"
@@ -1727,7 +1740,7 @@ class Kasir extends BaseController
 			    $this->printer->setFont(Printer::FONT_A);
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
-			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8))."\n");
+			   $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");
@@ -1885,7 +1898,7 @@ class Kasir extends BaseController
 			    $this->printer->setFont(Printer::FONT_A);
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
-			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8))."\n");
+			   $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");
@@ -2059,7 +2072,7 @@ class Kasir extends BaseController
 			    $this->printer->setFont(Printer::FONT_A);
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
-			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8))."\n");
+			   $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");
