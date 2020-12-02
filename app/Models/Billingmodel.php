@@ -56,7 +56,7 @@ class Billingmodel extends Model
 
     public function getbyMejaidkasir($id){
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,a.collected_user,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm');
+        $query->select('a.kasir_status_id,a.billing_id,a.created_dttm,a.status_cd as statusbilling,a.collected_user,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -300,6 +300,14 @@ class Billingmodel extends Model
                                 ORDER BY SUM(a.ttl_amount) DESC");
     }
 
+    public function getbillmejakosong($meja_id,$kasir_status_id) {
+        return $this->db->table('billing')
+                        ->where('meja_id',$meja_id)
+                        ->where('kasir_status_id',$kasir_status_id)
+                        ->whereIn('status_cd',['normal','verified','waiting'])
+                        ->get();
+    }
+
     public function simpanopenkasir($data) {
         $this->db->table('kasir_status')
                         ->insert($data);
@@ -324,6 +332,15 @@ class Billingmodel extends Model
                         ->where('status_cd','normal')
                         ->where('billing_id',$billing_id)
                         ->get();
+    }
+
+    public function updatepindahmeja($data,$billing_id,$old_meja_id,$kasir_status_id) {
+        return $this->db->table('billing')
+                        ->set($data)
+                        ->where('billing_id',$billing_id)
+                        ->where('meja_id',$old_meja_id)
+                        ->where('kasir_status_id',$kasir_status_id)
+                        ->update();
     }
 
     public function setnullifieditem($id){

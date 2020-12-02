@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -151,6 +151,7 @@ class Kasir extends BaseController
 		$subtotal 				= 0;
 		$amt_before_discount 	= 0;
 		if (count($res)>0) {
+			$kasir_status_id = $res[0]->kasir_status_id;
 			$billing_id = $res[0]->billing_id;
 			if ($res[0]->member_nm != "") {
 		        $member_nm = "<span style='font-size: 16px;'>".$res[0]->member_nm."</span> <a href='#' onclick='removemember($id,$billing_id)'><i style='color:red;' class='fas fa-times'></i></a>";
@@ -180,7 +181,7 @@ class Kasir extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Bill Name</td>
-				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,this)' class='btn btn-danger waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
+				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-danger waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Collected By</td>
@@ -379,6 +380,7 @@ class Kasir extends BaseController
 		$subtotal 				= 0;
 		$amt_before_discount 	= 0;
 		if (count($res)>0) {
+			$kasir_status_id = $res[0]->kasir_status_id;
 			$billing_id = $res[0]->billing_id;
 			if ($res[0]->member_nm != "") {
 		        $member_nm = "<span style='font-size: 16px;'>".$res[0]->member_nm."</span> <a href='#' onclick='removemember($id,$billing_id)'><i style='color:red;' class='fas fa-times'></i></a>";
@@ -408,7 +410,7 @@ class Kasir extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Bill Name</td>
-				          <td align='right'>$member_nm</td>
+				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-danger waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Collected By</td>
@@ -568,11 +570,6 @@ class Kasir extends BaseController
 		echo json_encode($return,JSON_UNESCAPED_SLASHES);
 	}
 
-	public function showpindahmeja() {
-		$billing_id = $this->request->getPost('billing_id');
-		$meja_id = $this->request->getPost('meja_id');
-
-	}
 
 	public function updateqty() {
 		$id = $this->request->getPost('value');
@@ -595,9 +592,7 @@ class Kasir extends BaseController
 	public function setnullifieditem(){
 		$id = $this->request->getPost('value');
 		$billing_id = $this->request->getPost('billing_id');
-
 		$data = $this->billingmodel->getCountitem($billing_id)->getResult();
-		echo json_encode($billing_id);
 		if ($data[0]->jumlahitem <= "1") {
 			$res = $this->billingmodel->setnullifiedbilling($billing_id);
 			if ($res) {
@@ -615,6 +610,58 @@ class Kasir extends BaseController
 			}
 		}
 		
+	}
+
+	public function showpindahmeja() {
+		$billing_id = $this->request->getPost('billing_id');
+		$old_meja_id = $this->request->getPost('meja_id');
+		$kasir_status_id = $this->request->getPost('kasir_status_id');
+		$res = $this->mejamodel->getbyNormal()->getResult();
+		
+			$ret = "<div class='modal-dialog modal-xl'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h2 class='modal-title'>SILAHKAN PILIH MEJA</h2>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body' align='center' style='padding-bottom: 50px;'>";
+	            foreach ($res as $key) {
+	            	$ret .= "<div style='display: inline-block; margin: 10px;'>
+								<button onclick='simpanpindahmeja($key->meja_id,$billing_id,$old_meja_id,$kasir_status_id)' class='btn btn-info font-weight-bold' style='font-size: 35px; padding: 20px;'>$key->meja_nm</button>
+							</div>";
+	            }
+	       $ret .= "</div>"
+	            . "</div>"
+	            . "</div>";
+		
+		return $ret;
+	}
+
+	public function updatepindahmeja() {
+		$billing_id 	= $this->request->getPost('billing_id');
+		$old_meja_id 	= $this->request->getPost('old_meja_id');
+		$meja_id 		= $this->request->getPost('meja_id');
+		$kasir_status_id 		= $this->request->getPost('kasir_status_id');
+
+		$getbillmejakosong = $this->billingmodel->getbillmejakosong($meja_id,$kasir_status_id)->getResult();
+
+		if (count($getbillmejakosong) > 0) {
+			$ret = "mejatidakkosong";
+		} else {
+			$data = [
+				'meja_id' => $meja_id,
+				'updated_dttm' => date('Y-m-d H:i:s'),
+				'updated_user' => $this->session->user_id
+			];
+
+			$update = $this->billingmodel->updatepindahmeja($data,$billing_id,$old_meja_id,$kasir_status_id);
+			if ($update) {
+				$ret = "berhasil";
+			} else {
+				$ret = "gagal";
+			}
+		}
+		return $ret;
 	}
 
 	public function discountkasir() {
@@ -819,13 +866,13 @@ class Kasir extends BaseController
 	            . "<form>"
 	            . "<div><label style='color:black !important;'>TUNAI</label></div>"
 	            . "<div class='btn-group btn-group-toggle' data-toggle='buttons' style='display:block !important;'>";
-	            $ret .= "<label class='btn btn-outline-primary' style='font-size: 20px; margin:5px !important; color:black !important;'>
-                            <input class='radiopayment' type='radio' name='payplan' id='tunai1' data-payplan-id='1' value='".number_format($gt)."' autocomplete='off'>".number_format($gt)."
+	            $ret .= "<label for='tunai1' class='btn btn-outline-primary labelpayplan' style='font-size: 20px; margin:5px !important; color:black !important;'>
+                            <input type='radio' name='payplan' id='tunai1' data-payplan-id='1' value='".number_format($gt)."' autocomplete='off'>".number_format($gt)."
                         </label>";
-                $ret .= "<input style='height:45px; border-radius: 5px; margin-left: 10px; font-size: 20px; text-align: center;' type='text' name='paymen_tunai' id='tunai3' data-paymen-id='1' placeholder='0' data-mask='#.##0' data-mask-reverse='true' data-mask-maxlength='false'/>";
+                $ret .= "<input onfocus='uncheckpayplan()' style='height:45px; border-radius: 5px; margin-left: 10px; font-size: 20px; text-align: center;' type='text' name='paymen_tunai' id='tunai2' data-paymen-id='1' placeholder='0' data-mask='#.##0' data-mask-reverse='true' data-mask-maxlength='false'/>";
                 $ret .= "<div style='margin-top: 20px;'><label style='color:black !important;'>EDC</label></div>";
 	            foreach ($res as $key) {
-	            $ret .= "<label style='width: 100px; height: 70px; margin: 5px; color:black !important;' class='btn btn-outline-primary radiopayment'>
+	            $ret .= "<label for='edc$key->payplan_id' style='width: 100px; height: 70px; margin: 5px; color:black !important;' class='btn btn-outline-primary labelpayplan'>
                             <input type='radio' name='payplan' data-payplan-id='$key->payplan_id' value='".number_format($gt)."' id='edc$key->payplan_id' autocomplete='off'><span style='justify-content:center; display:flex;  align-items:center; width:100%; height:100%;'>$key->payplan_nm</span>
                         </label> ";
 	            }
@@ -1391,7 +1438,7 @@ class Kasir extends BaseController
 				 . "</div>" // col-md-12
 				 . "</div>"; // row
 
-	   	$email->setTo('harrypurmanta@gmail.com');
+	   	$email->setTo('Donyk@lavitabella.co.id');
 		$email->setFrom('lavitabellakasir@gmail.com','MAIL REPORT');
 		$email->setSubject('SALES REPORT '.$closed_dttm);
 		$email->setMessage($pesan);

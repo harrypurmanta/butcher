@@ -852,6 +852,87 @@ function member() {
   });
 }
 
+
+function showpindahmeja(billing_id,meja_id,kasir_status_id) {
+  $.ajax({
+       url : "<?= base_url('kasir/showpindahmeja') ?>",
+       type: "post",
+       data: {billing_id:billing_id,meja_id:meja_id,kasir_status_id:kasir_status_id},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+       },
+       success:function(data){
+        $('#responsive-modal').html(data);
+        $('#responsive-modal').modal('show');
+        $("#loader-wrapper").addClass("d-none");
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+  });
+}
+
+function simpanpindahmeja(meja_id,billing_id,old_meja_id,kasir_status_id) {
+  $.ajax({
+       url : "<?= base_url('kasir/updatepindahmeja') ?>",
+       type: "post",
+       data: {billing_id:billing_id,meja_id:meja_id,old_meja_id:old_meja_id,kasir_status_id:kasir_status_id},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+       },
+       success:function(data){
+        if (data == "mejatidakkosong") {
+          Swal.fire({
+              title:"MEJA TIDAK KOSONG!!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+        } else if (data == "gagal") {
+          Swal.fire({
+              title:"PINDAH MEJA GAGAL!!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+        } else if (data == "berhasil") {
+          Swal.fire({
+              title:"BERHASIL!!",
+              text:"meja berhasil dipindahkan!",
+              type:"success",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+          showbillingbymeja(meja_id);
+          $('#responsive-modal').modal('hide');
+        }
+        $("#loader-wrapper").addClass("d-none");
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+  });
+}
+
 function addDiscount(di) {
     var id = $('#meja_id').val();
     var bi = $('#billing_id').val();
@@ -1307,17 +1388,27 @@ function checkout(id,gt,btn) {
   var meja_id = $('#meja_id').val();
   var billing_id = $('#billing_id').val();
   var paymen_tunai = $("input[name='paymen_tunai']").val();
-  var paymen_tunai_id = $("input[name=paymen_tunai]").data('paymen-id');
+  var paymen_tunai_id = $("input[name='paymen_tunai']").data('paymen-id');
   var payplan_value = $("input[name='payplan']").val();
-  var payplan_value_id = $("input[name=payplan]:checked").data('payplan-id');
-  alert(paymen_tunai);
-  if (paymen_tunai == "") {
-    var paid = payplan_value;
-    var payplan_id = payplan_value_id;
+  var payplan_value_id = $("input[name='payplan']:checked").data('payplan-id');
+
+  if (payplan_value_id == undefined && paymen_tunai == "") {
+    Swal.fire({
+            title:"CARA BAYAR HARUS DIPILIH !!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        });
   } else {
-    var paid = paymen_tunai;
-    var payplan_id = paymen_tunai_id;
-  }
+    if (paymen_tunai == "") {
+      var paid = payplan_value;
+      var payplan_id = payplan_value_id;
+    } else {
+      var paid = paymen_tunai;
+      var payplan_id = paymen_tunai_id;
+    }
 
     b = $(btn);
     b.attr('data-old', b.text());
@@ -1371,6 +1462,12 @@ function checkout(id,gt,btn) {
               });
           }
        })
+
+  } 
+}
+
+function uncheckpayplan() {
+    $(".labelpayplan").removeClass('active focus');
 }
 
 function removeitem(meja_id,id,billing_id,btn) {
@@ -1406,10 +1503,6 @@ function removeitem(meja_id,id,billing_id,btn) {
         
       }
    });
-}
-
-function showpindahmeja(billing_id,meja_id,btn) {
-  alert('Comming Soon !!');
 }
 
 function addjumlah(){
