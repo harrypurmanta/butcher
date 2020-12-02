@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -179,7 +179,7 @@ class Kasir extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Bill Name</td>
-				          <td align='right'>$member_nm</td>
+				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,this)' class='btn btn-danger waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Collected By</td>
@@ -565,6 +565,12 @@ class Kasir extends BaseController
 				$return = array('status' => 'kategori','billing' => "", 'produk' => $produk);
 		}
 		echo json_encode($return,JSON_UNESCAPED_SLASHES);
+	}
+
+	public function showpindahmeja() {
+		$billing_id = $this->request->getPost('billing_id');
+		$meja_id = $this->request->getPost('meja_id');
+		
 	}
 
 	public function updateqty() {

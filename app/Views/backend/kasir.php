@@ -1401,6 +1401,10 @@ function removeitem(meja_id,id,billing_id,btn) {
    });
 }
 
+function showpindahmeja(billing_id,meja_id,btn) {
+  alert('Comming Soon !!');
+}
+
 function addjumlah(){
   var currentVal = parseInt($("#jumlah").val());
   if (!isNaN(currentVal)) {
