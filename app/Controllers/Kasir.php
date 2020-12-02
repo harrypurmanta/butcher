@@ -35,6 +35,7 @@ class Kasir extends BaseController
 	protected $session;
 	public function __construct(){
 		
+		
 		$this->mejamodel = new Mejamodel();
 		$this->billingmodel = new Billingmodel();
 		$this->discountmodel = new Discountmodel();
@@ -1081,7 +1082,6 @@ class Kasir extends BaseController
     			$ttlvoid = $ttlvoid + $void->totalvoid;
     		}
     	}
-    	
     	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
 		$ret = "";
 		$no = 1;
@@ -1102,7 +1102,6 @@ class Kasir extends BaseController
 	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
-
 	            . "<div class='row'>"
 				 . "<div class='col-5'>"
 				 . "<div class='card'>"
@@ -1166,7 +1165,7 @@ class Kasir extends BaseController
 				 	$ret .= "<tr>"
 						 . "<td width='20'>".$no++.".</td>"
 						 . "<td width='50%'>$key->produk_nm</td>"
-						 . "<td>$key->totalqty X</td>"
+						 . "<td width='50'>$key->totalqty X</td>"
 						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
 						 . "</tr>";
 				}
@@ -1180,15 +1179,6 @@ class Kasir extends BaseController
 				 . "<h3><strong>PAYMENT</strong></h3>"
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
-				 // . "<thead>"
-				 // . "<tr>"
-				 // . "<th>No.</th>"
-				 // . "<th>Billing Kode</th>"
-				 // . "<th>Meja</th>"
-				 // . "<th>Grand Total</th>"
-				 // . "<th>Action</th>"
-				 // . "</tr>"
-				 // . "</thead>"
 				 . "<tbody>";
 				 foreach ($toppayplan as $payplan) {
 					 	$ret .= "<tr>"
@@ -1203,7 +1193,6 @@ class Kasir extends BaseController
 			$ret .= "</tbody>"
 				 . "</table>"
 				 . "</div>" // card-body paypaln
-
 				 . "</div>" // card
 				 . "</div>" // col-md-12
 				 . "</div>" // row
@@ -1217,6 +1206,162 @@ class Kasir extends BaseController
 
 	    return $ret;
     }
+
+     public function simpanclosekasir() {
+    	$email = \Config\Services::email();
+    	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
+    	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
+    	$toppayplan = $this->billingmodel->getPayplan($kasir_status[0]->kasir_status_id)->getResult();
+    	$getReport = $this->billingmodel->getReport($kasir_status[0]->kasir_status_id)->getResult();
+    	$getVoid = $this->billingmodel->getVoid($kasir_status[0]->kasir_status_id)->getResult();
+    	$qtyvoid = count($getVoid);
+    	$ttlvoid = 0;
+    	if ($qtyvoid > 0) {
+    		foreach ($getVoid as $void) {
+    			$ttlvoid = $ttlvoid + $void->totalvoid;
+    		}
+    	}
+    	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+		$ret = "";
+		$no = 1;
+		$nopayplan = 1;
+    	$pesan = "<div class='row'>"
+				 . "<div class='col-5'>"
+				 . "<div class='card'>"
+                 . "<div class='card-body'>"
+                 . "<h3><strong>SALES</strong></h3>"
+                 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;'  data-toggle='table' data-height='250' data-mobile-responsive='true'>"
+				 . "<tbody>";
+				 	$pesan .= "<tr>"
+						 . "<td width='150'>Gross Sales</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Discounts</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttldiscount)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Net Sales</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($netsales)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Service</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->totalservice)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Tax</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->totaltax)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Void (".$qtyvoid.")</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($ttlvoid)."</td>"
+						 . "</tr>";
+				 
+
+			$pesan .= "</tbody>"
+				 . "</table>"
+
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+
+				. "<div class='col-md-7'>"
+				 . "<div class='card' style='margin-bottom: 0px !important;'>"
+                 . "<div class='card-body'>"
+                 . "<h3><strong>TOP ITEMS</strong></h3>"
+                 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($topitem as $key) {
+				 	$pesan .= "<tr>"
+						 . "<td width='20'>".$no++.".</td>"
+						 . "<td width='50%'>$key->produk_nm</td>"
+						 . "<td width='20'>$key->totalqty X</td>"
+						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
+						 . "</tr>";
+				}
+				 
+
+			$pesan .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body
+
+				 . "<div class='card-body'>" // card-body paypaln
+				 . "<h3><strong>PAYMENT</strong></h3>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($toppayplan as $payplan) {
+					 	$pesan .= "<tr>"
+							 . "<td width='20'>".$nopayplan++.".</td>"
+							 . "<td width='50%'>$payplan->payplan_nm</td>"
+							 . "<td align='right'>$payplan->totalpayplan</td>"
+							 . "<td align='right'>Rp. ".number_format($payplan->ttlamount)."</td>"
+							 . "</tr>";
+					}
+				 
+
+			$pesan .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body paypaln
+
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+				 . "</div>"; // row
+
+	   	$email->setTo('harrypurmanta@gmail.com');
+		$email->setFrom('lavitabellakasir@gmail.com');
+		$email->setSubject('testing send email');
+		$email->setMessage($pesan);
+		$email->send();
+		echo $email->printDebugger(['headers']);
+
+
+    	$getlastkasirstatus = $this->billingmodel->getStatuskasir()->getResult();
+    	$cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
+    	$jam = date('H:i:s');
+    	if (count($cekunclosed)>0) {
+    		$ret = "belumfinish";
+    	} else {
+    		$closed_dttm = $this->request->getPost('closed_dttm');
+			$kasir_status_id = $getlastkasirstatus[0]->kasir_status_id;
+
+			$datastatuskasir = [
+				'status_cd' => 'closed',
+				'closed_dttm' => date('Y-m-d H:i:s'),
+				'closed_user' => $this->session->user_id,
+ 			];
+
+			$this->billingmodel->updatestatuskasir($getlastkasirstatus[0]->kasir_status_id,$datastatuskasir);
+
+	    	$data = [
+			  'status_cd' => 'closed',
+			  'closed_dttm' => $closed_dttm.' '.$jam,
+			  'closed_user' => $this->session->user_id,
+			];
+			$res = $this->billingmodel->closedkasir($getlastkasirstatus[0]->kasir_status_id,$data);
+			if ($res) {
+				$ret = "true";
+				$this->reportTopdf($closed_dttm);
+			} else {
+				$ret = "false";
+			}
+    	}
+		return $ret;
+    }
+
 
     public function reportTopdf($closed_dttm) {
     	$totalbilling = $this->billingmodel->getTotalbill($closed_dttm)->getResult();
@@ -1292,61 +1437,8 @@ class Kasir extends BaseController
 		return $ret;
     }
 
-    public function simpanclosekasir() {
-    	$getlastkasirstatus = $this->billingmodel->getStatuskasir()->getResult();
-    	$cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
-    	$jam = date('H:i:s');
-    	if (count($cekunclosed)>0) {
-    		$ret = "belumfinish";
-    	} else {
-    		$closed_dttm = $this->request->getPost('closed_dttm');
-			$kasir_status_id = $getlastkasirstatus[0]->kasir_status_id;
+   
 
-			$datastatuskasir = [
-				'status_cd' => 'closed',
-				'closed_dttm' => date('Y-m-d H:i:s'),
-				'closed_user' => $this->session->user_id,
- 			];
-
-			$this->billingmodel->updatestatuskasir($getlastkasirstatus[0]->kasir_status_id,$datastatuskasir);
-
-	    	$data = [
-			  'status_cd' => 'closed',
-			  'closed_dttm' => $closed_dttm.' '.$jam,
-			  'closed_user' => $this->session->user_id,
-			];
-			$res = $this->billingmodel->closedkasir($getlastkasirstatus[0]->kasir_status_id,$data);
-			if ($res) {
-				$ret = "true";
-			} else {
-				$ret = "false";
-			}
-			$this->reportTopdf($closed_dttm);
-			$this->sendingemail($closed_dttm);
-    	}
-    	
-		return $ret;
-    }
-
-    public function sendingemail() {
-    	$email = \Config\Services::email();
-		$email->clear();
-		$config["protocol"] = "smtp";
-		$config["SMTPHost"]  = "smtp.gmail.com";
-		$config["SMTPUser"]  = "lavitabellakasir@gmail.com"; 
-		$config["SMTPPass"]  = "plerkaw321"; 
-		$config["SMTPPort"]  = 465;
-		$config["SMTPCrypto"] = "ssl";
-		 
-		$email_smtp->initialize($config);
-
-        $email->setTo('harrypurmanta@gmail.com');
-        $email->setFrom('cextor.phl@gmail.com');
-        $email->setSubject('Here is your info ');
-        $email->setMessage('Hi Here is the info you requested.');
-        $email->attach('report/Laporan_penjualan_'.$closed_dttm.'.pdf');
-        $email->send();
-    }
 
 	public function addproduktobill() {
 		$meja_id 			= $this->request->getPost('meja_id');
