@@ -190,6 +190,12 @@ function simpanopenkasir(){
 }
 
 function simpanclosekasir(){
+  
+  if ($('#checkboxprintclosekasir').is(':checked')) {
+    var checkprint  = "true";
+  } else {
+    var checkprint  = "false";
+  }
   var closed_dttm = $('#closed_dttm').val();
   Swal.fire({
           title: 'Apakah anda yakin?',
@@ -204,7 +210,7 @@ function simpanclosekasir(){
               $.ajax({
                  url : "<?= base_url('kasir/simpanclosekasir') ?>",
                  type: "post",
-                 data: {closed_dttm:closed_dttm},
+                 data: {closed_dttm:closed_dttm,checkprint:checkprint},
                  beforeSend: function () { 
                     $("#loader-wrapper").removeClass("d-none")
                   },
@@ -228,6 +234,7 @@ function simpanclosekasir(){
                         cancelButtonColor:"#f46a6a"
                     })
                   } else {
+                    window.location.href = data;
                     $('#modaltambahmember').modal('hide');
                     listmejakasir();
                   }

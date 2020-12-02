@@ -278,11 +278,23 @@ class Billingmodel extends Model
                                 LIMIT 5");
     }
 
-    public function getPayplan($kasir_status_id) {
+    public function getPayplanEdc($kasir_status_id) {
         return $this->db->query("SELECT a.payplan_id, SUM(a.ttl_amount) AS ttlamount, COUNT(a.billing_id) AS totalpayplan, b.payplan_nm
                                 FROM billing a 
                                 LEFT JOIN payplan b ON a.payplan_id=b.payplan_id 
                                 WHERE a.kasir_status_id = '$kasir_status_id'
+                                -- AND b.type = 'edc'
+                                AND a.status_cd = 'finish'
+                                GROUP BY a.payplan_id 
+                                ORDER BY SUM(a.ttl_amount) DESC");
+    }
+
+    public function getPayplanTunai($kasir_status_id) {
+        return $this->db->query("SELECT a.payplan_id, SUM(a.ttl_amount) AS ttlamount, COUNT(a.billing_id) AS totalpayplan, b.payplan_nm
+                                FROM billing a 
+                                LEFT JOIN payplan b ON a.payplan_id=b.payplan_id 
+                                WHERE a.kasir_status_id = '$kasir_status_id'
+                                AND b.type = 'tunai'
                                 AND a.status_cd = 'finish'
                                 GROUP BY a.payplan_id 
                                 ORDER BY SUM(a.ttl_amount) DESC");

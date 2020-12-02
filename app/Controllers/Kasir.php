@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -691,10 +691,7 @@ class Kasir extends BaseController
 	            . "</div>"
 	            . "</div>";
 	            $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
-			// $ret .= "<script src='../assets/plugins/select2/dist/js/select2.full.min.js'></script>"
-			// 	. "<script src='../assets/plugins/bootstrap-select/bootstrap-select.min.js'></script>"
-			// 	. "<script src='../assets/plugins/multiselect/js/jquery.multi-select.js'></script>"
-			// 	. "<script>$('.select2').select2()</script>";
+		
 		return $ret;
 	}
 
@@ -1071,11 +1068,12 @@ class Kasir extends BaseController
 
     public function closekasir() {
     	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
-    	// echo json_encode($kasir_status);exit;
-    	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
-    	$toppayplan = $this->billingmodel->getPayplan($kasir_status[0]->kasir_status_id)->getResult();
-    	$getReport = $this->billingmodel->getReport($kasir_status[0]->kasir_status_id)->getResult();
-    	$getVoid = $this->billingmodel->getVoid($kasir_status[0]->kasir_status_id)->getResult();
+    	$kasir_status_id = $kasir_status[0]->kasir_status_id;
+    	$topitem = $this->billingmodel->getTopitem($kasir_status_id)->getResult();
+    	$edc = $this->billingmodel->getPayplanEdc($kasir_status_id)->getResult();
+    	$tunai = $this->billingmodel->getPayplanTunai($kasir_status_id)->getResult();
+    	$getReport = $this->billingmodel->getReport($kasir_status_id)->getResult();
+    	$getVoid = $this->billingmodel->getVoid($kasir_status_id)->getResult();
     	$qtyvoid = count($getVoid);
     	$ttlvoid = 0;
     	if ($qtyvoid > 0) {
@@ -1087,6 +1085,8 @@ class Kasir extends BaseController
 		$ret = "";
 		$no = 1;
 		$nopayplan = 1;
+		$notunai = 1;
+		$totaltunai = 0;
     	$date = date('Y-m-d');
     	$ret = "<div class='modal-dialog modal-xl'>"
 	            . "<div class='modal-content'>"
@@ -1109,7 +1109,7 @@ class Kasir extends BaseController
                  . "<div class='card-body'>"
                  . "<h3><strong>SALES</strong></h3>"
                  . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;'  data-toggle='table' data-height='250' data-mobile-responsive='true'>"
+				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 	$ret .= "<tr>"
 						 . "<td width='150'>Gross Sales</td>"
@@ -1149,16 +1149,10 @@ class Kasir extends BaseController
 				 
 
 			$ret .= "</tbody>"
-				 . "</table>"
+				 . "</table>" // GROSS SALES
 
-				 . "</div>" // card-body
-				 . "</div>" // card
-				 . "</div>" // col-md-12
-
-				. "<div class='col-md-7'>"
-				 . "<div class='card' style='margin-bottom: 0px !important;'>"
-                 . "<div class='card-body'>"
-                 . "<h3><strong>TOP ITEMS</strong></h3>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<h3><strong>TOP ITEMS</strong></h3>"
                  . "<hr style='border: solid 1px red'/>"
 				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
@@ -1173,25 +1167,61 @@ class Kasir extends BaseController
 				 
 
 			$ret .= "</tbody>"
-				 . "</table>"
+				 . "</table>" // TOP ITEMS
+
 				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+
+				. "<div class='col-md-7'>"
+				 . "<div class='card' style='margin-bottom: 0px !important;'>"
 
 				 . "<div class='card-body'>" // card-body paypaln
-				 . "<h3><strong>PAYMENT</strong></h3>"
+				 . "<h3><strong>EDC</strong></h3>"
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
-				 foreach ($toppayplan as $payplan) {
+				 foreach ($edc as $kedc) {
 					 	$ret .= "<tr>"
 							 . "<td width='20'>".$nopayplan++.".</td>"
-							 . "<td width='50%'>$payplan->payplan_nm</td>"
-							 . "<td align='right'>$payplan->totalpayplan</td>"
-							 . "<td align='right'>Rp. ".number_format($payplan->ttlamount)."</td>"
+							 . "<td width='50%'>$kedc->payplan_nm</td>"
+							 . "<td align='right'>$kedc->totalpayplan</td>"
+							 . "<td align='right'>Rp. ".number_format($kedc->ttlamount)."</td>"
 							 . "</tr>";
 					}
 				 
 
 			$ret .= "</tbody>"
+				 . "</table>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<h3><strong>PAYMENT</strong></h3>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($tunai as $ktunai) {
+					 	$ret .= "<tr>"
+							 . "<td width='20'></td>"
+							 . "<td width='50%'>$ktunai->payplan_nm</td>"
+							 . "<td align='right'>$ktunai->totalpayplan</td>"
+							 . "<td align='right'>Rp. ".number_format($ktunai->ttlamount)."</td>"
+							 . "</tr>";
+							 $totaltunai = $ktunai->ttlamount;
+					}
+
+
+			$ret .= "<tr>"
+				 . "<td width='20'></td>"
+				 . "<td width='50%'>MODAL</td>"
+				 . "<td align='right'> : </td>"
+				 . "<td align='right'>Rp. ".number_format($kasir_status[0]->modal)."</td>"
+				 . "</tr>"
+				 . "<tr>"
+				 . "<td width='20'></td>"
+				 . "<td width='50%' style='font-weight:bold; border-top: 1px solid #000;'>TOTAL CASH COLLECTED</td>"
+				 . "<td align='right'> : </td>"
+				 . "<td align='right' style='font-weight:bold; border-top: 1px solid #000;'>Rp. ".number_format($kasir_status[0]->modal + $totaltunai)."</td>"
+				 . "</tr>"
+				 . "</tbody>"
 				 . "</table>"
 				 . "</div>" // card-body paypaln
 				 . "</div>" // card
@@ -1199,6 +1229,10 @@ class Kasir extends BaseController
 				 . "</div>" // row
 	            . "</div>"
 	            . "<div class='modal-footer'>"
+	            
+	            . "<div class='switch'>"
+                . "<label>OFF<input type='checkbox' id='checkboxprintclosekasir'><span class='lever'></span>ON</label>"
+                . "</div>"
 	            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
 	            . "<button onclick='simpanclosekasir()' type='button' class='btn btn-danger waves-effect waves-light'>Tutup Kasir</button>"
 	            . "</div>"
@@ -1210,12 +1244,16 @@ class Kasir extends BaseController
 
      public function simpanclosekasir() {
      	$closed_dttm = $this->request->getPost('closed_dttm');
+     	$checkprint = $this->request->getPost('checkprint');
     	$email = \Config\Services::email();
     	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
-    	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
-    	$toppayplan = $this->billingmodel->getPayplan($kasir_status[0]->kasir_status_id)->getResult();
-    	$getReport = $this->billingmodel->getReport($kasir_status[0]->kasir_status_id)->getResult();
-    	$getVoid = $this->billingmodel->getVoid($kasir_status[0]->kasir_status_id)->getResult();
+    	$kasir_status_id = $kasir_status[0]->kasir_status_id;
+    	
+    	$topitem = $this->billingmodel->getTopitem($kasir_status_id)->getResult();
+    	$edc = $this->billingmodel->getPayplanEdc($kasir_status_id)->getResult();
+    	$tunai = $this->billingmodel->getPayplanTunai($kasir_status_id)->getResult();
+    	$getReport = $this->billingmodel->getReport($kasir_status_id)->getResult();
+    	$getVoid = $this->billingmodel->getVoid($kasir_status_id)->getResult();
     	$qtyvoid = count($getVoid);
     	$ttlvoid = 0;
     	if ($qtyvoid > 0) {
@@ -1224,16 +1262,19 @@ class Kasir extends BaseController
     		}
     	}
     	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+
 		$ret = "";
 		$no = 1;
 		$nopayplan = 1;
     	$pesan = "<div class='row'>"
-				 . "<div class='col-5'>"
+				 . "<div class='col-md-5'>"
 				 . "<div class='card'>"
                  . "<div class='card-body'>"
+
+                 . "<hr style='border: solid 1px red'/>"
                  . "<h3><strong>SALES</strong></h3>"
                  . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;'  data-toggle='table' data-height='250' data-mobile-responsive='true'>"
+				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 	$pesan .= "<tr>"
 						 . "<td width='150'>Gross Sales</td>"
@@ -1273,49 +1314,76 @@ class Kasir extends BaseController
 				 
 
 			$pesan .= "</tbody>"
-				 . "</table>"
+				 . "</table>" // GROSS SALES
 
-				 . "</div>" // card-body
-				 . "</div>" // card
-				 . "</div>" // col-md-12
-
-				. "<div class='col-md-7'>"
-				 . "<div class='card' style='margin-bottom: 0px !important;'>"
-                 . "<div class='card-body'>"
-                 . "<h3><strong>TOP ITEMS</strong></h3>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<h3><strong>TOP ITEMS</strong></h3>"
                  . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 foreach ($topitem as $key) {
 				 	$pesan .= "<tr>"
 						 . "<td width='20'>".$no++.".</td>"
 						 . "<td width='50%'>$key->produk_nm</td>"
-						 . "<td width='20'>$key->totalqty X</td>"
+						 . "<td width='50'>$key->totalqty X</td>"
 						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
 						 . "</tr>";
 				}
 				 
 
 			$pesan .= "</tbody>"
-				 . "</table>"
-				 . "</div>" // card-body
+				 . "</table>" // TOP ITEMS
 
+				 
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-5
+
+				. "<div class='col-md-7'>"
+				 . "<div class='card' style='margin-bottom: 0px !important;'>"
 				 . "<div class='card-body'>" // card-body paypaln
-				 . "<h3><strong>PAYMENT</strong></h3>"
 				 . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<h3><strong>EDC</strong></h3>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
-				 foreach ($toppayplan as $payplan) {
+				 foreach ($edc as $kedc) {
 					 	$pesan .= "<tr>"
 							 . "<td width='20'>".$nopayplan++.".</td>"
-							 . "<td width='50%'>$payplan->payplan_nm</td>"
-							 . "<td align='right'>$payplan->totalpayplan</td>"
-							 . "<td align='right'>Rp. ".number_format($payplan->ttlamount)."</td>"
+							 . "<td width='50%'>$kedc->payplan_nm</td>"
+							 . "<td>$kedc->totalpayplan</td>"
+							 . "<td align='right'>Rp. ".number_format($kedc->ttlamount)."</td>"
 							 . "</tr>";
 					}
 				 
 
 			$pesan .= "</tbody>"
+				 . "</table>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<h3><strong>TUNAI</strong></h3>"
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($tunai as $ktunai) {
+					 	$pesan .= "<tr>"
+							 . "<td width='50%'>$ktunai->payplan_nm</td>"
+							 . "<td>$ktunai->totalpayplan</td>"
+							 . "<td align='right'>Rp. ".number_format($ktunai->ttlamount)."</td>"
+							 . "</tr>";
+					}
+				 
+
+			$pesan .= "<tr>"
+				 . "<td width='50%'>MODAL</td>"
+				 . "<td align='right'> : </td>"
+				 . "<td align='right'>Rp. ".number_format($kasir_status[0]->modal)."</td>"
+				 . "</tr>"
+				 . "<tr>"
+				 . "<td width='50%' style='font-weight:bold; border-top: 1px solid #000;'>TOTAL CASH COLLECTED</td>"
+				 . "<td align='right'> : </td>"
+				 . "<td align='right' style='font-weight:bold; border-top: 1px solid #000;'>Rp. ".number_format($kasir_status[0]->modal + $ktunai->ttlamount)."</td>"
+				 . "</tr>"
+				 . "</tbody>"
 				 . "</table>"
 				 . "</div>" // card-body paypaln
 
@@ -1323,45 +1391,43 @@ class Kasir extends BaseController
 				 . "</div>" // col-md-12
 				 . "</div>"; // row
 
-	   	$email->setTo('Donyk@lavitabella.co.id');
-		$email->setFrom('lavitabellakasir@gmail.com','REPORT MAIL');
+	   	$email->setTo('harrypurmanta@gmail.com');
+		$email->setFrom('lavitabellakasir@gmail.com','MAIL REPORT');
 		$email->setSubject('SALES REPORT '.$closed_dttm);
 		$email->setMessage($pesan);
-		$email->send();
-		echo $email->printDebugger(['headers']);
+		$sendit = $email->send();
+		
+    		$cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
+	    	$jam = date('H:i:s');
+	    	if (count($cekunclosed)>0) {
+	    		$ret = "belumfinish";
+	    	} else {
 
+	    		$datastatuskasir = [
+					'status_cd' => 'closed',
+					'closed_dttm' => $closed_dttm.' '.$jam,
+					'closed_user' => $this->session->user_id,
+	 			];
 
-    	$getlastkasirstatus = $this->billingmodel->getStatuskasir()->getResult();
-    	$cekunclosed = $this->billingmodel->getbyunclosed()->getResult();
-    	$jam = date('H:i:s');
-    	if (count($cekunclosed)>0) {
-    		$ret = "belumfinish";
-    	} else {
-    		$closed_dttm = $this->request->getPost('closed_dttm');
-			$kasir_status_id = $getlastkasirstatus[0]->kasir_status_id;
+	 			$data = [
+				  'status_cd' => 'closed',
+				  'closed_dttm' => $closed_dttm.' '.$jam,
+				  'closed_user' => $this->session->user_id,
+				];
 
-			$datastatuskasir = [
-				'status_cd' => 'closed',
-				'closed_dttm' => date('Y-m-d H:i:s'),
-				'closed_user' => $this->session->user_id,
- 			];
+	    		if ($checkprint == "true") {
+		    		$ret = $this->cetakPrintclosekasir($kasir_status_id,$kasir_status[0]->modal);
+		    		$this->billingmodel->updatestatuskasir($kasir_status_id,$datastatuskasir);
+		    		$this->billingmodel->closedkasir($kasir_status_id,$data);
+		    	} else {
+		    		$this->billingmodel->updatestatuskasir($kasir_status_id,$datastatuskasir);
+		    		$this->billingmodel->closedkasir($kasir_status_id,$data);
+		    	}
 
-			$this->billingmodel->updatestatuskasir($getlastkasirstatus[0]->kasir_status_id,$datastatuskasir);
-
-	    	$data = [
-			  'status_cd' => 'closed',
-			  'closed_dttm' => $closed_dttm.' '.$jam,
-			  'closed_user' => $this->session->user_id,
-			];
-			$res = $this->billingmodel->closedkasir($getlastkasirstatus[0]->kasir_status_id,$data);
-			if ($res) {
-				$ret = "true";
-				$this->reportTopdf($closed_dttm);
-			} else {
-				$ret = "false";
-			}
-    	}
-		return $ret;
+		    	$this->reportTopdf($closed_dttm);
+	    	}
+	    	echo $ret;
+		
     }
 
 
@@ -2012,6 +2078,95 @@ class Kasir extends BaseController
 			}
 		} else {
 			return 'false';
+		}
+	}
+
+	public function cetakPrintclosekasir($kasir_status_id,$modal) {
+    	$topitem = $this->billingmodel->getTopitem($kasir_status_id)->getResult();
+    	$edc = $this->billingmodel->getPayplanEdc($kasir_status_id)->getResult();
+    	$tunai = $this->billingmodel->getPayplanTunai($kasir_status_id)->getResult();
+    	$getReport = $this->billingmodel->getReport($kasir_status_id)->getResult();
+    	$getVoid = $this->billingmodel->getVoid($kasir_status_id)->getResult();
+    	$qtyvoid = count($getVoid);
+    	$ttlvoid = 0;
+    	if ($qtyvoid > 0) {
+    		foreach ($getVoid as $void) {
+    			$ttlvoid = $ttlvoid + $void->totalvoid;
+    		}
+    	}
+    	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+    	$date = date('Y-m-d H:i:s');
+
+		
+		if (count($getReport)>0) {
+    		$this->profile = CapabilityProfile::load("POS-5890");
+    		$this->connector = new RawbtPrintConnector();
+    		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
+    
+    		$this->printer = new Printer($this->connector);
+    		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+    		// Make sure you load a Star print connector or you may get gibberish.
+    		try {
+    
+    		    /* Information for the receipt */
+    		    /* Date is kept the same for testing */
+    		$date = date('Y-m-d H:i');
+    		    /* Items */
+    		    $this->printer->feed(1);
+    		  	$this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->setTextSize(2, 2);
+    		    $this->printer->text("SALES REPORT"."\n");
+			    $this->printer->selectPrintMode();
+			    $this->printer->setTextSize(1, 1);
+			    $this->printer->feed();
+    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->feed(2);
+    		    $this->printer->text("SALES"."\n");
+    		    $this->printer->text("--------------------------------\n");
+
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->setEmphasis(true);
+    		    $this->printer->text($this->buatBaris4Kolom("Gross Sales",":",number_format($getReport[0]->grosssales)));
+    		    $this->printer->text($this->buatBaris4Kolom("Discounts",":",number_format($getReport[0]->grosssales)));
+    		    $this->printer->text($this->buatBaris4Kolom("Net Sales",":",number_format($netsales)));
+    		    $this->printer->text($this->buatBaris4Kolom("Service",":",number_format($getReport[0]->totalservice)));
+    		    $this->printer->text($this->buatBaris4Kolom("Tax",":",number_format($getReport[0]->totaltax)));
+    		    $this->printer->text($this->buatBaris4Kolom("Void".$qtyvoid.")",":",number_format($ttlvoid)));
+
+    		    $this->printer->feed();
+    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->feed(2);
+    		    $this->printer->text("EDC"."\n");
+    		    $this->printer->text("--------------------------------\n");
+    		    foreach ($edc as $kedc) {
+    		    	$this->printer->text($this->buatBaris4Kolom($kedc->payplan_nm,$kedc->totalpayplan,number_format($kedc->ttlamount)));
+    		    }
+
+    		    $this->printer->feed();
+    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->feed(2);
+    		    $this->printer->text("TUNAI"."\n");
+    		    $this->printer->text("--------------------------------\n");
+    		    foreach ($tunai as $ktunai) {
+    		    	$this->printer->text($this->buatBaris4Kolom($ktunai->payplan_nm,$ktunai->totalpayplan,number_format($ktunai->ttlamount)));
+    		    }
+    		    $this->printer->text($this->buatBaris4Kolom("MODAL",":",number_format($modal)));
+    		    $this->printer->text($this->buatBaris4Kolom("TOTAL CASH COLLECTED",":",number_format($modal + $ktunai->ttlamount)));
+
+    		    $this->printer->setEmphasis(false);
+    		    $this->printer->text($date);
+    		    $this->printer->setEmphasis(false);
+    		    $this->printer->feed(2);
+    		} catch (Exception $e) {
+    		    echo $e->getMessage();
+    		} finally {
+    		    $this->printer->close();
+    		}
+    		
+		} else {
+		    echo json_encode(false);
 		}
 	}
 
