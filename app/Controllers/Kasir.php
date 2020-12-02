@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -1071,6 +1071,7 @@ class Kasir extends BaseController
 
     public function closekasir() {
     	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
+    	echo json_encode($kasir_status);exit;
     	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
     	$toppayplan = $this->billingmodel->getPayplan($kasir_status[0]->kasir_status_id)->getResult();
     	$getReport = $this->billingmodel->getReport($kasir_status[0]->kasir_status_id)->getResult();
@@ -1103,7 +1104,7 @@ class Kasir extends BaseController
 	            . "</div>"
 	            . "<div class='modal-body'>"
 	            . "<div class='row'>"
-				 . "<div class='col-5'>"
+				 . "<div class='col-md-5'>"
 				 . "<div class='card'>"
                  . "<div class='card-body'>"
                  . "<h3><strong>SALES</strong></h3>"
@@ -1208,6 +1209,7 @@ class Kasir extends BaseController
     }
 
      public function simpanclosekasir() {
+     	$closed_dttm = $this->request->getPost('closed_dttm');
     	$email = \Config\Services::email();
     	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
     	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
@@ -1321,9 +1323,9 @@ class Kasir extends BaseController
 				 . "</div>" // col-md-12
 				 . "</div>"; // row
 
-	   	$email->setTo('harrypurmanta@gmail.com');
-		$email->setFrom('lavitabellakasir@gmail.com');
-		$email->setSubject('testing send email');
+	   	$email->setTo('Donyk@lavitabella.co.id');
+		$email->setFrom('lavitabellakasir@gmail.com','REPORT MAIL');
+		$email->setSubject('SALES REPORT '.$closed_dttm);
 		$email->setMessage($pesan);
 		$email->send();
 		echo $email->printDebugger(['headers']);
