@@ -570,7 +570,7 @@ class Kasir extends BaseController
 	public function showpindahmeja() {
 		$billing_id = $this->request->getPost('billing_id');
 		$meja_id = $this->request->getPost('meja_id');
-		
+
 	}
 
 	public function updateqty() {
@@ -1073,6 +1073,15 @@ class Kasir extends BaseController
     	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
     	$toppayplan = $this->billingmodel->getPayplan($kasir_status[0]->kasir_status_id)->getResult();
     	$getReport = $this->billingmodel->getReport($kasir_status[0]->kasir_status_id)->getResult();
+    	$getVoid = $this->billingmodel->getVoid($kasir_status[0]->kasir_status_id)->getResult();
+    	$qtyvoid = count($getVoid);
+    	$ttlvoid = 0;
+    	if ($qtyvoid > 0) {
+    		foreach ($getVoid as $void) {
+    			$ttlvoid = $ttlvoid + $void->totalvoid;
+    		}
+    	}
+    	
     	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
 		$ret = "";
 		$no = 1;
@@ -1118,6 +1127,24 @@ class Kasir extends BaseController
 						 . "<td width='150'>Net Sales</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($netsales)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Service</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->totalservice)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Tax</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->totaltax)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Void (".$qtyvoid.")</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($ttlvoid)."</td>"
 						 . "</tr>";
 				 
 

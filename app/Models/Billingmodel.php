@@ -243,10 +243,26 @@ class Billingmodel extends Model
 
     public function getReport($kasir_status_id) {
         return $this->db->table('billing')
-                        ->select('SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount')
+                        ->select('SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount, SUM(tax) AS totaltax, SUM(service) AS totalservice')
                         ->where('status_cd','finish')
                         ->where('kasir_status_id',$kasir_status_id)
                         ->get();
+    }
+
+    public function getVoid($kasir_status_id) {
+        return $this->db->query("SELECT billing_id as bill_id, (SELECT SUM(price) FROM billing_item WHERE billing_id=bill_id AND status_cd='nullified') AS totalvoid FROM billing WHERE status_cd = 'nullified' AND kasir_status_id='$kasir_status_id'");
+
+
+
+
+        // return $this->db->table('billing a')
+        //                 ->select('COUNT(a.billing_id) as qtyvoid, SUM(b.price) as totalvoid')
+        //                 ->join('billing_item b','b.billing_id=a.billing_id','left')
+        //                 ->where('a.status_cd','nullified')
+        //                 ->where('b.status_cd','nullified')
+        //                 ->where('a.kasir_status_id',$kasir_status_id)
+        //                 // ->groupby('a.billing_id')
+        //                 ->get();
     }
 
     public function getTopitem($kasir_status_id) {
