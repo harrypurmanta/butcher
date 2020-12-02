@@ -1071,7 +1071,7 @@ class Kasir extends BaseController
 
     public function closekasir() {
     	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
-    	echo json_encode($kasir_status);exit;
+    	// echo json_encode($kasir_status);exit;
     	$topitem = $this->billingmodel->getTopitem($kasir_status[0]->kasir_status_id)->getResult();
     	$toppayplan = $this->billingmodel->getPayplan($kasir_status[0]->kasir_status_id)->getResult();
     	$getReport = $this->billingmodel->getReport($kasir_status[0]->kasir_status_id)->getResult();
