@@ -192,7 +192,7 @@ class Billingmodel extends Model
     public function getVoidbill($closed_dttm) {
         return $this->db->table('billing')
                         ->selectCount('billing_id')
-                        ->where('status_cd','nullified')
+                        ->where('status_cd','cancel')
                         ->where('closed_dttm >=',$closed_dttm.' 00:00:00')
                         ->where('closed_dttm <=',$closed_dttm.' 59:23:23')
                         ->get();
@@ -209,6 +209,7 @@ class Billingmodel extends Model
 
     public function getbyfinish() {
         return $this->db->table('billing a')
+                        ->select('*, a.status_cd as statusbilling')
                         ->join('billing_item b','b.billing_id=a.billing_id','left')
                         ->join('produk c','c.produk_id=b.produk_id','left')
                         ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
@@ -217,7 +218,7 @@ class Billingmodel extends Model
                         ->join('person g','g.person_id=e.person_id','left')
                         ->join('person h','h.person_id=a.verified_user','left')
                         ->join('payplan i','i.payplan_id=a.payplan_id','left')
-                        ->where('a.status_cd','finish')
+                        ->whereIn('a.status_cd',['finish','cancel'])
                         ->where('b.status_cd','normal')
                         ->orderby('a.billing_id','DESC')
                         ->groupby('a.billing_id')
@@ -250,19 +251,7 @@ class Billingmodel extends Model
     }
 
     public function getVoid($kasir_status_id) {
-        return $this->db->query("SELECT billing_id as bill_id, (SELECT SUM(price) FROM billing_item WHERE billing_id=bill_id AND status_cd='nullified') AS totalvoid FROM billing WHERE status_cd = 'nullified' AND kasir_status_id='$kasir_status_id'");
-
-
-
-
-        // return $this->db->table('billing a')
-        //                 ->select('COUNT(a.billing_id) as qtyvoid, SUM(b.price) as totalvoid')
-        //                 ->join('billing_item b','b.billing_id=a.billing_id','left')
-        //                 ->where('a.status_cd','nullified')
-        //                 ->where('b.status_cd','nullified')
-        //                 ->where('a.kasir_status_id',$kasir_status_id)
-        //                 // ->groupby('a.billing_id')
-        //                 ->get();
+        return $this->db->query("SELECT billing_id as bill_id, (SELECT SUM(price) FROM billing_item WHERE billing_id=bill_id AND status_cd='cancel') AS totalvoid FROM billing WHERE status_cd = 'cancel' AND kasir_status_id='$kasir_status_id'");
     }
 
     public function getTopitem($kasir_status_id) {
@@ -308,6 +297,14 @@ class Billingmodel extends Model
                         ->get();
     }
 
+    public function getCountitem($billing_id) {
+        return $this->db->table('billing_item')
+                        ->select('COUNT(billing_item_id) as jumlahitem')
+                        ->where('status_cd','normal')
+                        ->where('billing_id',$billing_id)
+                        ->get();
+    }
+
     public function simpanopenkasir($data) {
         $this->db->table('kasir_status')
                         ->insert($data);
@@ -321,18 +318,29 @@ class Billingmodel extends Model
 
     }
 
+     public function insertbilldisct($data) {
+        return $this->db->table('billing_discount')
+                    ->insert($data);
+    }
+
+    public function insertpoin($data) {
+        return $this->db->table('member_poin')
+                        ->insert($data);
+    }
+
+    public function insertbillmember($id,$data) {
+        return $this->db->table('billing')
+                        ->set($data)
+                        ->where('billing_id',$id)
+                        ->update();
+    }
+
     public function simpanbillitem($data) {
     	$builder = $this->db->table('billing_item');
         return $builder->insert($data);
     }
 
-    public function getCountitem($billing_id) {
-        return $this->db->table('billing_item')
-                        ->select('COUNT(billing_item_id) as jumlahitem')
-                        ->where('status_cd','normal')
-                        ->where('billing_id',$billing_id)
-                        ->get();
-    }
+    
 
     public function updatepindahmeja($data,$billing_id,$old_meja_id,$kasir_status_id) {
         return $this->db->table('billing')
@@ -355,6 +363,35 @@ class Billingmodel extends Model
         $query->set('status_cd','nullified');
         $query->where('billing_id',$id);
         return $query->update();
+    }
+
+    public function setcancelitemByid($id){
+        return $this->db->table('billing_item')
+                        ->set('status_cd','cancel')
+                        ->where('billing_item_id',$id)
+                        ->update();
+    }
+
+
+    public function cancelItembybillId($id,$dataitem){
+        return $this->db->table('billing_item')
+                        ->set($dataitem)
+                        ->where('billing_id',$id)
+                        ->update();
+    }
+
+    public function confirmbatalbilling($billing_id,$databill){
+        return $this->db->table('billing')
+                        ->set($databill)
+                        ->where('billing_id',$billing_id)
+                        ->update();
+    }
+
+    public function cancelDiskonbybillId() {
+        return $this->db->table('billing_discount')
+                        ->set($datadiskon)
+                        ->where('billing_id',$id)
+                        ->update();
     }
 
     public function setnormalitem($id){
@@ -385,22 +422,7 @@ class Billingmodel extends Model
         return $query->update();
     }
 
-    public function insertbilldisct($data) {
-        return $this->db->table('billing_discount')
-                    ->insert($data);
-    }
-
-    public function insertpoin($data) {
-        return $this->db->table('member_poin')
-                        ->insert($data);
-    }
-
-    public function insertbillmember($id,$data) {
-        return $this->db->table('billing')
-                        ->set($data)
-                        ->where('billing_id',$id)
-                        ->update();
-    }
+   
 
     public function updateqty($id,$data) {
         return $this->db->table('billing_item')

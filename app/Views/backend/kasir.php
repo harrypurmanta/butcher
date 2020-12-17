@@ -47,24 +47,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="modaltambahmember" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-                        </div>
                     </div>
             </div>
             <div class="d-none" id='loader-wrapper'>
                 <div class="loader"></div>
             </div>
-            <div id="responsive-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+             <div id="modaltambahmember" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+            </div>
+             <div id="responsive-modal" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
                               
             </div>
-            
             <!-- ============================================================== -->
             <!-- End Container fluid  -->
             <!-- ============================================================== -->
             <!-- ============================================================== -->
             <script src="../assets/plugins/jquery/jquery.min.js"></script>
             <script src="../assets/plugins/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
-    <script src="../assets/plugins/bootstrap-select/bootstrap-select.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="../assets/plugins/multiselect/js/jquery.multi-select.js"></script>
             <!-- <script src="../assets/js/perfect-scrollbar.jquery.min.js"></script> -->
 <script type="text/javascript">
@@ -113,8 +111,8 @@ function closekasir() {
     },
      success:function(data){
       $("#loader-wrapper").addClass("d-none");
-      $('#modaltambahmember').html(data);
-      $('#modaltambahmember').modal('show');
+      $('#responsive-modal').html(data);
+      $('#responsive-modal').modal('show');
     },
     error:function(){
         Swal.fire({
@@ -1482,15 +1480,38 @@ function removeitem(meja_id,id,billing_id,btn) {
   }).then((result) => {
       if (result.value == true) {
         $.ajax({
-         url : "<?= base_url('kasir/setnullifieditem')?>",
+         url : "<?= base_url('kasir/setcancelitem')?>",
          type : "POST",
          data : {'value':id,billing_id:billing_id},
          beforeSend: function () { 
             $("#loader-wrapper").removeClass("d-none");
          },
-         success:function(){
+         success:function(data){
+          if (data == "true") {
+            Swal.fire({
+                title:"Berhasil!",
+                text:"Data Berhasil di VOID!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+            showbillingbymeja(meja_id);
+          } else if (data == "false") {
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal di VOID!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+            showbillingbymeja(meja_id);
+          } else {
+            $('#responsive-modal').html(data);
+            $('#responsive-modal').modal('show');
+          }
             $("#loader-wrapper").addClass("d-none");
-          showbillingbymeja(meja_id);
         },
         error:function(){
           Swal.fire(
@@ -1574,7 +1595,7 @@ function minusitem(value){
         }).then((result) => {
             if (result.value == true) {
               $.ajax({
-               url : "<?= base_url('kasir/setnullifieditem')?>",
+               url : "<?= base_url('kasir/setcancelitem')?>",
                type : "POST",
                data : {'value':value},
                beforeSend: function () { 
@@ -1620,6 +1641,123 @@ function minusitem(value){
         });
     }
 };
+
+function batalbilling(billing_id,btn) {
+  $.ajax({
+       url : "<?= base_url('kasir/showbatalbilling') ?>",
+       type: "post",
+       data: {billing_id:billing_id},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+       },
+       success:function(data){
+        $('#responsive-modal').html(data);
+        $('#responsive-modal').modal('show');
+        $("#loader-wrapper").addClass("d-none");
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+
+  });
+}
+
+
+function confirmbatalbilling(billing_id,btn){
+  var alasanvoid = $('#alasanvoid').val();
+  var description = $('#description').val();
+  if (alasanvoid == "") {
+    Swal.fire({
+        title:"HARUS PILIH ALASAN !",
+        text:"alasan wajib dipilih!",
+        type:"warning",
+        showCancelButton:0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else {
+    b = $(btn);
+    b.attr('data-old', b.text());
+    b.text('wait . . .');
+    Swal.fire({
+        title: 'Yakin void billing ini ?',
+        text: "Data tidak bisa dikembalikan lagi . . .",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yakin'
+    }).then((result) => {
+        if (result.value == true) {
+          $.ajax({
+           url : "<?= base_url('kasir/confirmbatalbilling')?>",
+           type : "POST",
+           data : {billing_id:billing_id,alasanvoid:alasanvoid,description:description},
+           beforeSend: function () { 
+              $("#loader-wrapper").removeClass("d-none");
+           },
+           success:function(data){
+            if (data == "true") {
+              Swal.fire({
+                  title:"SUKSES!",
+                  text:"Data Berhasil di VOID!",
+                  type:"success",
+                  showCancelButton:0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              })
+            } else if (data == "gagalcancelitem") {
+              Swal.fire({
+                  title:"GAGAL !",
+                  text:"Data item Gagal di VOID!",
+                  type:"warning",
+                  showCancelButton:0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              })
+            } else if (data == "gagalcancelbilling") {
+              Swal.fire({
+                  title:"GAGAL !",
+                  text:"Data billing Gagal di VOID!",
+                  type:"warning",
+                  showCancelButton:0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              })
+            } else if (data == "gagalcanceldiskon") {
+              Swal.fire({
+                  title:"GAGAL !",
+                  text:"Data Diskon Gagal di VOID!",
+                  type:"warning",
+                  showCancelButton:0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              })
+            }
+            listmejakasir();
+            $('#responsive-modal').modal('hide');
+            $("#loader-wrapper").addClass("d-none");
+          },
+            error:function(){
+              Swal.fire(
+                'Gagal!',
+                'Silahkan Coba Lagi.',
+                'warning'
+              )
+            }
+          });
+        }
+        b.text(b.attr('data-old'));
+     });
+  }
+}
 
 </script>
 

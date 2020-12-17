@@ -680,7 +680,6 @@ class Meja extends BaseController {
 
 	public function cancelbilling(){
 		$id = $this->request->getPost('id');
-
 		$res = $this->billingmodel->batalbilling($id);
 		if ($res) {
 			return 'true';

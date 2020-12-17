@@ -140,6 +140,136 @@ class Kasir extends BaseController
 		return $ret;
 	}
 
+	public function setcancelitem(){
+		$id = $this->request->getPost('value');
+		$billing_id = $this->request->getPost('billing_id');
+		$data = $this->billingmodel->getCountitem($billing_id)->getResult();
+		if ($data[0]->jumlahitem <= "1") {
+
+			$ret = "<div class='modal-dialog'>
+                   <div class='modal-content'>
+                       <div class='modal-header'>
+                       <h4 class='modal-title'>Alasan Void</h4>
+                           <button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>
+                       </div>
+                       <div class='modal-body'>
+                           <form>
+                               <div class='form-group'>
+                                   <label for='recipient-name' class='control-label'><b>Alasan Void :</b></label>
+                                   <select class='form-control' id='alasanvoid'>
+                                   <option value=''> -- pilih alasan -- </option>
+                                   <option value='training'> Training </option>
+                                   <option value='guestrequest'> Guest request </option>
+                                   <option value='outofstock'> Out of stock </option>
+                                   <option value='others'> Others </option>
+                                   </select>
+                               </div>
+                               <div class='form-group'>
+                                   <label for='message-text' class='control-label'><b>Catatan :</b></label>
+                                   <textarea class='form-control' id='description'></textarea>
+                               </div>
+                           </form>
+                       </div>
+                       <div class='modal-footer'>
+                           <button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>
+                           <button onclick='confirmbatalbilling($billing_id,this)' type='button' class='btn btn-danger waves-effect waves-light'>Save Void</button>
+                       </div>
+                   </div>
+               </div>";
+
+
+		return $ret;
+			
+		} else {
+			$ressetcancelitemByid = $this->billingmodel->setcancelitemByid($id);
+			if ($ressetcancelitemByid) {
+				return "true";
+			} else {
+				return "false";
+			}
+		}
+		
+	}
+
+	public function showbatalbilling() {
+		$billing_id = $this->request->getPost('billing_id');
+		$ret = "<div class='modal-dialog'>
+                   <div class='modal-content'>
+                       <div class='modal-header'>
+                       <h4 class='modal-title'>Alasan Void</h4>
+                           <button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>
+                       </div>
+                       <div class='modal-body'>
+                           <form>
+                               <div class='form-group'>
+                                   <label for='recipient-name' class='control-label'><b>Alasan Void :</b></label>
+                                   <select class='form-control' id='alasanvoid'>
+                                   <option value=''> -- pilih alasan -- </option>
+                                   <option value='training'> Training </option>
+                                   <option value='guestrequest'> Guest request </option>
+                                   <option value='outofstock'> Out of stock </option>
+                                   <option value='others'> Others </option>
+                                   </select>
+                               </div>
+                               <div class='form-group'>
+                                   <label for='message-text' class='control-label'><b>Catatan :</b></label>
+                                   <textarea class='form-control' id='description'></textarea>
+                               </div>
+                           </form>
+                       </div>
+                       <div class='modal-footer'>
+                           <button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>
+                           <button onclick='confirmbatalbilling($billing_id,this)' type='button' class='btn btn-danger waves-effect waves-light'>Confirm Void</button>
+                       </div>
+                   </div>
+               </div>";
+        return $ret;
+	}
+
+	public function confirmbatalbilling() {
+		$billing_id = $this->request->getPost('billing_id');
+		$alasanvoid = $this->request->getPost('alasanvoid');
+		$description = $this->request->getPost('description');
+		$databill = [
+			'alasanvoid' => $alasanvoid,
+			'description' => $description,
+			'status_cd' => 'cancel',
+			'member_id' => 0,
+			'nullified_dttm' => date('Y-m-d H:i:s'),
+			'nullified_user' => $this->session->user_id
+		];
+
+		$cancelbilling = $this->billingmodel->confirmbatalbilling($billing_id,$databill);
+		if ($cancelbilling) {
+			$dataitem = [
+				'status_cd' => 'cancel',
+				'nullified_dttm' => date('Y-m-d H:i:s'),
+				'nullified_user' => $this->session->user_id
+			];
+
+			$cancelitem = $this->billingmodel->cancelItembybillId($billing_id,$dataitem);
+			if ($cancelitem) {
+				$datadiskon = [
+					'status_cd' => 'cancel',
+					'nullified_dttm' => date('Y-m-d H:i:s'),
+					'nullified_user' => $this->session->user_id
+				];
+				$canceldiskon = $this->billingmodel->cancelDiskonbybillId($billing_id,$datadiskon);
+				if ($canceldiskon) {
+					$ret = "true";
+				} else {
+					$ret = "gagalcancelitem";
+				}
+			} else {
+				$ret = "gagalcancelitem";
+			}
+		} else {
+			$ret = "gagalcancelbilling";
+		}
+
+		return $ret;
+	}
+
 	public function clickmejabutton() {
 		$id = $this->request->getPost('id');
 		$res = $this->billingmodel->getbyMejaidkasir($id)->getResult();
@@ -165,13 +295,9 @@ class Kasir extends BaseController
 			$ret = "<div><div class='row col-md-12 m-0' id='div-item'>
 					<input type='hidden' id='meja_id' value='$id'/>
 					<input type='hidden' id='billing_id' value='$billing_id'/>
-						<!-- <div class='col-md-12 m-0 text-center' align='center' style='margin-top: 30px;'>
-							
-								<p style='font-size: 16px;margin-block-end: -5px;'>Butcher Steak & Pasta Palembang</p>
-								<p style='font-size: 16px;margin-block-end: -5px;'>Jl. AKBP Cek Agus No. 284, Palembang</p>
-								<p style='font-size: 16px;margin-block-end: -5px;'>Sumatera Selatan, 30114, 07115626366</p>
-							
-						</div> -->
+						<div class='col-md-12' align='left' style='margin-bottom:20px;'>
+							<button onclick='batalbilling($billing_id,this)' class='btn btn-danger waves-effect waves-light' type='button'>Void Billing</button>
+						</div>
 					</div>";
 			$ret .= "<div class='row col-md-12 m-0'>
 					  <table width='100%' style='font-size: 18px;'>
@@ -181,7 +307,7 @@ class Kasir extends BaseController
 				        </tr>
 				        <tr>
 				          <td align='left'>Bill Name</td>
-				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-danger waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
+				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-warning waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
 				        </tr>
 				        <tr>
 				          <td align='left'>Collected By</td>
@@ -394,13 +520,9 @@ class Kasir extends BaseController
 			$ret = "<div><div class='row col-md-12 m-0' id='div-item'>
 					<input type='hidden' id='meja_id' value='$id'/>
 					<input type='hidden' id='billing_id' value='$billing_id'/>
-						<!-- <div class='col-md-12 m-0 text-center' align='center' style='margin-top: 30px;'>
-							
-								<p style='font-size: 16px;margin-block-end: -5px;'>Butcher Steak & Pasta Palembang</p>
-								<p style='font-size: 16px;margin-block-end: -5px;'>Jl. AKBP Cek Agus No. 284, Palembang</p>
-								<p style='font-size: 16px;margin-block-end: -5px;'>Sumatera Selatan, 30114, 07115626366</p>
-							
-						</div> -->
+						<div class='col-md-12' align='left' style='margin-bottom:20px;'>
+							<button onclick='batalbilling($billing_id,this)' class='btn btn-danger waves-effect waves-light' type='button'>Void Billing</button>
+						</div>
 					</div>";
 			$ret .= "<div class='row col-md-12 m-0'>
 					  <table width='100%' style='font-size: 18px;'>
@@ -453,7 +575,7 @@ class Kasir extends BaseController
 				
 				$ret .= "<tr>
 				        <td colspan='3' align='left' style='font-weight: bold;font-size: 20px;'>
-				            <span>$key->produk_nm <a style='float: right;' onclick='removeitem($id,$key->billing_item_id,$billing_id,this)'><i style='color:red;' class='fas fa-times'></i></a></span>
+				            <span>".strtoupper($key->produk_nm)." <a style='float: right;' onclick='removeitem($id,$key->billing_item_id,$billing_id,this)'><i style='color:red;' class='fas fa-times'></i></a></span>
 				          </td>
 				        </tr>
 				        <tr style='font-size: 18px;'>
@@ -589,28 +711,7 @@ class Kasir extends BaseController
 		
 	}
 
-	public function setnullifieditem(){
-		$id = $this->request->getPost('value');
-		$billing_id = $this->request->getPost('billing_id');
-		$data = $this->billingmodel->getCountitem($billing_id)->getResult();
-		if ($data[0]->jumlahitem <= "1") {
-			$res = $this->billingmodel->setnullifiedbilling($billing_id);
-			if ($res) {
-				$res = $this->billingmodel->setnullifieditem($id);
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			$res = $this->billingmodel->setnullifieditem($id);
-			if ($res) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-	}
+
 
 	public function showpindahmeja() {
 		$billing_id = $this->request->getPost('billing_id');
@@ -939,24 +1040,32 @@ class Kasir extends BaseController
 				 . "<div class='col-md-12'>"
 				 . "<div class='card'>"
                  . "<div class='card-body'>"
-				 . "<table width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<table width='100%' data-toggle='table' data-height='350' data-mobile-responsive='true' class='table-striped'>"
 				 . "<thead>"
 				 . "<tr>"
 				 . "<th>No.</th>"
 				 . "<th>Billing Kode</th>"
 				 . "<th>Meja</th>"
+				 . "<th>Petugas</th>"
 				 . "<th>Grand Total</th>"
 				 . "<th>Cetak Payments</th>"
 				 . "</tr>"
 				 . "</thead>"
 				 . "<tbody>";
 				 foreach ($history as $key) {
+				 	if ($key->statusbilling == "finish") {
+				 		$button = "<button onclick='cetakulangcheckout($key->meja_id,$key->billing_id,this)' class='btn btn-info'>Cetak Payments</button>";
+				 	} else if ($key->statusbilling == "cancel") {
+				 		$button = "<button class='btn btn-danger'>Void</button>";
+				 	}
+
 				 	$ret .= "<tr>"
 						 . "<td>".$no++."</td>"
 						 . "<td>$key->billing_cd</td>"
 						 . "<td>MEJA - $key->meja_nm</td>"
+						 . "<td>$key->collected_user</td>"
 						 . "<td>".number_format($key->ttl_amount)."</td>"
-						 . "<td><button onclick='cetakulangcheckout($key->meja_id,$key->billing_id,this)' class='btn btn-info'>Cetak Payments</button></td>"
+						 . "<td>$button</td>"
 						 . "</tr>";
 				 }
 
@@ -1150,6 +1259,7 @@ class Kasir extends BaseController
 	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
 	            . "</div>"
 	            . "<div class='modal-body'>"
+	            . "<div class='col-md-12'>"
 	            . "<div class='row'>"
 				 . "<div class='col-md-5'>"
 				 . "<div class='card'>"
@@ -1218,7 +1328,7 @@ class Kasir extends BaseController
 
 				 . "</div>" // card-body
 				 . "</div>" // card
-				 . "</div>" // col-md-12
+				 . "</div>" // col-md-5
 
 				. "<div class='col-md-7'>"
 				 . "<div class='card' style='margin-bottom: 0px !important;'>"
@@ -1272,8 +1382,9 @@ class Kasir extends BaseController
 				 . "</table>"
 				 . "</div>" // card-body paypaln
 				 . "</div>" // card
-				 . "</div>" // col-md-12
+				 . "</div>" // col-md-7
 				 . "</div>" // row
+				 . "</div>" // col-md-12
 	            . "</div>"
 	            . "<div class='modal-footer'>"
 	            
@@ -1662,7 +1773,7 @@ class Kasir extends BaseController
 		$di = $this->request->getPost('di');
 
 		$data = [
-			'status_cd' => 'nullified',
+			'status_cd' => 'cancel',
 			'nullified_dttm' => date('Y-m-d H:i:s'),
 			'nullified_user' => $this->session->user_id
 		];
@@ -1679,7 +1790,7 @@ class Kasir extends BaseController
 		$di = $this->request->getPost('di');
 
 		$data = [
-			'status_cd' => 'nullified',
+			'status_cd' => 'cancel',
 			'nullified_dttm' => date('Y-m-d H:i:s'),
 			'nullified_user' => $this->session->user_id
 		];
