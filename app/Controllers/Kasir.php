@@ -2434,7 +2434,6 @@ class Kasir extends BaseController
     		$date = date('Y-m-d H:i');
     		   
     		    /* Items */
-    		    $this->printer->feed(5);
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
@@ -2456,7 +2455,7 @@ class Kasir extends BaseController
     		    $this->printer->setEmphasis(false);
     		    $this->printer->text("--------------------------------\n");
     		    $this->printer->setEmphasis(false);
-    		    $this->printer->feed(7);
+    		    $this->printer->feed(2);
     			
     		    /* Cut the receipt and open the cash drawer */
     		    // $this->printer->cut();
