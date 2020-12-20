@@ -33,6 +33,8 @@ class Login extends BaseController
 		  	return redirect('dashboard');
 		  } else if ($this->session->user_group == 'kasir') {
 		  	return redirect('kasir');
+		  } else if ($this->session->user_group == 'manajer') {
+		  	return redirect('dashboard');
 		  } else {
 		  	return redirect('/');
 		  }

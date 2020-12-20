@@ -141,49 +141,27 @@ class Kasir extends BaseController
 	}
 
 	public function setcancelitem(){
-		$id = $this->request->getPost('value');
+		$billing_item_id = $this->request->getPost('billing_item_id');
 		$billing_id = $this->request->getPost('billing_id');
+		$voidcause = $this->request->getPost('voidcause');
+		$description = $this->request->getPost('description');
+
 		$data = $this->billingmodel->getCountitem($billing_id)->getResult();
 		if ($data[0]->jumlahitem <= "1") {
-
-			$ret = "<div class='modal-dialog'>
-                   <div class='modal-content'>
-                       <div class='modal-header'>
-                       <h4 class='modal-title'>Alasan Void</h4>
-                           <button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>
-                       </div>
-                       <div class='modal-body'>
-                           <form>
-                               <div class='form-group'>
-                                   <label for='recipient-name' class='control-label'><b>Alasan Void :</b></label>
-                                   <select class='form-control' id='alasanvoid'>
-                                   <option value=''> -- pilih alasan -- </option>
-                                   <option value='training'> Training </option>
-                                   <option value='guestrequest'> Guest request </option>
-                                   <option value='outofstock'> Out of stock </option>
-                                   <option value='others'> Others </option>
-                                   </select>
-                               </div>
-                               <div class='form-group'>
-                                   <label for='message-text' class='control-label'><b>Catatan :</b></label>
-                                   <textarea class='form-control' id='description'></textarea>
-                               </div>
-                           </form>
-                       </div>
-                       <div class='modal-footer'>
-                           <button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>
-                           <button onclick='confirmbatalbilling($billing_id,this)' type='button' class='btn btn-danger waves-effect waves-light'>Save Void</button>
-                       </div>
-                   </div>
-               </div>";
-
-
-		return $ret;
-			
+			return "voidbill";
 		} else {
-			$ressetcancelitemByid = $this->billingmodel->setcancelitemByid($id);
-			if ($ressetcancelitemByid) {
-				return "true";
+			
+			$data = [
+				'status_cd' => 'cancel',
+				'voidcause' => $voidcause,
+				'description' => $description,
+				'update_dttm' => date('Y-m-d H:i:s'),
+				'update_user' => $this->session->user_id
+			];
+
+			$setcancelitemByid = $this->billingmodel->setcancelitemByid($billing_item_id,$data);
+			if ($setcancelitemByid) {
+				$cetakremoveitem = $this->cetakRemoveitem($billing_item_id);
 			} else {
 				return "false";
 			}
@@ -196,8 +174,8 @@ class Kasir extends BaseController
 		$ret = "<div class='modal-dialog'>
                    <div class='modal-content'>
                        <div class='modal-header'>
-                       <h4 class='modal-title'>Alasan Void</h4>
-                           <button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>
+                       <h4 class='modal-title'>Alasan Void Billing</h4>
+                           <button type='button' class='btn btn-info' data-dismiss='modal' aria-hidden='true'>×</button>
                        </div>
                        <div class='modal-body'>
                            <form>
@@ -226,8 +204,46 @@ class Kasir extends BaseController
         return $ret;
 	}
 
+	public function showremoveitem() {
+		$billing_id = $this->request->getPost('billing_id');
+		$billing_item_id = $this->request->getPost('billing_item_id');
+		$meja_id = $this->request->getPost('meja_id');
+		$ret = "<div class='modal-dialog'>
+                   <div class='modal-content'>
+                       <div class='modal-header'>
+                       <h4 class='modal-title'>Alasan Void Item</h4>
+                           <button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>
+                       </div>
+                       <div class='modal-body'>
+                           <form>
+                               <div class='form-group'>
+                                   <label for='recipient-name' class='control-label'><b>Alasan Void Item:</b></label>
+                                   <select class='form-control' id='voidcause'>
+                                   <option value=''> -- pilih alasan -- </option>
+                                   <option value='training'> Training </option>
+                                   <option value='guestrequest'> Guest request </option>
+                                   <option value='outofstock'> Out of stock </option>
+                                   <option value='others'> Others </option>
+                                   </select>
+                               </div>
+                               <div class='form-group'>
+                                   <label for='message-text' class='control-label'><b>Catatan :</b></label>
+                                   <textarea class='form-control' id='description'></textarea>
+                               </div>
+                           </form>
+                       </div>
+                       <div class='modal-footer'>
+                           <button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>
+                           <button onclick='confirmremoveitem($meja_id,$billing_item_id,$billing_id,this)' type='button' class='btn btn-danger waves-effect waves-light'>Confirm Void</button>
+                       </div>
+                   </div>
+               </div>";
+        return $ret;
+	}
+
 	public function confirmbatalbilling() {
 		$billing_id = $this->request->getPost('billing_id');
+		
 		$alasanvoid = $this->request->getPost('alasanvoid');
 		$description = $this->request->getPost('description');
 		$databill = [
@@ -256,19 +272,20 @@ class Kasir extends BaseController
 				];
 				$canceldiskon = $this->billingmodel->cancelDiskonbybillId($billing_id,$datadiskon);
 				if ($canceldiskon) {
-					$ret = "true";
+					echo $this->cetakCancelbill($billing_id);
+
 				} else {
-					$ret = "gagalcancelitem";
+					return "gagalcancelitem";
 				}
 			} else {
-				$ret = "gagalcancelitem";
+				return "gagalcancelitem";
 			}
 		} else {
-			$ret = "gagalcancelbilling";
+			return "gagalcancelbilling";
 		}
-
-		return $ret;
 	}
+
+
 
 	public function clickmejabutton() {
 		$id = $this->request->getPost('id');
@@ -285,8 +302,10 @@ class Kasir extends BaseController
 			$billing_id = $res[0]->billing_id;
 			if ($res[0]->member_nm != "") {
 		        $member_nm = "<span style='font-size: 16px;'>".$res[0]->member_nm."</span> <a href='#' onclick='removemember($id,$billing_id)'><i style='color:red;' class='fas fa-times'></i></a>";
+		        $member_id = $res[0]->member_id;
 		    } else {
 		        $member_nm = "MEJA ".$res[0]->meja_nm;
+		        $member_id = "";
 		    }
 		
 			list($dt,$tm) = explode(" ", $res[0]->created_dttm);
@@ -295,24 +314,30 @@ class Kasir extends BaseController
 			$ret = "<div><div class='row col-md-12 m-0' id='div-item'>
 					<input type='hidden' id='meja_id' value='$id'/>
 					<input type='hidden' id='billing_id' value='$billing_id'/>
+					<input type='hidden' id='member_id' value='$member_id'/>
 						<div class='col-md-12' align='left' style='margin-bottom:20px;'>
 							<button onclick='batalbilling($billing_id,this)' class='btn btn-danger waves-effect waves-light' type='button'>Void Billing</button>
 						</div>
 					</div>";
 			$ret .= "<div class='row col-md-12 m-0'>
 					  <table width='100%' style='font-size: 18px;'>
+					  	<tr>
+				          <td align='left'>Bill Code</td>
+				          <td align='right'>".$res[0]->billing_cd."</td>
+				        </tr>
 				        <tr>
 				          <td align='left'>".panjang($dt)."</td>
 				          <td align='right'>".$tm."</td>
 				        </tr>
 				        <tr>
-				          <td align='left'>Bill Name</td>
-				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-warning waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
-				        </tr>
-				        <tr>
 				          <td align='left'>Collected By</td>
 				          <td align='right'>".$res[0]->collected_user."</td>
 				        </tr>
+				        <tr>
+				          <td align='left'>Bill Name</td>
+				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-warning waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
+				        </tr>
+				       
 				      </table>
 				      </div>
 				      <hr style='border: 1px solid red'>
@@ -526,18 +551,23 @@ class Kasir extends BaseController
 					</div>";
 			$ret .= "<div class='row col-md-12 m-0'>
 					  <table width='100%' style='font-size: 18px;'>
+					  	<tr>
+				          <td align='left'>Bill Code</td>
+				          <td align='right'>".$res[0]->billing_cd."</td>
+				        </tr>
 				        <tr>
 				          <td align='left'>".panjang($dt)."</td>
 				          <td align='right'>".$tm."</td>
 				        </tr>
 				        <tr>
-				          <td align='left'>Bill Name</td>
-				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-danger waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
-				        </tr>
-				        <tr>
 				          <td align='left'>Collected By</td>
 				          <td align='right'>".$res[0]->collected_user."</td>
 				        </tr>
+				        <tr>
+				          <td align='left'>Bill Name</td>
+				          <td align='right'><button onclick='showpindahmeja($billing_id,$id,$kasir_status_id)' class='btn btn-danger waves-effect waves-light' type='button'><span class='btn-label'><i class='fas fa-angle-double-left'></i></span>Pindah</button> $member_nm</td>
+				        </tr>
+				        
 				      </table>
 				      </div>
 				      <hr style='border: 1px solid red'>
@@ -1025,9 +1055,13 @@ class Kasir extends BaseController
 	}
 
 	public function billinghistoryfinish() {
+		$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
+    	$kasir_status_id = $kasir_status[0]->kasir_status_id;
 		$history = $this->billingmodel->getbyfinish()->getResult();
+		$getbycancel = $this->billingmodel->getBycancel($kasir_status_id)->getResult();
 		$ret = "";
 		$no = 1;
+		$novoid = 1;
 		if (count($history)>0) {
 			$ret .= "<div class='modal-dialog modal-xl'>"
 	            . "<div class='modal-content'>"
@@ -1040,7 +1074,14 @@ class Kasir extends BaseController
 				 . "<div class='col-md-12'>"
 				 . "<div class='card'>"
                  . "<div class='card-body'>"
-				 . "<table width='100%' data-toggle='table' data-height='350' data-mobile-responsive='true' class='table-striped'>"
+                 . "<ul class='nav nav-tabs customtab2' role='tablist'>"
+                 . "<li class='nav-item'> <a class='nav-link active' data-toggle='tab' href='#finishtable' role='tab'><span class='hidden-xs-down'>Finish</span></a> </li>"
+                 . "<li class='nav-item'> <a class='nav-link' data-toggle='tab' href='#voidtable' role='tab'><span class='hidden-xs-down'>Void</span></a> </li>"
+                 . "</ul>"
+
+                 . "<div class='tab-content'>"
+                 . "<div class='tab-pane active' id='finishtable' role='tabpanel'>"
+                 . "<table width='100%' data-toggle='table' data-height='350' data-mobile-responsive='true' class='table table-striped'>"
 				 . "<thead>"
 				 . "<tr>"
 				 . "<th>No.</th>"
@@ -1048,20 +1089,22 @@ class Kasir extends BaseController
 				 . "<th>Meja</th>"
 				 . "<th>Petugas</th>"
 				 . "<th>Grand Total</th>"
-				 . "<th>Cetak Payments</th>"
+				 . "<th>Action</th>"
 				 . "</tr>"
 				 . "</thead>"
 				 . "<tbody>";
 				 foreach ($history as $key) {
 				 	if ($key->statusbilling == "finish") {
-				 		$button = "<button onclick='cetakulangcheckout($key->meja_id,$key->billing_id,this)' class='btn btn-info'>Cetak Payments</button>";
+				 		$button = "<button onclick='showdetailhistory($key->meja_id,$key->billing_id,this)' class='btn btn-primary'>Detail</button> <button style='float: right;' onclick='cetakulangcheckout($key->meja_id,$key->billing_id,this)' class='btn btn-info'>Cetak Payments</button>";
+				 		$status = "<span class='badge badge-success'>Finish</span>";
 				 	} else if ($key->statusbilling == "cancel") {
-				 		$button = "<button class='btn btn-danger'>Void</button>";
+				 		$button = "<button onclick='showdetailhistory($key->meja_id,$key->billing_id,this)' class='btn btn-primary'>Detail</button>";
+				 		$status = "<span class='badge badge-danger'>Void</span>";
 				 	}
 
 				 	$ret .= "<tr>"
 						 . "<td>".$no++."</td>"
-						 . "<td>$key->billing_cd</td>"
+						 . "<td>$key->billing_cd $status</td>"
 						 . "<td>MEJA - $key->meja_nm</td>"
 						 . "<td>$key->collected_user</td>"
 						 . "<td>".number_format($key->ttl_amount)."</td>"
@@ -1070,7 +1113,48 @@ class Kasir extends BaseController
 				 }
 
 			$ret .= "</tbody>"
-				 . "</table>"
+				 . "</table>"         
+                 . "</div>" // tab-pane finish
+
+                 . "<div class='tab-pane' id='voidtable' role='tabpanel'>"
+                 . "<table width='100%' data-toggle='table' data-height='350' data-mobile-responsive='true' class='table table-striped'>"
+				 . "<thead>"
+				 . "<tr>"
+				 . "<th>No.</th>"
+				 . "<th>Billing Kode</th>"
+				 . "<th>Meja</th>"
+				 . "<th>Alasan</th>"
+				 . "<th>Petugas</th>"
+				 . "<th>Catatan</th>"
+				 . "<th>Action</th>"
+				 . "</tr>"
+				 . "</thead>"
+				 . "<tbody>";
+				 foreach ($getbycancel as $key) {
+				 	if ($key->statusbilling == "finish") {
+				 		$button = "<button onclick='showdetailhistory($key->meja_id,$key->billing_id,this)' class='btn btn-primary'>Detail</button> <button style='float: right;' onclick='cetakulangcheckout($key->meja_id,$key->billing_id,this)' class='btn btn-info'>Cetak Payments</button>";
+				 		$status = "<span class='badge badge-success'>Finish</span>";
+				 	} else if ($key->statusbilling == "cancel") {
+				 		$button = "<button onclick='showdetailhistory($key->meja_id,$key->billing_id,this)' class='btn btn-primary'>Detail</button>";
+				 		$status = "<span class='badge badge-danger'>Void</span>";
+				 	}
+
+				 	$ret .= "<tr>"
+						 . "<td>".$novoid++."</td>"
+						 . "<td>$key->billing_cd $status</td>"
+						 . "<td>MEJA - $key->meja_nm</td>"
+						 . "<td>$key->alasanvoid</td>"
+						 . "<td>$key->collected_user</td>"
+						 . "<td>$key->bill_description</td>"
+						 . "<td>$button</td>"
+						 . "</tr>";
+				 }
+
+			$ret .= "</tbody>"
+				 . "</table>"  
+                 . "</div>" // tab-pane void
+                 . "</div>" // tab-content
+				 
 				 . "</div>" // card-body
 				 . "</div>" // card
 				 . "</div>" // col-md-12
@@ -1079,7 +1163,7 @@ class Kasir extends BaseController
 	            . "</div>"
 	            . "</div>";
 
-	        $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
+	        $ret .= "<script src='".base_url()."/assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
 		} else {
 			$ret .= "<div class='modal-dialog modal-xl'>"
 	            . "<div class='modal-content'>"
@@ -1180,6 +1264,90 @@ class Kasir extends BaseController
 		return $ret;
 	}
 
+	public function showdetailhistory() {
+		$meja_id 	= $this->request->getPost('meja_id');
+		$billing_id = $this->request->getPost('billing_id');
+
+		$res = $this->billingmodel->getBybillid($meja_id,$billing_id)->getResult();
+		if (count($res)>0) {
+			$ret = "<div class='modal-dialog modal-lg'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>DETAIL BILLING</h4>"
+	            . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+
+	            . "<div class='row'>"
+				 . "<div class='col-md-12'>"
+				 . "<div class='card m-0'>"
+                 . "<div class='card-body p-10'>"
+                 . "<table>"
+                 . "<tr>
+                 <td>Code</td><td>:</td><td style='border-right: 1px solid grey; padding-right:10px'>".$res[0]->billing_cd."</td> 
+                 <td style='padding-left:10px'> Petugas</td><td>:</td><td style='border-right: 1px solid grey; padding-right:10px'>".$res[0]->collected_user."</td> 
+                 <td style='padding-left:10px'> Grand Total</td><td>:</td><td style='border-right: 1px solid grey; padding-right:10px'>".number_format($res[0]->ttl_amount)."</td> 
+                 <td style='padding-left:10px'> Alasan Void</td><td>:</td><td>".$res[0]->alasanvoid."</td>
+                 </tr>"
+                 . "<tr>
+                 <td>Tanggal</td><td>:</td><td style='border-right: 1px solid grey; padding-right:10px'>".$res[0]->created_dttm."</td> 
+                 <td style='padding-left:10px;'> MEJA </td><td>:</td><td style='border-right: 1px solid grey; padding-right:10px'>".$res[0]->meja_nm."</td>
+                 <td style='padding-left:10px;'> Diskon </td><td>:</td><td style='border-right: 1px solid grey; padding-right:10px'>".number_format($res[0]->ttl_discount)."</td> 
+                 <td style='padding-left:10px; word-wrap: break-word;'> Catatan</td><td>:</td><td>".$res[0]->bill_description."</td></tr>"
+                 . "</table>"
+
+                 . "</div>"
+                 . "</div>"
+                 . "</div>"
+                 . "</div>" // row atas
+
+				 . "<div class='row'>"
+				 . "<div class='col-md-12'>"
+				 . "<div class='card'>"
+                 . "<div class='card-body'>"
+				 . "<table width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<thead>"
+				 . "<tr>"
+				 . "<th>No.</th>"
+				 . "<th>Item</th>"
+				 . "<th>Jumlah</th>"
+				 . "<th>Harga Satuan</th>"
+				 . "<th>Harga</th>"
+				 . "</tr>"
+				 . "</thead>"
+				 . "<tbody>";
+				 $no = 1;
+				 foreach ($res as $key) {
+				 	$harga = $key->qty * $key->price;
+				 	$ret .= "<tr>"
+						 . "<td>".$no++."</td>"
+						 . "<td>".strtoupper($key->produk_nm)."</td>"
+						 . "<td>$key->qty</td>"
+						 . "<td align='right'>".number_format($key->price)."</td>"
+						 . "<td align='right'>".number_format($harga)."</td>"
+						 . "</tr>";
+				 }
+
+			$ret .= "</tbody>"
+				 . "</table>"
+				 . "</div>" // card-body
+				 . "</div>" // card
+				 . "</div>" // col-md-12
+				 . "</div>" // row
+
+
+	       		. "</div>" // modal body
+	            . "</div>"
+	            . "</div>";
+
+	        $ret .= "<script src='../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js'></script>";
+		} else {
+			$ret = "false";
+		}
+		
+		return $ret;
+	}
+
 	public function tambah_nol($angka,$jumlah)
     {
        $jumlah_nol = strlen($angka);
@@ -1221,6 +1389,8 @@ class Kasir extends BaseController
 	    $ret .= "<script src='../assets/js/jquery.mask.js'></script>";
 	    return $ret;
     }
+
+
 
     public function closekasir() {
     	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
@@ -1689,7 +1859,7 @@ class Kasir extends BaseController
 			}
 
 			$zero = str_pad($code, 4, "0", STR_PAD_LEFT);
-			$billing_cd = "LAV$zero";
+			$billing_cd = "LAV-".date('Ym')."$zero";
 
 			$data = [
 				'kasir_status_id' => $kasirstatus,
@@ -1824,6 +1994,8 @@ class Kasir extends BaseController
 		}
 	}
 
+	
+
 	public function cetakmenudrinks() {
 		return $this->_getDrinksmenu($this->request->getPost('id')); 
 	}
@@ -1859,6 +2031,7 @@ class Kasir extends BaseController
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
@@ -1918,6 +2091,7 @@ class Kasir extends BaseController
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
@@ -1977,6 +2151,7 @@ class Kasir extends BaseController
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
@@ -2033,6 +2208,7 @@ class Kasir extends BaseController
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
@@ -2103,7 +2279,7 @@ class Kasir extends BaseController
 
 
 			    /* Print top logo */
-			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    // $this->printer->setJustification(Printer::JUSTIFY_CENTER);
 			    
 			    // if ($this->profile->getSupportsGraphics()) {
 			    //     $this->printer->graphics($logo);
@@ -2123,9 +2299,10 @@ class Kasir extends BaseController
 			    $this->printer->feed();
 			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
 			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text($this->buatBaris4Kolom("Bill Code","",$data[0]->billing_cd));
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
-			   $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
+			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");
@@ -2236,6 +2413,210 @@ class Kasir extends BaseController
 			}
 		} else {
 			return 'false';
+		}
+	}
+
+
+	private function cetakRemoveitem($billing_item_id) {
+		$data = $this->billingmodel->getItemcancelBybillId($billing_item_id)->getResult();
+		if  (count($data)>0) {
+    		$this->profile = CapabilityProfile::load("POS-5890");
+    		$this->connector = new RawbtPrintConnector();
+    		// $this->connector = new FilePrintConnector("/dev/usb/lp0");
+    		$meja_nm = "MEJA ".$data[0]->meja_nm;
+		    
+    
+    		$this->printer = new Printer($this->connector);
+    		$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+    		// Make sure you load a Star print connector or you may get gibberish.
+    		try {
+    
+    		$date = date('Y-m-d H:i');
+    		   
+    		    /* Items */
+    		    $this->printer->feed(5);
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->setFont(Printer::FONT_A);
+    		    $this->printer->setEmphasis(true);
+    		    	$this->printer->setJustification(Printer::JUSTIFY_RIGHT);
+    		    $this->printer->text($date."\n");
+    		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+    		    $this->printer->text($meja_nm."\n");
+    		    $this->printer->text($data[0]->billing_cd."\n");
+    		    $this->printer->text("--------------------------------\n");
+    		    foreach ($data as $item) {
+    		    	$this->printer->setEmphasis(true);
+    		        // $this->printer->text($item->produk_nm."\n");
+    		        $this->printer->setEmphasis(false);
+    		        $this->printer->text($this->getAsString(32,$item->qty."x",strtoupper($item->produk_nm))); // for 58mm Font A
+    		        $this->printer->text($item->voidcause."\n");
+    		        $this->printer->text($item->description."\n");
+
+    		    }
+    		    $this->printer->setEmphasis(false);
+    		    $this->printer->text("--------------------------------\n");
+    		    $this->printer->setEmphasis(false);
+    		    $this->printer->feed(7);
+    			
+    		    /* Cut the receipt and open the cash drawer */
+    		    // $this->printer->cut();
+    		    // $this->printer->pulse();
+    		} catch (Exception $e) {
+    		    return $e->getMessage();
+    		} finally {
+    		    $this->printer->close();
+    		}
+    		
+		} else {
+		    return 'false';
+		}
+		
+	}
+
+	public function cetakCancelbill($billing_id){
+		$data = $this->billingmodel->getCancelBybillid($billing_id)->getResult();
+		$discount_nmx = "";	 
+		$discount_valuex = "";
+		$discount = "";
+		$discount_nm = "";
+		$subtotal = 0;
+		$ptotal = "";
+		$ttl_discount = 0;
+		$amt_before_discount = 0;
+		$nilaidiskon = "";
+
+		if (count($data)>0) {
+			$member_nm = "Meja ".$data[0]->meja_nm;
+
+		    list($dt,$tm) = explode(" ", $data[0]->created_dttm);
+		    $resdc = $this->discountmodel->getbybillidpersen($billing_id)->getResult();
+			$notpersen = $this->discountmodel->getbybillid($billing_id)->getResult();
+
+			$this->profile = CapabilityProfile::load("POS-5890");
+			$this->connector = new RawbtPrintConnector();
+			// $this->connector = new FilePrintConnector("/dev/usb/lp0");
+
+
+			$this->printer = new Printer($this->connector);
+			$this->printer2 = new Printer($this->connector); // dirty printer profile hack !!
+			// Make sure you load a Star print connector or you may get gibberish.
+			try {
+				// $logo = EscposImage::load("images/lib/logo.png", false);
+			    /* Name of shop */
+			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text("Butcher Steak & Pasta\n");
+			    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
+			    $this->printer->text("07115626366\n");
+			    $this->printer->selectPrintMode();
+			    $this->printer->feed();
+			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text($this->buatBaris4Kolom("Bill Code","",$data[0]->billing_cd));
+			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
+			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
+			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
+			    /* Title of receipt */
+			    $this->printer->setEmphasis(true);
+			    $this->printer->text("--------------------------------\n");
+			    $this->printer->feed(1);
+			    
+
+			    /* Items */
+			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
+			    foreach ($data as $item) {
+			    	$this->printer->setEmphasis(true);
+					$total = $item->produk_harga * $item->qty;
+					$amt_before_discount = $amt_before_discount + $total;
+					if (count($resdc)>0) {
+						foreach ($resdc as $dc) {
+							$symb = substr($dc->value, -1);
+							if ($symb == "%") {
+								$percentega = str_replace("%", "", $dc->value);
+								$ptotal = ($percentega/100) * $total;
+								list($harga,$belakangkoma) = explode(".", $ptotal);
+								$nilaidiskon = "(".$harga.")";
+								$afterdc = $total - $harga;
+								$subtotal = $subtotal + $afterdc;
+								$discount_nmx = $dc->discount_nm;
+								$discount_valuex = $dc->value;
+								$ttl_discount = $ttl_discount + $ptotal; 
+							} else {
+								$subtotal = $subtotal + $total;
+							}
+						} 
+					} else {
+						$subtotal = $subtotal + $total;
+					}
+			        $this->printer->text(strtoupper($item->produk_nm)."\n");
+			        $this->printer->setEmphasis(false);
+			        $this->printer->text($this->buatBaris4Kolom($item->qty."x","","")); // for 58mm Font A
+			        $this->printer->text($this->buatBaris4Kolom($discount_nmx."".$discount_valuex," ",$nilaidiskon)."\n");
+			    }
+
+
+	            if (count($notpersen)>0) {
+					foreach ($notpersen as $dc) {
+						$discount_nm = $dc->discount_nm;
+						$discount_value = $dc->value;
+						$this->printer->text($this->buatBaris4Kolom($discount_nm,"","(".number_format($discount_value).")")."\n"); // for 58mm Font A
+						$subtotal = $subtotal - $dc->value;
+						$ttl_discount = $ttl_discount + $dc->value; 
+					}
+				} 
+			    $this->printer->setEmphasis(false);
+			    $this->printer->text("--------------------------------\n");
+			    $this->printer->setEmphasis(false);
+			    $this->printer->feed();
+			    
+				// $taxx = $amt_before_discount * 0.10;
+				// list($tax,$belakangkoma) = explode(".", $taxx);
+				// $servicex = $amt_before_discount * 0.05;
+				// list($service,$belakangkoma) = explode(".", $servicex);
+				$servicex = $amt_before_discount * 0.05;
+				if (strpos($servicex,'.') == TRUE) {
+					list($service,$belakangkomas) = explode(".", $servicex);
+				} else {
+					$service = $servicex;
+				}
+
+				$taxx = ($amt_before_discount + $service) * 0.10;
+				if (strpos($taxx,'.') == TRUE) {
+					list($tax,$belakangkoma) = explode(".", $taxx);
+				} else {
+					$tax = $taxx;
+				}
+
+				$grandtotal = $subtotal + $tax + $service;
+				$jmlbulat = $this->pembulatanratusan($grandtotal);
+				$nilaibulat = $jmlbulat - $grandtotal;
+						
+			    $this->printer->setEmphasis(false);
+				$this->printer->text($this->buatBaris4Kolom("Subtotal","",number_format($subtotal))); 
+				$this->printer->text($this->buatBaris4Kolom("Tax","",number_format($tax))); 
+				$this->printer->text($this->buatBaris4Kolom("Service","",number_format($service))); 
+				$this->printer->text($this->buatBaris4Kolom("Rounding","",number_format($nilaibulat))); 
+			    $this->printer->text("--------------------------------\n");
+			    $this->printer->setEmphasis(true);
+				$this->printer->text($this->buatBaris4Kolom("Total","",number_format($jmlbulat))); 
+			    $this->printer->setEmphasis(false);
+			    /*footer */
+			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
+			    $this->printer->text(date('Y-m-d H:i:s')."\n");
+			    /* Cut the receipt and open the cash drawer */
+			    // $this->printer->cut();
+			    // $this->printer->pulse();
+
+			} catch (Exception $e) {
+			    return $e->getMessage();
+			} finally {
+			    $this->printer->close();
+			}
+
+		} else {
+			return "false";
 		}
 	}
 
@@ -2370,9 +2751,10 @@ class Kasir extends BaseController
 			    $this->printer->feed();
 			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
 			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text($this->buatBaris4Kolom("Bill Code","",$data[0]->billing_cd));
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
-			   $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
+			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");
@@ -2544,9 +2926,10 @@ class Kasir extends BaseController
 			    $this->printer->feed();
 			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
 			    $this->printer->setFont(Printer::FONT_A);
+			    $this->printer->text($this->buatBaris4Kolom("Bill Code","",$data[0]->billing_cd));
 			    $this->printer->text($this->buatBaris4Kolom(panjang($dt),"",$tm));
 			    $this->printer->text($this->buatBaris4Kolom("Bill Name","",substr($member_nm, 0,8)));
-			   $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
+			    $this->printer->text($this->buatBaris4Kolom("Collected by","",substr($data[0]->collected_user, 0,8)));
 			    /* Title of receipt */
 			    $this->printer->setEmphasis(true);
 			    $this->printer->text("--------------------------------\n");

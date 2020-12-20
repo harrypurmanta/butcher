@@ -85,39 +85,43 @@ $this->session->start();
                                 <span class='hide-menu'>Home </span>
                             </a>
                         </li>
-                        <li class='nav-item dropdown'> 
-                            <a class='nav-link dropdown-toggle nav-item' href='#' id='navbarDropdown' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                Pengaturan
-                            </a>
-                            <div class='dropdown-menu' aria-labelledby='navbarDropdown'>
-                                <a class='dropdown-item' href='<?=base_url() ?>/kategori'>Kategori Produk</a>
-                                <!-- <a class='dropdown-item' href='<?=base_url() ?>/subkat'>Sub Kategori Produk</a> -->
-                                <!-- <a class='dropdown-item' href='<?=base_url() ?>/kategori/option'>Kategori Options</a> -->
-                                <a class='dropdown-item' href='<?=base_url() ?>/produk'>Produk</a>
-                                <a class='dropdown-item' href='<?=base_url() ?>/discount'>Diskon</a>
-                                <a class='dropdown-item' href='<?=base_url() ?>/payplan'>Cara Bayar</a>
-                                <a class='dropdown-item' href='<?=base_url() ?>/membertype'>Tipe Member</a>
-                                <a class='dropdown-item' href='<?=base_url() ?>/meja'>Meja</a>
-                                <a class='dropdown-item' href='<?=base_url() ?>/karyawan'>Karyawan</a>
-                            </div>
-                        </li>
+                        <?php
+                        if ($this->session->user_group == "admin") {
+                            echo "<li class='nav-item dropdown'> 
+                                    <a class='nav-link dropdown-toggle nav-item' href='#' id='navbarDropdown' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                        Pengaturan
+                                    </a>
+                                    <div class='dropdown-menu' aria-labelledby='navbarDropdown'>
+                                        <a class='dropdown-item' href='".base_url()."/kategori'>Kategori Produk</a>
+                                        <!-- <a class='dropdown-item' href='".base_url()."/subkat'>Sub Kategori Produk</a> -->
+                                        <!-- <a class='dropdown-item' href='".base_url()."/kategori/option'>Kategori Options</a> -->
+                                        <a class='dropdown-item' href='".base_url()."/produk'>Produk</a>
+                                        <a class='dropdown-item' href='".base_url()."/discount'>Diskon</a>
+                                        <a class='dropdown-item' href='".base_url()."/payplan'>Cara Bayar</a>
+                                        <a class='dropdown-item' href='".base_url()."/membertype'>Tipe Member</a>
+                                        <a class='dropdown-item' href='".base_url()."/meja'>Meja</a>
+                                        <a class='dropdown-item' href='".base_url()."/karyawan'>Karyawan</a>
+                                    </div>
+                                </li>
+                                <li class='nav-item'> 
+                                    <a class='nav-link' href='".base_url()."/produk/listmenu'>
+                                        <span class='hide-menu'>Menu Item </span>
+                                    </a>
+                                </li>
+                                <li class='nav-item'> 
+                                    <a class='nav-link' href='".base_url()."/member'>
+                                        <span class='hide-menu'>Member </span>
+                                    </a>
+                                </li>
+                                <li class='nav-item'> 
+                                    <a class='nav-link' href='".base_url()."/kasir'>
+                                        <span class='hide-menu'>Kasir </span>
+                                    </a>
+                                </li>";
+                        }
+                        ?>
                         <li class='nav-item'> 
-                            <a class='nav-link' href='<?=base_url() ?>/produk/listmenu'>
-                                <span class='hide-menu'>Menu Item </span>
-                            </a>
-                        </li>
-                        <li class='nav-item'> 
-                            <a class='nav-link' href='<?=base_url() ?>/member'>
-                                <span class='hide-menu'>Member </span>
-                            </a>
-                        </li>
-                        <li class='nav-item'> 
-                            <a class='nav-link' href='<?=base_url() ?>/kasir'>
-                                <span class='hide-menu'>Kasir </span>
-                            </a>
-                        </li>
-                        <li class='nav-item'> 
-                            <a class='nav-link' href='#'>
+                            <a class='nav-link' href='<?=base_url() ?>/laporan'>
                                 <span class='hide-menu'>Laporan </span>
                             </a>
                         </li>

@@ -62,8 +62,6 @@
             <!-- ============================================================== -->
             <!-- ============================================================== -->
             <script src="../assets/plugins/jquery/jquery.min.js"></script>
-            <script src="../assets/plugins/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
-    <script type="text/javascript" src="../assets/plugins/multiselect/js/jquery.multi-select.js"></script>
             <!-- <script src="../assets/js/perfect-scrollbar.jquery.min.js"></script> -->
 <script type="text/javascript">
 $(document).ready(function($){
@@ -563,6 +561,47 @@ function billinghistoryverified() {
       $('#modaltambahmember').html(data);
       $('#modaltambahmember').modal('show');
       $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function showdetailhistory(meja_id,billing_id,btn) {
+  b = $(btn);
+  b.attr('data-old', b.text());
+  b.text('wait..');
+  $.ajax({
+     url : "<?= base_url('kasir/showdetailhistory') ?>",
+     type: "post",
+     data: {meja_id:meja_id,billing_id:billing_id},
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+     },
+     success:function(data){
+      if (data == 'false') {
+        Swal.fire({
+            title:"Data tidak ditemukan!",
+            text:"Hubungi Programmer",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+      } else {
+        $('#responsive-modal').html(data);
+        $('#responsive-modal').modal('show');
+      }
+      $("#loader-wrapper").addClass("d-none");
+      b.text(b.attr('data-old'));
     },
     error:function(){
         Swal.fire({
@@ -1468,7 +1507,37 @@ function uncheckpayplan() {
     $(".labelpayplan").removeClass('active focus');
 }
 
-function removeitem(meja_id,id,billing_id,btn) {
+function removeitem(meja_id,billing_item_id,billing_id,btn) {
+  $.ajax({
+       url : "<?= base_url('kasir/showremoveitem') ?>",
+       type: "post",
+       data: {billing_item_id:billing_item_id,billing_id:billing_id,meja_id:meja_id},
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+       },
+       success:function(data){
+        $('#responsive-modal').html(data);
+        $('#responsive-modal').modal('show');
+        $("#loader-wrapper").addClass("d-none");
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+
+  });
+  
+}
+
+function confirmremoveitem(meja_id,billing_item_id,billing_id,btn) {
+  var voidcause = $('#voidcause').val();
+  var description = $('#description').val();
   Swal.fire({
       title: 'Yakin menghapus item ini ?',
       text: "item yang sudah dihapus tidak bisa dikembalikan lagi, tapi anda bisa memesan lagi",
@@ -1482,34 +1551,41 @@ function removeitem(meja_id,id,billing_id,btn) {
         $.ajax({
          url : "<?= base_url('kasir/setcancelitem')?>",
          type : "POST",
-         data : {'value':id,billing_id:billing_id},
+         data : {billing_item_id:billing_item_id,billing_id:billing_id,voidcause:voidcause,description:description},
          beforeSend: function () { 
             $("#loader-wrapper").removeClass("d-none");
          },
          success:function(data){
-          if (data == "true") {
+          if (data == "voidbill") {
             Swal.fire({
-                title:"Berhasil!",
-                text:"Data Berhasil di VOID!",
+                title:"ITEM TERSISA HANYA 1 (SATU) SILAHKAN GUNAKAN TOMBOL VOID BILL!",
                 type:"warning",
-                showCancelButton:!0,
+                showCancelButton:0,
                 confirmButtonColor:"#556ee6",
                 cancelButtonColor:"#f46a6a"
             })
-            showbillingbymeja(meja_id);
           } else if (data == "false") {
             Swal.fire({
                 title:"Gagal!",
                 text:"Data gagal di VOID!",
                 type:"warning",
-                showCancelButton:!0,
+                showCancelButton:0,
                 confirmButtonColor:"#556ee6",
                 cancelButtonColor:"#f46a6a"
             })
             showbillingbymeja(meja_id);
           } else {
-            $('#responsive-modal').html(data);
-            $('#responsive-modal').modal('show');
+            window.location.href = data;
+            Swal.fire({
+                title:"Berhasil!",
+                text:"Data Berhasil di VOID!",
+                type:"success",
+                showCancelButton:0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+              $('#responsive-modal').modal('hide');
+              showbillingbymeja(meja_id);
           }
             $("#loader-wrapper").addClass("d-none");
         },
@@ -1577,10 +1653,10 @@ function additem(value){
   }
 };
 
-function minusitem(value){
-    var currentVal = parseInt($("#inputqty"+value).val());
-    $("#inputqty"+value).val(currentVal - 1);
-    $("#jumlahitem"+value).val(currentVal - 1);  
+function minusitem(billing_item_id){
+    var currentVal = parseInt($("#inputqty"+billing_item_id).val());
+    $("#inputqty"+billing_item_id).val(currentVal - 1);
+    $("#jumlahitem"+billing_item_id).val(currentVal - 1);  
     var qty = currentVal - 1;     
     var id = $("#value-meja").val();
     if (qty==0) {
@@ -1597,7 +1673,7 @@ function minusitem(value){
               $.ajax({
                url : "<?= base_url('kasir/setcancelitem')?>",
                type : "POST",
-               data : {'value':value},
+               data : {billing_item_id:billing_item_id},
                beforeSend: function () { 
                   $("#loader-wrapper").removeClass("d-none");
                },
@@ -1620,7 +1696,7 @@ function minusitem(value){
         $.ajax({
           url : "<?= base_url('kasir/updateqty') ?>",
           type: "post",
-          data : {'value':value,'quanty':qty},
+          data : {'value':billing_item_id,'quanty':qty},
           beforeSend: function () { 
             $("#loader-wrapper").removeClass("d-none");
           },
@@ -1704,16 +1780,8 @@ function confirmbatalbilling(billing_id,btn){
               $("#loader-wrapper").removeClass("d-none");
            },
            success:function(data){
-            if (data == "true") {
-              Swal.fire({
-                  title:"SUKSES!",
-                  text:"Data Berhasil di VOID!",
-                  type:"success",
-                  showCancelButton:0,
-                  confirmButtonColor:"#556ee6",
-                  cancelButtonColor:"#f46a6a"
-              })
-            } else if (data == "gagalcancelitem") {
+
+             if (data == "gagalcancelitem") {
               Swal.fire({
                   title:"GAGAL !",
                   text:"Data item Gagal di VOID!",
@@ -1740,6 +1808,16 @@ function confirmbatalbilling(billing_id,btn){
                   confirmButtonColor:"#556ee6",
                   cancelButtonColor:"#f46a6a"
               })
+            } else {
+              window.location.href = data;
+              Swal.fire({
+                  title:"SUKSES!",
+                  text:"Data Berhasil di VOID!",
+                  type:"success",
+                  showCancelButton:0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              });
             }
             listmejakasir();
             $('#responsive-modal').modal('hide');

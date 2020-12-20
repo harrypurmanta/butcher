@@ -56,7 +56,7 @@ class Billingmodel extends Model
 
     public function getbyMejaidkasir($id){
         $query = $this->db->table('billing a');
-        $query->select('a.kasir_status_id,a.billing_id,a.created_dttm,a.status_cd as statusbilling,a.collected_user,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm');
+        $query->select('a.kasir_status_id,a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,a.collected_user,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -81,9 +81,18 @@ class Billingmodel extends Model
     	return $query->get();
     }
 
+    public function getItemcancelBybillId($billing_item_id) {
+        return $this->db->table('billing a')
+                        ->join('billing_item b','b.billing_id=a.billing_id','left')
+                        ->join('produk c','c.produk_id=b.produk_id','left')
+                        ->join('meja f','f.meja_id=a.meja_id','left')
+                        ->where('b.billing_item_id',$billing_item_id)
+                        ->get();
+    }
+
     public function getdrinkmenu($id) {
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm,b.description');
+        $query->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm,b.description');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -100,7 +109,7 @@ class Billingmodel extends Model
 
     public function getfoodmenu($id) {
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm,b.description');
+        $query->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm as member_nm,b.description');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -117,7 +126,7 @@ class Billingmodel extends Model
 
     public function cetakulangdrinks($billing_id) {
         return $this->db->table('billing a')
-                        ->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,b.description')
+                        ->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,b.description')
                         ->join('billing_item b','b.billing_id=a.billing_id','left')
                         ->join('produk c','c.produk_id=b.produk_id','left')
                         ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
@@ -131,7 +140,7 @@ class Billingmodel extends Model
 
     public function cetakulangfoods($billing_id) {
         return $this->db->table('billing a')
-                        ->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,b.description')
+                        ->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,b.description')
                         ->join('billing_item b','b.billing_id=a.billing_id','left')
                         ->join('produk c','c.produk_id=b.produk_id','left')
                         ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
@@ -145,7 +154,7 @@ class Billingmodel extends Model
 
     public function cetakulangcheckout($billing_id) {
         return $this->db->table('billing a')
-                        ->select('a.billing_id,a.created_dttm,a.status_cd as statusbilling,a.collected_user,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm,a.payplan_id,a.ttl_paid')
+                        ->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,a.collected_user,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm,a.payplan_id,a.ttl_paid')
                         ->join('billing_item b','b.billing_id=a.billing_id','left')
                         ->join('produk c','c.produk_id=b.produk_id','left')
                         ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
@@ -218,8 +227,8 @@ class Billingmodel extends Model
                         ->join('person g','g.person_id=e.person_id','left')
                         ->join('person h','h.person_id=a.verified_user','left')
                         ->join('payplan i','i.payplan_id=a.payplan_id','left')
-                        ->whereIn('a.status_cd',['finish','cancel'])
-                        ->where('b.status_cd','normal')
+                        ->where('a.status_cd','finish')
+                        ->whereIn('b.status_cd',['normal','cancel'])
                         ->orderby('a.billing_id','DESC')
                         ->groupby('a.billing_id')
                         ->get();
@@ -237,6 +246,55 @@ class Billingmodel extends Model
                         ->join('payplan i','i.payplan_id=a.payplan_id','left')
                         ->where('a.status_cd','verified')
                         ->where('b.status_cd','normal')
+                        ->orderby('a.billing_id','DESC')
+                        ->groupby('a.billing_id')
+                        ->get();
+    }
+
+    public function getBybillid($meja_id,$billing_id) {
+        return $this->db->table('billing a')
+                        ->select('*,a.description as bill_description')
+                        ->join('billing_item b','b.billing_id=a.billing_id','left')
+                        ->join('produk c','c.produk_id=b.produk_id','left')
+                        ->join('member e','e.member_id=a.member_id','left')
+                        ->join('meja f','f.meja_id=a.meja_id','left')
+                        ->join('person g','g.person_id=e.person_id','left')
+                        ->join('payplan i','i.payplan_id=a.payplan_id','left')
+                        ->where('a.billing_id',$billing_id)
+                        ->where('a.meja_id',$meja_id)
+                        ->get();
+    }
+
+    public function getCancelBybillid($billing_id) {
+        return $this->db->table('billing a')
+                        ->select('a.kasir_status_id,a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,a.collected_user,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,g.person_nm,h.person_nm as collected_nm,i.person_nm as member_nm,j.payplan_nm')
+                        ->join('billing_item b','b.billing_id=a.billing_id','left')
+                        ->join('produk c','c.produk_id=b.produk_id','left')
+                        ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
+                        ->join('member e','e.member_id=a.member_id','left')
+                        ->join('person i','i.person_id=e.person_id','left')
+                        ->join('meja f','f.meja_id=a.meja_id','left')
+                        ->join('person g','g.person_id=e.person_id','left')
+                        ->join('person h','h.person_id=a.verified_user','left')
+                        ->join('payplan j','j.payplan_id=a.payplan_id','left')
+                        ->where('a.status_cd','cancel')
+                        ->where('a.billing_id',$billing_id)
+                        ->get();
+    }
+
+    public function getBycancel($kasir_status_id) {
+        return $this->db->table('billing a')
+                        ->select('*, a.status_cd as statusbilling,a.description as bill_description')
+                        ->join('billing_item b','b.billing_id=a.billing_id','left')
+                        ->join('produk c','c.produk_id=b.produk_id','left')
+                        ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
+                        ->join('member e','e.member_id=a.member_id','left')
+                        ->join('meja f','f.meja_id=a.meja_id','left')
+                        ->join('person g','g.person_id=e.person_id','left')
+                        ->join('person h','h.person_id=a.verified_user','left')
+                        ->join('payplan i','i.payplan_id=a.payplan_id','left')
+                        ->where('a.status_cd','cancel')
+                        ->where('a.kasir_status_id', $kasir_status_id)
                         ->orderby('a.billing_id','DESC')
                         ->groupby('a.billing_id')
                         ->get();
@@ -365,10 +423,10 @@ class Billingmodel extends Model
         return $query->update();
     }
 
-    public function setcancelitemByid($id){
+    public function setcancelitemByid($billing_item_id,$data){
         return $this->db->table('billing_item')
-                        ->set('status_cd','cancel')
-                        ->where('billing_item_id',$id)
+                        ->set($data)
+                        ->where('billing_item_id',$billing_item_id)
                         ->update();
     }
 
@@ -387,10 +445,10 @@ class Billingmodel extends Model
                         ->update();
     }
 
-    public function cancelDiskonbybillId() {
+    public function cancelDiskonbybillId($billing_id,$datadiskon) {
         return $this->db->table('billing_discount')
                         ->set($datadiskon)
-                        ->where('billing_id',$id)
+                        ->where('billing_id',$billing_id)
                         ->update();
     }
 
