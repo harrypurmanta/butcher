@@ -86,7 +86,7 @@ $this->session->start();
                             </a>
                         </li>
                         <?php
-                        if ($this->session->user_group == "admin") {
+                        if ($this->session->user_group == "owner") {
                             echo "<li class='nav-item dropdown'> 
                                     <a class='nav-link dropdown-toggle nav-item' href='#' id='navbarDropdown' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                         Pengaturan
