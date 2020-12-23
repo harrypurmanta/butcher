@@ -310,7 +310,7 @@ class Billingmodel extends Model
 
     public function getReport($kasir_status_id) {
         return $this->db->table('billing')
-                        ->select('SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount, SUM(tax) AS totaltax, SUM(service) AS totalservice')
+                        ->select('SUM(amt_before_discount) as amt_before_discount, SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount, SUM(tax) AS totaltax, SUM(service) AS totalservice')
                         ->where('status_cd','finish')
                         ->where('kasir_status_id',$kasir_status_id)
                         ->get();

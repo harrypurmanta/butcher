@@ -1420,7 +1420,8 @@ class Kasir extends BaseController
     			$ttlvoid = $ttlvoid + $void->totalvoid;
     		}
     	}
-    	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+    	$grosssales = $getReport[0]->amt_before_discount + $getReport[0]->totaltax + $getReport[0]->totalservice;
+    	$netsales = $grosssales - $getReport[0]->ttldiscount;
 		$ret = "";
 		$no = 1;
 		$nopayplan = 1;
@@ -1454,7 +1455,7 @@ class Kasir extends BaseController
 				 	$ret .= "<tr>"
 						 . "<td width='150'>Gross Sales</td>"
 						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
+						 . "<td align='right'>Rp. ".number_format($grosssales)."</td>"
 						 . "</tr>"
 
 						 . "<tr>"
