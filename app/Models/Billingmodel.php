@@ -124,6 +124,14 @@ class Billingmodel extends Model
         return $query->get();
     }
 
+    public function getPrintstatus($billing_item_id) {
+        return $this->db->table('billing_item')
+                        ->select('print_status')
+                        ->where('billing_item_id',$billing_item_id)
+                        ->get();
+
+    }
+
     public function cetakulangdrinks($billing_id) {
         return $this->db->table('billing a')
                         ->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,b.description')

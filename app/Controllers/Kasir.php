@@ -150,9 +150,18 @@ class Kasir extends BaseController
 		if ($data[0]->jumlahitem <= "1") {
 			return "voidbill";
 		} else {
+			$print_status = $this->billingmodel->getPrintstatus($billing_item_id)->getResult();
+			if (count($print_status)>0) {
+				if ($print_status[0]->print_status == "printed") {
+					$status_cd = 'cancel';
+				} else {
+					$status_cd = 'nullified';
+				}
+			}
 			
+
 			$data = [
-				'status_cd' => 'cancel',
+				'status_cd' => $status_cd,
 				'voidcause' => $voidcause,
 				'description' => $description,
 				'update_dttm' => date('Y-m-d H:i:s'),
@@ -208,7 +217,8 @@ class Kasir extends BaseController
 		$billing_id = $this->request->getPost('billing_id');
 		$billing_item_id = $this->request->getPost('billing_item_id');
 		$meja_id = $this->request->getPost('meja_id');
-		$ret = "<div class='modal-dialog'>
+		
+			$ret = "<div class='modal-dialog'>
                    <div class='modal-content'>
                        <div class='modal-header'>
                        <h4 class='modal-title'>Alasan Void Item</h4>
@@ -238,6 +248,9 @@ class Kasir extends BaseController
                        </div>
                    </div>
                </div>";
+		
+
+		
         return $ret;
 	}
 
