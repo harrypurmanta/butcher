@@ -73,12 +73,13 @@ class Billingmodel extends Model
     }
 
     public function getitembyBillid($id) {
-    	$query = $this->db->table('billing_item a');
-    	$query->select('a.qty,b.produk_nm,b.produk_id');
-    	$query->join('produk b','b.produk_id=a.produk_id');
-    	$query->where('a.status_cd','normal');
-    	$query->where('a.billing_id',$id);
-    	return $query->get();
+    	return $this->db->table('billing_item a')
+    	                ->select('*')
+    	                ->join('produk b','b.produk_id=a.produk_id')
+                        ->where('a.status_cd','normal')
+                        ->where('a.print_status','printed')
+    	                ->where('a.billing_id',$id)
+    	                ->get();
     }
 
     public function getItemcancelBybillId($billing_item_id) {

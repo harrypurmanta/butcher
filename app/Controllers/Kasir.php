@@ -256,13 +256,20 @@ class Kasir extends BaseController
 
 	public function confirmbatalbilling() {
 		$billing_id = $this->request->getPost('billing_id');
-		
+		$print_status = $this->billingmodel->getitembyBillid($billing_id)->getResult();
+		if (count($print_status)>0) {
+			$status_billing = "cancel";
+		} else {
+			$status_billing = "nullified";
+		}
+
+
 		$alasanvoid = $this->request->getPost('alasanvoid');
 		$description = $this->request->getPost('description');
 		$databill = [
 			'alasanvoid' => $alasanvoid,
 			'description' => $description,
-			'status_cd' => 'cancel',
+			'status_cd' => $status_billing,
 			'member_id' => 0,
 			'nullified_dttm' => date('Y-m-d H:i:s'),
 			'nullified_user' => $this->session->user_id
@@ -271,7 +278,7 @@ class Kasir extends BaseController
 		$cancelbilling = $this->billingmodel->confirmbatalbilling($billing_id,$databill);
 		if ($cancelbilling) {
 			$dataitem = [
-				'status_cd' => 'cancel',
+				'status_cd' => $status_billing,
 				'nullified_dttm' => date('Y-m-d H:i:s'),
 				'nullified_user' => $this->session->user_id
 			];
@@ -279,7 +286,7 @@ class Kasir extends BaseController
 			$cancelitem = $this->billingmodel->cancelItembybillId($billing_id,$dataitem);
 			if ($cancelitem) {
 				$datadiskon = [
-					'status_cd' => 'cancel',
+					'status_cd' => $status_billing,
 					'nullified_dttm' => date('Y-m-d H:i:s'),
 					'nullified_user' => $this->session->user_id
 				];
@@ -2451,7 +2458,8 @@ class Kasir extends BaseController
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setFont(Printer::FONT_A);
     		    $this->printer->setEmphasis(true);
-    		    	$this->printer->setJustification(Printer::JUSTIFY_RIGHT);
+    		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
+    		    $this->printer->text("VOID \n");
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->text($meja_nm."\n");
@@ -2519,9 +2527,8 @@ class Kasir extends BaseController
 			    $this->printer->setJustification(Printer::JUSTIFY_CENTER);
 			    // $this->printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
 			    $this->printer->setFont(Printer::FONT_A);
-			    $this->printer->text("Butcher Steak & Pasta\n");
-			    $this->printer->text("Jl. AKBP Cek Agus No. 284, Palembang\n");
-			    $this->printer->text("07115626366\n");
+			    $this->printer->feed(2);
+			    $this->printer->text("VOID\n");
 			    $this->printer->selectPrintMode();
 			    $this->printer->feed();
 			    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
