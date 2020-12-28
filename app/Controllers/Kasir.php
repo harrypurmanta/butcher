@@ -153,27 +153,41 @@ class Kasir extends BaseController
 			$print_status = $this->billingmodel->getPrintstatus($billing_item_id)->getResult();
 			if (count($print_status)>0) {
 				if ($print_status[0]->print_status == "printed") {
-					$status_cd = 'cancel';
+					$data = [
+						'status_cd' => 'cancel',
+						'voidcause' => $voidcause,
+						'description' => $description,
+						'update_dttm' => date('Y-m-d H:i:s'),
+						'update_user' => $this->session->user_id
+					];
+
+					$setcancelitemByid = $this->billingmodel->setcancelitemByid($billing_item_id,$data);
+					if ($setcancelitemByid) {
+						$cetakremoveitem = $this->cetakRemoveitem($billing_item_id);
+					} else {
+						return "false";
+					}
+
 				} else {
-					$status_cd = 'nullified';
+					$data = [
+						'status_cd' => 'nullified',
+						'voidcause' => $voidcause,
+						'description' => $description,
+						'update_dttm' => date('Y-m-d H:i:s'),
+						'update_user' => $this->session->user_id
+					];
+
+					$setcancelitemByid = $this->billingmodel->setcancelitemByid($billing_item_id,$data);
+					if ($setcancelitemByid) {
+						return "true";
+					} else {
+						return "false";
+					}
 				}
 			}
 			
 
-			$data = [
-				'status_cd' => $status_cd,
-				'voidcause' => $voidcause,
-				'description' => $description,
-				'update_dttm' => date('Y-m-d H:i:s'),
-				'update_user' => $this->session->user_id
-			];
-
-			$setcancelitemByid = $this->billingmodel->setcancelitemByid($billing_item_id,$data);
-			if ($setcancelitemByid) {
-				$cetakremoveitem = $this->cetakRemoveitem($billing_item_id);
-			} else {
-				return "false";
-			}
+			
 		}
 		
 	}
@@ -292,8 +306,11 @@ class Kasir extends BaseController
 				];
 				$canceldiskon = $this->billingmodel->cancelDiskonbybillId($billing_id,$datadiskon);
 				if ($canceldiskon) {
-					echo $this->cetakCancelbill($billing_id);
-
+					if ($status_billing == "cancel") {
+						echo $this->cetakCancelbill($billing_id);
+					} else {
+						return "true";
+					}
 				} else {
 					return "gagalcancelitem";
 				}

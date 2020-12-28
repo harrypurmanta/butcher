@@ -1574,7 +1574,18 @@ function confirmremoveitem(meja_id,billing_item_id,billing_id,btn) {
                 cancelButtonColor:"#f46a6a"
             })
             showbillingbymeja(meja_id);
-          } else {
+          } else if (data == "true") {
+            Swal.fire({
+                title:"BERHASIL!",
+                text:"ITEM BERHASIL DIHAPUS!",
+                type:"warning",
+                showCancelButton:0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+            showbillingbymeja(meja_id);
+            $('#responsive-modal').modal('hide');
+          } else  {
             window.location.href = data;
             Swal.fire({
                 title:"Berhasil!",
@@ -1803,6 +1814,15 @@ function confirmbatalbilling(billing_id,btn){
               Swal.fire({
                   title:"GAGAL !",
                   text:"Data Diskon Gagal di VOID!",
+                  type:"warning",
+                  showCancelButton:0,
+                  confirmButtonColor:"#556ee6",
+                  cancelButtonColor:"#f46a6a"
+              })
+            }  else if (data == "true") {
+              Swal.fire({
+                  title:"BERHASIL !",
+                  text:"Data billing berhasil di hapus!",
                   type:"warning",
                   showCancelButton:0,
                   confirmButtonColor:"#556ee6",
