@@ -51,6 +51,7 @@
                                     <div class="form-actions">
                                         <button id="caribtn" type="button" class="btn btn-success" onclick="cariemployee()"> <i class="fa fa-search"></i> Cari</button>
                                         <button onclick="window.location.href = '<?=base_url()?>/karyawan/formdaftarkaryawan';" type="button" class="btn btn-inverse">Daftarkan Karyawan</button>
+                                        <button onclick="window.location.href = '<?=base_url()?>/karyawan/listpengguna';" type="button" class="btn btn-info">List Pengguna</button>
                                     </div>
                             </div>
                         </div>

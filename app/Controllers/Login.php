@@ -13,7 +13,17 @@ class Login extends BaseController
 	}
 
 	public function index() {
-		return view('login');
+		if ($this->session->user_group == "waiters") {
+		  	return redirect('dashboard/waiters');
+		  } else if ($this->session->user_group == 'owner') {
+		  	return redirect('dashboard');
+		  } else if ($this->session->user_group == 'kasir') {
+		  	return redirect('kasir');
+		  } else if ($this->session->user_group == 'manajer') {
+		  	return redirect('dashboard');
+		  } else {
+		  	return view('login');
+		  }
 	}
 
 	public function checklogin() {

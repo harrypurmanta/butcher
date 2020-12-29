@@ -16,6 +16,12 @@ class Usersmodel extends Model
                         ->get();
     }
 
+    public function getbynormal() {
+        return $this->db->table($this->table)
+                        ->where('status_cd', 'normal')
+                        ->get();
+    }
+
     public function getbyId($id){
         return $this->db->table('person a')
                  ->select('*')

@@ -10,11 +10,16 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
+use App\Models\Laporanmodel;
+
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 
 class Laporan extends BaseController
 {
 
 	protected $mejamodel;
+	protected $laporanmodel;
 	protected $billingmodel;
 	protected $discountmodel;
 	protected $membermodel;
@@ -35,6 +40,7 @@ class Laporan extends BaseController
 		$this->payplanmodel = new Payplanmodel();
 		$this->kategorimodel = new Kategorimodel();
 		$this->produkmodel = new Produkmodel();
+		$this->laporanmodel = new Laporanmodel();
 	}
 
 	public function index() {
@@ -62,13 +68,16 @@ class Laporan extends BaseController
 	}
 
 	public function reportclosekasir() {
-    	$kasir_status = $this->billingmodel->getStatuskasir()->getResult();
-    	$kasir_status_id = $kasir_status[0]->kasir_status_id;
-    	$topitem = $this->billingmodel->getTopitem($kasir_status_id)->getResult();
-    	$edc = $this->billingmodel->getPayplanEdc($kasir_status_id)->getResult();
-    	$tunai = $this->billingmodel->getPayplanTunai($kasir_status_id)->getResult();
-    	$getReport = $this->billingmodel->getReport($kasir_status_id)->getResult();
-    	$getVoid = $this->billingmodel->getVoid($kasir_status_id)->getResult();
+		$status_cd 	= $this->request->getPost('status_cd');
+		$start_dttm = $this->request->getPost('start_dttm');
+		$end_dttm 	= $this->request->getPost('end_dttm');
+
+		$topitem = $this->laporanmodel->getTopitem($status_cd,$start_dttm,$end_dttm)->getResult();
+		$lattestitem = $this->laporanmodel->getLattestitem($status_cd,$start_dttm,$end_dttm)->getResult();
+    	$edc = $this->laporanmodel->getPayplanEdc($status_cd,$start_dttm,$end_dttm)->getResult();
+    	$tunai = $this->laporanmodel->getPayplanTunai($status_cd,$start_dttm,$end_dttm)->getResult();
+		$getReport = $this->laporanmodel->getByfilter($status_cd,$start_dttm,$end_dttm)->getResult();
+    	$getVoid = $this->laporanmodel->getVoid($status_cd,$start_dttm,$end_dttm)->getResult();
     	$qtyvoid = count($getVoid);
     	$ttlvoid = 0;
     	if ($qtyvoid > 0) {
@@ -132,23 +141,7 @@ class Laporan extends BaseController
 			$ret .= "</tbody>"
 				 . "</table>" // GROSS SALES
 
-				 . "<hr style='border: solid 1px red'/>"
-				 . "<h3><strong>TOP ITEMS</strong></h3>"
-                 . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
-				 . "<tbody>";
-				 foreach ($topitem as $key) {
-				 	$ret .= "<tr>"
-						 . "<td width='20'>".$no++.".</td>"
-						 . "<td width='50%'>$key->produk_nm</td>"
-						 . "<td width='50'>$key->totalqty X</td>"
-						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
-						 . "</tr>";
-				}
 				 
-
-			$ret .= "</tbody>"
-				 . "</table>" // TOP ITEMS
 
 				 . "</div>" // card-body
 				 . "</div>" // card
@@ -175,7 +168,7 @@ class Laporan extends BaseController
 			$ret .= "</tbody>"
 				 . "</table>"
 				 . "<hr style='border: solid 1px red'/>"
-				 . "<h3><strong>PAYMENT</strong></h3>"
+				 . "<h3><strong>TUNAI</strong></h3>"
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
@@ -190,23 +183,52 @@ class Laporan extends BaseController
 					}
 
 
-			$ret .= "<tr>"
-				 . "<td width='20'></td>"
-				 . "<td width='50%'>MODAL</td>"
-				 . "<td align='right'> : </td>"
-				 . "<td align='right'>Rp. ".number_format($kasir_status[0]->modal)."</td>"
-				 . "</tr>"
-				 . "<tr>"
-				 . "<td width='20'></td>"
-				 . "<td width='50%' style='font-weight:bold; border-top: 1px solid #000;'>TOTAL CASH COLLECTED</td>"
-				 . "<td align='right'> : </td>"
-				 . "<td align='right' style='font-weight:bold; border-top: 1px solid #000;'>Rp. ".number_format($kasir_status[0]->modal + $totaltunai)."</td>"
-				 . "</tr>"
-				 . "</tbody>"
+			$ret .= "</tbody>"
 				 . "</table>"
 				 . "</div>" // card-body paypaln
 				 . "</div>" // card
 				 . "</div>" // col-md-7
+
+				 . "<div class='col-md-12'>"
+
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<h3><strong>TOP ITEMS</strong></h3>"
+                 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($topitem as $key) {
+				 	$ret .= "<tr>"
+						 . "<td width='20'>".$no++.".</td>"
+						 . "<td width='50%'>$key->produk_nm</td>"
+						 . "<td width='100'>$key->totalqty X</td>"
+						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
+						 . "</tr>";
+				}
+				 
+
+			$ret .= "</tbody>"
+				 . "</table>" // TOP ITEMS
+
+				 . "<hr style='border: solid 1px red'/>"
+				 . "<h3><strong>LATTEST ITEMS</strong></h3>"
+                 . "<hr style='border: solid 1px red'/>"
+				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<tbody>";
+				 foreach ($lattestitem  as $key) {
+				 	$ret .= "<tr>"
+						 . "<td width='20'>".$no++.".</td>"
+						 . "<td width='50%'>$key->produk_nm</td>"
+						 . "<td width='100'>$key->totalqty X</td>"
+						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
+						 . "</tr>";
+				}
+				 
+
+			$ret .= "</tbody>"
+				 . "</table>" // TOP ITEMS
+
+				 . "</div>" // col-md-12
+
 				 . "</div>" // row
 				 . "</div>"; // col-md-12
 	          

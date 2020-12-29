@@ -30,6 +30,19 @@ class Karyawan extends BaseController
 		return view('backend/karyawan',$data);
 	}
 
+    public function listpengguna() {
+        if (session()->get('user_nm') == "") {
+            session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
+            return redirect()->to(base_url('/'));
+        }
+        $data = [
+            'title' => 'Karyawan',
+            'subtitle' => 'Karyawan',
+            'user' => $this->usersmodel->getbynormal()->getResult(),
+        ];
+        return view('backend/listpengguna',$data);
+    }
+
 	public function formdaftarkaryawan() {
 		if (session()->get('user_nm') == "") {
             session()->setFlashdata('error', 'Anda belum login! Silahkan login terlebih dahulu');
@@ -44,6 +57,38 @@ class Karyawan extends BaseController
 
 		return view('backend/formdaftarkaryawan',$data);
 	}
+
+    public function formtambahkaryawan() {
+        $ret = "<div class='modal-dialog'>"
+                . "<div class='modal-content'>"
+                . "<div class='modal-header'>"
+                . "<button type='button' class='btn btn-warning' data-dismiss='modal' aria-hidden='true'>×</button>"
+                . "</div>"
+                . "<div class='modal-body'>"
+                . "<div class='col-md-12'>"
+                . "<form>"
+                . "<div class='form-group'>"
+                . "<div class='input-group'>"
+                . "<input id='user_nm' class='form-control' type='text' placeholder='Username' name='user_nm'>"
+                . "</div>"
+                . "</div>"
+                . "<div class='form-group'>"
+                . "<div class='input-group'>"
+                . "<input id='password' class='form-control' type='text' placeholder='Password' name='password'>"
+                . "</div>"
+                . "</div>"
+                . "<div>"
+                . "<button onclick='simpanuser()' class='btn btn-info'>Simpan</button>"
+                . "</div>"
+                . "</form>"
+                . "</div>"
+                . "</div>" // modal body
+                . "</div>"
+                . "</div>";
+
+
+                return $ret;
+    }
 
 	public function cariByname(){
 		$person_nm = $this->request->getVar('person_nm');

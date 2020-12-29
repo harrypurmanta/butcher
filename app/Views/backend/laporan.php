@@ -24,26 +24,27 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="card">
                             <div class="card-body">
-                               <div class="row">
-                               	<div class="col-md-12">
-                               		<div class="form-group">
-                               			<select class="select2 form-control custom-select" style="width: 100%; height:36px;">
-                               				<option value="finish">Finish</option>
-                               				<option value="cancel">Void</option>
-                               				<option value="">Void</option>
-                               				<option value="">Void</option>
-                               				<option value="">Void</option>
-                               			</select>
-                               		</div>
-                               		<div class="form-group">
-                               			<label class="control-label">Start Dttm</label>
-                               			<input type="date" class="form-control" placeholder="dd/mm/yyyy" name="start_dttm" id="start_dttm">
-                               		</div>
+                            	<div class="col-md-12">
+                               		<div class="row">
+                               			<div class="form-group col-2">
+                               				<label class="control-label">Tipe</label>
+	                               			<select id="status_cd" class="select2 form-control custom-select">
+	                               				<option value="closed">Closed</option>
+	                               				<option value="cancel">Void</option>
+	                               			</select>
+	                               		</div>
+	                               			<div class="form-group col-2">
+		                               			<label class="control-label">Start Dttm</label>
+		                               			<input type="date" class="form-control" placeholder="dd/mm/yyyy" name="start_dttm" id="start_dttm">
+		                               		</div>
 
-                               		<div class="form-group">
-                               			<label class="control-label">End Dttm</label>
-                               			<input type="date" class="form-control" placeholder="dd/mm/yyyy" name="end_dttm" id="end_dttm">
-                               		</div>
+		                               		<div class="form-group col-2">
+		                               			<label class="control-label">End Dttm</label>
+		                               			<input type="date" class="form-control" placeholder="dd/mm/yyyy" name="end_dttm" id="end_dttm">
+		                               		</div>
+		                               		<div class="form-group col-2">
+		                               			<button onclick="submitfilterlaporan()" class="btn btn-info">Submit</button>
+		                               		</div>
                                	</div>
                                </div>
 
@@ -69,13 +70,15 @@
             <!-- ============================================================== -->
 
 <script type="text/javascript">
-$(document).ready(function($){
-    laporan_content();
-});
 
-function laporan_content() {
+function submitfilterlaporan() {
+	var status_cd = $('#status_cd').val();
+	var start_dttm = $('#start_dttm').val();
+	var end_dttm = $('#end_dttm').val();
 	$.ajax({
-    url : "<?= base_url('kasir/closekasir') ?>",
+    url : "<?= base_url('laporan/reportclosekasir') ?>",
+    type: 'post',
+    data: {status_cd:status_cd,start_dttm:start_dttm,end_dttm:end_dttm},
     beforeSend: function () { 
       $("#loader-wrapper").removeClass("d-none")
     },
