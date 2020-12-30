@@ -102,12 +102,6 @@ class Laporan extends BaseController
 				 . "<table style='font-size:18px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 	$ret .= "<tr>"
-						 . "<td width='150'>Gross Sales</td>"
-						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
-						 . "</tr>"
-
-						 . "<tr>"
 						 . "<td width='150'>Discounts</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttldiscount)."</td>"
