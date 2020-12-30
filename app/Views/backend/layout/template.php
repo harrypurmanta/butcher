@@ -59,17 +59,15 @@ $this->session->start();
                 <!-- ============================================================== -->
                 <!-- Logo -->
                 <!-- ============================================================== -->
-                <div class='navbar-header'>
+                <div>
                     <a class='navbar-brand' href='<?=base_url() ?>'>
-                     
                          <img src='<?=base_url() ?>/images/lib/logo.png' alt='homepage' class='dark-logo' />
-                         <!-- Light Logo text -->    
-                         <img src='<?=base_url() ?>/images/lib/logo.png' class='light-logo' alt='homepage' /></span> </a>
+                     </a>
                 </div>
                 <!-- ============================================================== -->
                 <!-- End Logo -->
                 <!-- ============================================================== -->
-                <div class='collapse navbar-collapse' id='navbarSupportedContent'>
+                <div class='collapse navbar-collapse'>
                     <ul class='navbar-nav mr-auto'>
                         <li class='nav-item'> 
                             <a class='nav-link' href='<?= base_url() ?>'>

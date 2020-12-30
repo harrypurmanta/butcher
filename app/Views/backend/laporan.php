@@ -7,7 +7,7 @@
         <!-- ============================================================== -->
         <!-- Page wrapper  -->
         <!-- ============================================================== -->
-        <div class="page-wrapper">
+        <div class="page-wrapper m-t-20">
             
             <!-- ============================================================== -->
             <!-- Container fluid  -->
@@ -24,29 +24,28 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="card">
                             <div class="card-body">
-                            	<div class="col-md-12">
                                		<div class="row">
-                               			<div class="form-group col-2">
+                               			<div class="form-group col-md-3">
                                				<label class="control-label">Tipe</label>
 	                               			<select id="status_cd" class="select2 form-control custom-select">
 	                               				<option value="closed">Closed</option>
 	                               				<option value="cancel">Void</option>
 	                               			</select>
 	                               		</div>
-	                               			<div class="form-group col-2">
+	                               			<div class="form-group col-md-3">
 		                               			<label class="control-label">Start Dttm</label>
 		                               			<input type="date" class="form-control" placeholder="dd/mm/yyyy" name="start_dttm" id="start_dttm">
 		                               		</div>
 
-		                               		<div class="form-group col-2">
+		                               		<div class="form-group col-md-3">
 		                               			<label class="control-label">End Dttm</label>
 		                               			<input type="date" class="form-control" placeholder="dd/mm/yyyy" name="end_dttm" id="end_dttm">
 		                               		</div>
-		                               		<div class="form-group col-2">
+		                               		<div class="form-group col-md-3">
 		                               			<button onclick="submitfilterlaporan()" class="btn btn-info">Submit</button>
 		                               		</div>
-                               	</div>
-                               </div>
+                               		</div>
+                               <!-- </div> -->
 
                                <div class="row">
                                	<div class="col-md-12">

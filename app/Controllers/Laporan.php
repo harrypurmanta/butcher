@@ -92,14 +92,14 @@ class Laporan extends BaseController
 		$notunai = 1;
 		$totaltunai = 0;
     	$date = date('Y-m-d');
-    	$ret = "<div class='col-md-12'>"
+    	$ret = "<div class='col-md-12 p-0'>"
 	            . "<div class='row'>"
 				 . "<div class='col-md-5'>"
 				 . "<div class='card'>"
-                 . "<div class='card-body'>"
+                 . "<div class='card-body p-0'>"
                  . "<h3><strong>SALES</strong></h3>"
                  . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
+				 . "<table style='font-size:18px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 	$ret .= "<tr>"
 						 . "<td width='150'>Gross Sales</td>"
@@ -150,10 +150,10 @@ class Laporan extends BaseController
 				. "<div class='col-md-7'>"
 				 . "<div class='card' style='margin-bottom: 0px !important;'>"
 
-				 . "<div class='card-body'>" // card-body paypaln
+				 . "<div class='card-body p-0'>" // card-body paypaln
 				 . "<h3><strong>EDC</strong></h3>"
 				 . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<table style='font-size:16px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 foreach ($edc as $kedc) {
 					 	$ret .= "<tr>"
@@ -170,7 +170,7 @@ class Laporan extends BaseController
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<h3><strong>TUNAI</strong></h3>"
 				 . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<table style='font-size:16px;' width='100%' data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 foreach ($tunai as $ktunai) {
 					 	$ret .= "<tr>"
@@ -194,7 +194,7 @@ class Laporan extends BaseController
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<h3><strong>TOP ITEMS</strong></h3>"
                  . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<table style='font-size:14px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 foreach ($topitem as $key) {
 				 	$ret .= "<tr>"
@@ -212,7 +212,7 @@ class Laporan extends BaseController
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<h3><strong>LATTEST ITEMS</strong></h3>"
                  . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
+				 . "<table style='font-size:14px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 foreach ($lattestitem  as $key) {
 				 	$ret .= "<tr>"
