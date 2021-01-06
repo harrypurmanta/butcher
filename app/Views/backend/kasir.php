@@ -518,8 +518,8 @@ function simpanproduk(produk_id,btn) {
                 showCancelButton:0,
                 confirmButtonColor:"#556ee6",
                 cancelButtonColor:"#f46a6a"
-            })
-          } else if {
+            });
+          } else {
             Swal.fire({
                 title:"Gagal!",
                 text:"Data gagal disimpan!",
@@ -527,7 +527,7 @@ function simpanproduk(produk_id,btn) {
                 showCancelButton:0,
                 confirmButtonColor:"#556ee6",
                 cancelButtonColor:"#f46a6a"
-            })
+            });
           }
           b.text(b.attr('data-old'));
           $("#loader-wrapper").addClass("d-none");
