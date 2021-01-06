@@ -1444,8 +1444,8 @@ class Kasir extends BaseController
     			$ttlvoid = $ttlvoid + $void->totalvoid;
     		}
     	}
-    	$grosssales = $getReport[0]->amt_before_discount + $getReport[0]->totaltax + $getReport[0]->totalservice;
-    	$netsales = $grosssales - $getReport[0]->ttldiscount;
+    	// $grosssales = $getReport[0]->grosssales + $getReport[0]->totaltax + $getReport[0]->totalservice;
+    	// $netsales = $grosssales - $getReport[0]->ttldiscount;
 		$ret = "";
 		$no = 1;
 		$nopayplan = 1;
@@ -1477,9 +1477,9 @@ class Kasir extends BaseController
 				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 	$ret .= "<tr>"
-						 . "<td width='150'>Gross Sales</td>"
+						 . "<td width='150'>Net Sales</td>"
 						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($grosssales)."</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
 						 . "</tr>"
 
 						 . "<tr>"
@@ -1488,11 +1488,11 @@ class Kasir extends BaseController
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttldiscount)."</td>"
 						 . "</tr>"
 
-						 . "<tr>"
-						 . "<td width='150'>Net Sales</td>"
-						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($netsales)."</td>"
-						 . "</tr>"
+						 // . "<tr>"
+						 // . "<td width='150'>Net Sales</td>"
+						 // . "<td width='20'>:</td>"
+						 // . "<td align='right'>Rp. ".number_format($netsales)."</td>"
+						 // . "</tr>"
 
 						 . "<tr>"
 						 . "<td width='150'>Service</td>"
@@ -1654,11 +1654,11 @@ class Kasir extends BaseController
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttldiscount)."</td>"
 						 . "</tr>"
 
-						 . "<tr>"
-						 . "<td width='150'>Net Sales</td>"
-						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($netsales)."</td>"
-						 . "</tr>"
+						 // . "<tr>"
+						 // . "<td width='150'>Net Sales</td>"
+						 // . "<td width='20'>:</td>"
+						 // . "<td align='right'>Rp. ".number_format($netsales)."</td>"
+						 // . "</tr>"
 
 						 . "<tr>"
 						 . "<td width='150'>Service</td>"
@@ -1885,54 +1885,56 @@ class Kasir extends BaseController
 		$getbill 			= $this->billingmodel->getbyMejaidkasir($meja_id)->getResult();
 		$kasir_status 		= $this->billingmodel->getStatuskasir()->getResult();
 		$kasirstatus 		= $kasir_status[0]->kasir_status_id;
-		
-		if (count($getbill)>0) {
-			$billing_id = $getbill[0]->billing_id;
+		if ($meja_id == 0) {
+			return "mejakosong";
 		} else {
-			$desclimit 	= $this->billingmodel->getDesclim1()->getResult();
-			if (count($desclimit)>0) {
-				$code = $desclimit[0]->billing_id + 1;
+			if (count($getbill)>0) {
+				$billing_id = $getbill[0]->billing_id;
 			} else {
-				$code = 1;
+				$desclimit 	= $this->billingmodel->getDesclim1()->getResult();
+				if (count($desclimit)>0) {
+					$code = $desclimit[0]->billing_id + 1;
+				} else {
+					$code = 1;
+				}
+
+				$zero = str_pad($code, 4, "0", STR_PAD_LEFT);
+				$billing_cd = "LAV-".date('Ym')."$zero";
+
+				$data = [
+					'kasir_status_id' => $kasirstatus,
+				  	'meja_id' => $meja_id,
+				  	'billing_cd' => $billing_cd,
+				  	'jumlah_customer' => $jumlah_customer,
+				  	'status_cd' => 'verified',
+				  	'collected_user' => $collected_user,
+				  	'created_dttm' => $date,
+				  	'created_user' => $meja_id
+				];
+				$billing_id = $this->billingmodel->simpanbilling($data);
 			}
 
-			$zero = str_pad($code, 4, "0", STR_PAD_LEFT);
-			$billing_cd = "LAV-".date('Ym')."$zero";
-
-			$data = [
-				'kasir_status_id' => $kasirstatus,
-			  	'meja_id' => $meja_id,
-			  	'billing_cd' => $billing_cd,
-			  	'jumlah_customer' => $jumlah_customer,
-			  	'status_cd' => 'verified',
-			  	'collected_user' => $collected_user,
-			  	'created_dttm' => $date,
-			  	'created_user' => $meja_id
-			];
-			$billing_id = $this->billingmodel->simpanbilling($data);
+			if ($billing_id != "") {
+				$produk = $this->produkmodel->getbyId($produk_id)->getResult();
+				$harga = $produk[0]->produk_harga * $qty;
+				$dataitem = [
+					'billing_id' 	=> $billing_id,
+					'item_dttm'  	=> $date,
+					'produk_id'  	=> $produk_id,
+					'produk_nm'  	=> $produk[0]->produk_nm,
+					'qty' 		 	=> $qty,
+					'price'		 	=> $harga,
+					'description' 	=> $catatan,
+					'status_cd' 	=> 'normal',
+					'created_dttm' 	=> $date,
+					'created_user' 	=> $meja_id
+				];
+				$bil_item = $this->billingmodel->simpanbillitem($dataitem);
+				return 'true';
+			} else {
+				return 'false';
+			}
 		}
-
-		if ($billing_id != "") {
-			$produk = $this->produkmodel->getbyId($produk_id)->getResult();
-			$harga = $produk[0]->produk_harga * $qty;
-			$dataitem = [
-				'billing_id' 	=> $billing_id,
-				'item_dttm'  	=> $date,
-				'produk_id'  	=> $produk_id,
-				'produk_nm'  	=> $produk[0]->produk_nm,
-				'qty' 		 	=> $qty,
-				'price'		 	=> $harga,
-				'description' 	=> $catatan,
-				'status_cd' 	=> 'normal',
-				'created_dttm' 	=> $date,
-				'created_user' 	=> $meja_id
-			];
-			$bil_item = $this->billingmodel->simpanbillitem($dataitem);
-			return 'true';
-		} else {
-			return 'false';
-		}
-
 	}
 
 	public function adddiscounttobill() {
@@ -2670,7 +2672,7 @@ class Kasir extends BaseController
     			$ttlvoid = $ttlvoid + $void->totalvoid;
     		}
     	}
-    	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+    	// $netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
     	$date = date('Y-m-d H:i:s');
 
 		
@@ -2704,9 +2706,9 @@ class Kasir extends BaseController
 
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
     		    $this->printer->setEmphasis(true);
-    		    $this->printer->text($this->buatBaris4Kolom("Gross Sales",":",number_format($getReport[0]->grosssales)));
-    		    $this->printer->text($this->buatBaris4Kolom("Discounts",":",number_format($getReport[0]->grosssales)));
-    		    $this->printer->text($this->buatBaris4Kolom("Net Sales",":",number_format($netsales)));
+    		    $this->printer->text($this->buatBaris4Kolom("Net Sales",":",number_format($getReport[0]->grosssales)));
+    		    $this->printer->text($this->buatBaris4Kolom("Discounts",":",number_format($getReport[0]->ttldiscount)));
+    		    // $this->printer->text($this->buatBaris4Kolom("Net Sales",":",number_format($netsales)));
     		    $this->printer->text($this->buatBaris4Kolom("Service",":",number_format($getReport[0]->totalservice)));
     		    $this->printer->text($this->buatBaris4Kolom("Tax",":",number_format($getReport[0]->totaltax)));
     		    $this->printer->text($this->buatBaris4Kolom("Void".$qtyvoid.")",":",number_format($ttlvoid)));
@@ -3074,6 +3076,7 @@ class Kasir extends BaseController
 					'amt_before_discount' 	=> $amt_before_discount,
 					'tax' 					=> $tax,
 					'service' 				=> $service,
+					'rounding' 				=> $nilaibulat,
 					'finish_dttm' 			=> date('Y-m-d H:i:s'),
 					'finish_user' 			=> $this->session->user_id,
 					'status_cd' 			=> 'finish'

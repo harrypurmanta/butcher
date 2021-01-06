@@ -491,38 +491,59 @@ function simpanproduk(produk_id,btn) {
   var catatan = $("#catatan").val();
   var jumlah_customer = $("#jumlah_customer").val();
   var collected_user = $("#collecteduser").val();
-  $.ajax({
-      url : "<?= base_url('kasir/addproduktobill') ?>",
-      type: "POST",
-      data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan,jumlah_customer:jumlah_customer,collected_user:collected_user},
-      success:function(data){
-        if (data == 'true') {
-          showbillingbymeja2(meja_id);
-          $('#modaltambahmember').modal('hide');
-        } else {
-          Swal.fire({
-              title:"Gagal!",
-              text:"Data gagal disimpan!",
-              type:"warning",
-              showCancelButton:0,
-              confirmButtonColor:"#556ee6",
-              cancelButtonColor:"#f46a6a"
-          })
+
+  if (meja_id == 0) {
+    Swal.fire({
+        title:"Error. Refresh Halaman!",
+        text:"Data gagal disimpan!",
+        type:"warning",
+        showCancelButton:0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else {
+    $.ajax({
+        url : "<?= base_url('kasir/addproduktobill') ?>",
+        type: "POST",
+        data: {produk_id:produk_id,meja_id:meja_id,jumlah:jumlah,catatan:catatan,jumlah_customer:jumlah_customer,collected_user:collected_user},
+        success:function(data){
+          if (data == 'true') {
+            showbillingbymeja2(meja_id);
+            $('#modaltambahmember').modal('hide');
+          } else if (data == 'mejakosong') {
+            Swal.fire({
+                title:"Error. Refresh Halaman!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+          } else if {
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+          }
+          b.text(b.attr('data-old'));
+          $("#loader-wrapper").addClass("d-none");
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
         }
-        b.text(b.attr('data-old'));
-        $("#loader-wrapper").addClass("d-none");
-      },
-      error:function(){
-          Swal.fire({
-              title:"Gagal!",
-              text:"Data gagal disimpan!",
-              type:"warning",
-              showCancelButton:!0,
-              confirmButtonColor:"#556ee6",
-              cancelButtonColor:"#f46a6a"
-          })
-      }
-  });
+    });
+  }
 }
 
 function billinghistoryfinish() {
