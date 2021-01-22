@@ -12,8 +12,8 @@ use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
 use App\Models\Laporanmodel;
 
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 
 class Laporan extends BaseController
 {
@@ -195,7 +195,6 @@ class Laporan extends BaseController
 						 . "<td width='20'>".$no++.".</td>"
 						 . "<td width='50%'>$key->produk_nm</td>"
 						 . "<td width='100'>$key->totalqty X</td>"
-						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
 						 . "</tr>";
 				}
 				 
@@ -203,23 +202,7 @@ class Laporan extends BaseController
 			$ret .= "</tbody>"
 				 . "</table>" // TOP ITEMS
 
-				 . "<hr style='border: solid 1px red'/>"
-				 . "<h3><strong>LATTEST ITEMS</strong></h3>"
-                 . "<hr style='border: solid 1px red'/>"
-				 . "<table style='font-size:14px;' width='100%'  data-toggle='table' data-height='250' data-mobile-responsive='true' class='table-striped'>"
-				 . "<tbody>";
-				 foreach ($lattestitem  as $key) {
-				 	$ret .= "<tr>"
-						 . "<td width='20'>".$no++.".</td>"
-						 . "<td width='50%'>$key->produk_nm</td>"
-						 . "<td width='100'>$key->totalqty X</td>"
-						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
-						 . "</tr>";
-				}
 				 
-
-			$ret .= "</tbody>"
-				 . "</table>" // TOP ITEMS
 
 				 . "</div>" // col-md-12
 
@@ -228,6 +211,17 @@ class Laporan extends BaseController
 	          
 
 	    return $ret;
+    }
+
+    public function chartCustomer() {
+    	$start_dttm = "2021-01-01 00:00:00";
+    	$end_dttm = "2021-01-01 23:59:59";
+
+    	$res = $this->laporanmodel->getCustomerbyrange($start_dttm,$end_dttm)->getResult();
+    	$data = array();
+    	// $data = ;
+
+    	echo json_encode($res);
     }
 
 }

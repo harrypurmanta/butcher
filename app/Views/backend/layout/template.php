@@ -89,6 +89,7 @@ $this->session->start();
                                         <a class='dropdown-item' href='".base_url()."/payplan'>Cara Bayar</a>
                                         <a class='dropdown-item' href='".base_url()."/membertype'>Tipe Member</a>
                                         <a class='dropdown-item' href='".base_url()."/meja'>Meja</a>
+                                        <a class='dropdown-item' href='".base_url()."/kategorimeja'>Kategori Meja</a>
                                         <a class='dropdown-item' href='".base_url()."/karyawan'>Karyawan</a>
                                     </div>
                                 </li>
@@ -128,15 +129,12 @@ $this->session->start();
                                             <div class='u-img'><img src='<?=base_url() ?>/assets/images/users/1.jpg' alt='user'></div>
                                             <div class='u-text'>
                                                 <h4>Steave Jobs</h4>
-                                                <p class='text-muted'><a href='https://www.wrappixel.com/cdn-cgi/l/email-protection' class='__cf_email__' data-cfemail='6f190e1d1a012f08020e0603410c0002'>[email&#160;protected]</a></p><a href='pages-profile.html' class='btn btn-rounded btn-danger btn-sm'>View Profile</a></div>
+                                            </div>
                                         </div>
                                     </li>
                                     <li role='separator' class='divider'></li>
-                                    <li><a href='#'><i class='ti-user'></i> My Profile</a></li>
-                                    <li><a href='#'><i class='ti-wallet'></i> My Balance</a></li>
-                                    <li><a href='#'><i class='ti-email'></i> Inbox</a></li>
-                                    <li role='separator' class='divider'></li>
-                                    <li><a href='#'><i class='ti-settings'></i> Account Setting</a></li>
+                               
+                                    <li><a href='<?=base_url() ?>/login/gantipassword'><i class='ti-settings'></i> Ganti Password</a></li>
                                     <li role='separator' class='divider'></li>
                                     <li><a href='<?=base_url()?>/login/logout'><i class='fa fa-power-off'></i>Logout</a></li>
                                 </ul>

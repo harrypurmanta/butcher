@@ -10,8 +10,8 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
@@ -59,7 +59,10 @@ class Kasir extends BaseController
 	}
 
 	public function cardbodymeja() {
-		$ret = "";
+		$tengah = "";
+		$samping = "";
+		$atas = "";
+		$takeaway = "";
 		$kasirstatus = $this->billingmodel->getStatuskasir()->getResult();
 		if (count($kasirstatus)>0) {
 			if ($kasirstatus[0]->status_cd == "open") {
@@ -79,11 +82,45 @@ class Kasir extends BaseController
 					} else {
 					  $btnclass = "btn btn-info";
 					}
-					
-					$ret .= "<div style='display: inline-block; margin: 5px;'>
-								<button onclick='clickmejabutton($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
-							</div>";	   
+
+					if ($key->kategori_meja_id == 1) {
+						$tengah .= "<div style='display: inline-block; margin: 5px;'>
+									<button onclick='clickmejabutton($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
+								</div>";	
+					} else if ($key->kategori_meja_id == 2) {
+						$samping .= "<div style='display: inline-block; margin: 5px;'>
+									<button onclick='clickmejabutton($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
+								</div>";	
+					} else if ($key->kategori_meja_id == 3) {
+						$atas .= "<div style='display: inline-block; margin: 5px;'>
+									<button onclick='clickmejabutton($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
+								</div>";	
+					} else if ($key->kategori_meja_id == 4) {
+						$takeaway .= "<div style='display: inline-block; margin: 5px;'>
+									<button onclick='clickmejabutton($key->meja_id)' class='$btnclass font-weight-bold' style='font-size: 20px; padding: 10px;'>$key->meja_nm</button>
+								</div>";	
+					}
+					   
 				}
+				$ret = "<table class='active'>"
+					. "<tr><td style='font-weight:bold;'>TENGAH</td></tr>"
+					. "<tr class='border-bottom'><td style='padding-bottom: 50px;'>"
+					. "$tengah"
+					. "</td></tr>"
+					. "<tr><td style='font-weight:bold;'>SAMPING</td></tr>"
+				 	. "<tr class='border-bottom'><td style='padding-bottom: 50px;'>"
+				 	. "$samping"
+				 	. "</td></tr>"
+				 	. "<tr><td style='font-weight:bold;'>TAKEAWAY</td></tr>"
+				 	. "<tr class='border-bottom'><td style='padding-bottom: 50px;'>"
+				 	. "$takeaway"
+				 	. "</td></tr>"
+				 	. "<tr><td style='font-weight:bold;'>ATAS</td></tr>"
+				 	. "<tr><td>"
+				 	. "$atas"
+				 	. "</td></tr>"
+				 	. "</table>";
+				
 			} else {
 				$ret .= "<div align='center' style='display: inline-block; margin: 5px;'>
 							<button onclick='openkasir()' class='btn btn-info font-weight-bold' style='font-size: 20px; padding: 10px;'>OPEN KASIR</button>
@@ -94,6 +131,7 @@ class Kasir extends BaseController
 						<button onclick='openkasir()' class='btn btn-info font-weight-bold' style='font-size: 20px; padding: 10px;'>OPEN KASIR</button>
 					</div>";	
 		}
+		
 		return $ret;                       
 	}
 
@@ -184,6 +222,8 @@ class Kasir extends BaseController
 						return "false";
 					}
 				}
+			} else {
+				return false;
 			}
 			
 
@@ -389,7 +429,12 @@ class Kasir extends BaseController
 						if ($symb == "%") {
 							$percentega = str_replace("%", "", $dc->value);
 							$ptotal = ($percentega/100) * $total;
-							list($harga,$belakangkoma) = explode(".", $ptotal);
+							// list($harga,$belakangkoma) = explode(".", $ptotal);
+							if (is_numeric($ptotal)) {
+								    $harga = $ptotal;
+								} else {
+								    list($harga,$belakangkoma) = explode(".", $ptotal);
+								}
 							$discount = "<span style='font-size: 16px;'>(".number_format($harga).")</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
 							$afterdc = $total - $harga;
 							$subtotal = $subtotal + $afterdc;
@@ -443,18 +488,30 @@ class Kasir extends BaseController
 				
 				    
 					$servicex = $amt_before_discount * 0.05;
-					if (strpos($servicex,'.') == TRUE) {
-						list($service,$belakangkomas) = explode(".", $servicex);
-					} else {
-						$service = $servicex;
-					}
+					// if (strpos($servicex,'.') == TRUE) {
+					// 	list($service,$belakangkomas) = explode(".", $servicex);
+					// } else {
+					// 	$service = $servicex;
+					// }
 
-					$taxx = ($amt_before_discount + $service) * 0.10;
-					if (strpos($taxx,'.') == TRUE) {
-						list($tax,$belakangkoma) = explode(".", $taxx);
+					
+
+					if (is_numeric($servicex)) {
+						$service = $servicex;
 					} else {
-						$tax = $taxx;
+						list($service,$belakangkomas) = explode(".", $servicex);
 					}
+					$taxx = ($amt_before_discount + $service) * 0.10;
+					if (is_numeric($taxx)) {
+						$tax = $taxx;
+					} else {
+						list($tax,$belakangkomas) = explode(".", $taxx);
+					}
+					// if (strpos($taxx,'.') == TRUE) {
+					// 	list($tax,$belakangkoma) = explode(".", $taxx);
+					// } else {
+					// 	$tax = $taxx;
+					// }
 					
 					
 					$grandtotal = $subtotal + $tax + $service;
@@ -619,7 +676,12 @@ class Kasir extends BaseController
 						if ($symb == "%") {
 							$percentega = str_replace("%", "", $dc->value);
 							$ptotal = ($percentega/100) * $total;
-							list($harga,$belakangkoma) = explode(".", $ptotal);
+							// list($harga,$belakangkoma) = explode(".", $ptotal);
+							if (is_numeric($ptotal)) {
+								    $harga = $ptotal;
+								} else {
+								    list($harga,$belakangkoma) = explode(".", $ptotal);
+								}
 							$discount = "<span style='font-size: 16px;'>(".number_format($harga).")</span> <a href='#' onclick='removedcmember($id,$dc->billing_discount_id)'><i style='color:red;' class='fas fa-times'></i></a>";
 							$afterdc = $total - $harga;
 							$subtotal = $subtotal + $afterdc;
@@ -673,17 +735,17 @@ class Kasir extends BaseController
 				
 				    
 					$servicex = $amt_before_discount * 0.05;
-					if (strpos($servicex,'.') == TRUE) {
-						list($service,$belakangkomas) = explode(".", $servicex);
-					} else {
+					if (is_numeric($servicex)) {
 						$service = $servicex;
+					} else {
+						list($service,$belakangkomas) = explode(".", $servicex);
 					}
 
 					$taxx = ($amt_before_discount + $service) * 0.10;
-					if (strpos($taxx,'.') == TRUE) {
-						list($tax,$belakangkoma) = explode(".", $taxx);
-					} else {
+					if (is_numeric($taxx)) {
 						$tax = $taxx;
+					} else {
+						list($tax,$belakangkoma) = explode(".", $taxx);
 					}
 					
 					
@@ -1437,13 +1499,21 @@ class Kasir extends BaseController
     	$tunai = $this->billingmodel->getPayplanTunai($kasir_status_id)->getResult();
     	$getReport = $this->billingmodel->getReport($kasir_status_id)->getResult();
     	$getVoid = $this->billingmodel->getVoid($kasir_status_id)->getResult();
-    	$qtyvoid = count($getVoid);
-    	$ttlvoid = 0;
-    	if ($qtyvoid > 0) {
-    		foreach ($getVoid as $void) {
-    			$ttlvoid = $ttlvoid + $void->totalvoid;
-    		}
+    	// echo json_encode($getVoid);exit;
+    	if (count($getVoid)>0) {
+    		$ttlqtyvoid = $getVoid[0]->ttlqtyvoid;
+    		$totalvoid = $getVoid[0]->totalvoid;
+    	} else {
+    		$ttlqtyvoid = 0;
+    		$totalvoid = 0;
     	}
+    	// $qtyvoid = count($getVoid);
+    	// $ttlvoid = 0;
+    	// if ($qtyvoid > 0) {
+    	// 	foreach ($getVoid as $void) {
+    	// 		$ttlvoid = $ttlvoid + $void->totalvoid;
+    	// 	}
+    	// }
     	// $grosssales = $getReport[0]->grosssales + $getReport[0]->totaltax + $getReport[0]->totalservice;
     	// $netsales = $grosssales - $getReport[0]->ttldiscount;
 		$ret = "";
@@ -1507,9 +1577,15 @@ class Kasir extends BaseController
 						 . "</tr>"
 
 						 . "<tr>"
-						 . "<td width='150'>Void (".$qtyvoid.")</td>"
+						 . "<td width='150'>Rounding</td>"
 						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($ttlvoid)."</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttlrounding)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Void (".$ttlqtyvoid.")</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($totalvoid)."</td>"
 						 . "</tr>";
 				 
 
@@ -1524,9 +1600,8 @@ class Kasir extends BaseController
 				 foreach ($topitem as $key) {
 				 	$ret .= "<tr>"
 						 . "<td width='20'>".$no++.".</td>"
-						 . "<td width='50%'>$key->produk_nm</td>"
-						 . "<td width='50'>$key->totalqty X</td>"
-						 . "<td align='right'>Rp. ".number_format($key->totalprice)."</td>"
+						 . "<td>$key->produk_nm</td>"
+						 . "<td style='padding-left: 10px;'>$key->totalqty X</td>"
 						 . "</tr>";
 				}
 				 
@@ -1620,13 +1695,21 @@ class Kasir extends BaseController
     	$tunai = $this->billingmodel->getPayplanTunai($kasir_status_id)->getResult();
     	$getReport = $this->billingmodel->getReport($kasir_status_id)->getResult();
     	$getVoid = $this->billingmodel->getVoid($kasir_status_id)->getResult();
-    	$qtyvoid = count($getVoid);
-    	$ttlvoid = 0;
-    	if ($qtyvoid > 0) {
-    		foreach ($getVoid as $void) {
-    			$ttlvoid = $ttlvoid + $void->totalvoid;
-    		}
+    	if (count($getVoid)>0) {
+    		$ttlqtyvoid = $getVoid[0]->ttlqtyvoid;
+    		$totalvoid = $getVoid[0]->totalvoid;
+    	} else {
+    		$ttlqtyvoid = 0;
+    		$totalvoid = 0;
     	}
+
+    	// $qtyvoid = count($getVoid);
+    	// $ttlvoid = 0;
+    	// if ($qtyvoid > 0) {
+    	// 	foreach ($getVoid as $void) {
+    	// 		$ttlvoid = $ttlvoid + $void->totalvoid;
+    	// 	}
+    	// }
     	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
 
 		$ret = "";
@@ -1673,9 +1756,15 @@ class Kasir extends BaseController
 						 . "</tr>"
 
 						 . "<tr>"
-						 . "<td width='150'>Void (".$qtyvoid.")</td>"
+						 . "<td width='150'>Rounding</td>"
 						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($ttlvoid)."</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttlrounding)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Void (".$ttlqtyvoid.")</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($totalvoid)."</td>"
 						 . "</tr>";
 				 
 
@@ -2362,7 +2451,12 @@ class Kasir extends BaseController
 							if ($symb == "%") {
 								$percentega = str_replace("%", "", $dc->value);
 								$ptotal = ($percentega/100) * $total;
-								list($harga,$belakangkoma) = explode(".", $ptotal);
+								// list($harga,$belakangkoma) = explode(".", $ptotal);
+								if (is_numeric($ptotal)) {
+								    $harga = $ptotal;
+								} else {
+								    list($harga,$belakangkoma) = explode(".", $ptotal);
+								}
 								$nilaidiskon = "(".$harga.")";
 								$afterdc = $total - $harga;
 								$subtotal = $subtotal + $afterdc;
@@ -2401,17 +2495,17 @@ class Kasir extends BaseController
 
 
 			    $servicex = $amt_before_discount * 0.05;
-				if (strpos($servicex,'.') == TRUE) {
-					list($service,$belakangkomas) = explode(".", $servicex);
-				} else {
+				if (is_numeric($servicex)) {
 					$service = $servicex;
+				} else {
+					list($service,$belakangkomas) = explode(".", $servicex);
 				}
 
 				$taxx = ($amt_before_discount + $service) * 0.10;
-				if (strpos($taxx,'.') == TRUE) {
-					list($tax,$belakangkoma) = explode(".", $taxx);
-				} else {
+				if (is_numeric($taxx)) {
 					$tax = $taxx;
+				} else {
+					list($tax,$belakangkoma) = explode(".", $taxx);
 				}
 
 				$grandtotal = $subtotal + $tax + $service;
@@ -2575,7 +2669,12 @@ class Kasir extends BaseController
 							if ($symb == "%") {
 								$percentega = str_replace("%", "", $dc->value);
 								$ptotal = ($percentega/100) * $total;
-								list($harga,$belakangkoma) = explode(".", $ptotal);
+								// list($harga,$belakangkoma) = explode(".", $ptotal);
+								if (is_numeric($ptotal)) {
+								    $harga = $ptotal;
+								} else {
+								    list($harga,$belakangkoma) = explode(".", $ptotal);
+								}
 								$nilaidiskon = "(".$harga.")";
 								$afterdc = $total - $harga;
 								$subtotal = $subtotal + $afterdc;
@@ -2615,17 +2714,17 @@ class Kasir extends BaseController
 				// $servicex = $amt_before_discount * 0.05;
 				// list($service,$belakangkoma) = explode(".", $servicex);
 				$servicex = $amt_before_discount * 0.05;
-				if (strpos($servicex,'.') == TRUE) {
-					list($service,$belakangkomas) = explode(".", $servicex);
-				} else {
+				if (is_numeric($servicex)) {
 					$service = $servicex;
+				} else {
+					list($service,$belakangkomas) = explode(".", $servicex);
 				}
 
 				$taxx = ($amt_before_discount + $service) * 0.10;
-				if (strpos($taxx,'.') == TRUE) {
-					list($tax,$belakangkoma) = explode(".", $taxx);
-				} else {
+				if (is_numeric($taxx)) {
 					$tax = $taxx;
+				} else {
+					list($tax,$belakangkoma) = explode(".", $taxx);
 				}
 
 				$grandtotal = $subtotal + $tax + $service;
@@ -2665,12 +2764,12 @@ class Kasir extends BaseController
     	$tunai = $this->billingmodel->getPayplanTunai($kasir_status_id)->getResult();
     	$getReport = $this->billingmodel->getReport($kasir_status_id)->getResult();
     	$getVoid = $this->billingmodel->getVoid($kasir_status_id)->getResult();
-    	$qtyvoid = count($getVoid);
-    	$ttlvoid = 0;
-    	if ($qtyvoid > 0) {
-    		foreach ($getVoid as $void) {
-    			$ttlvoid = $ttlvoid + $void->totalvoid;
-    		}
+    	if (count($getVoid)>0) {
+    		$ttlqtyvoid = $getVoid[0]->ttlqtyvoid;
+    		$totalvoid = $getVoid[0]->totalvoid;
+    	} else {
+    		$ttlqtyvoid = 0;
+    		$totalvoid = 0;
     	}
     	// $netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
     	$date = date('Y-m-d H:i:s');
@@ -2711,7 +2810,8 @@ class Kasir extends BaseController
     		    // $this->printer->text($this->buatBaris4Kolom("Net Sales",":",number_format($netsales)));
     		    $this->printer->text($this->buatBaris4Kolom("Service",":",number_format($getReport[0]->totalservice)));
     		    $this->printer->text($this->buatBaris4Kolom("Tax",":",number_format($getReport[0]->totaltax)));
-    		    $this->printer->text($this->buatBaris4Kolom("Void".$qtyvoid.")",":",number_format($ttlvoid)));
+    		    $this->printer->text($this->buatBaris4Kolom("Rounding",":",number_format($getReport[0]->ttlrounding)));
+    		    $this->printer->text($this->buatBaris4Kolom("Void".$ttlqtyvoid.")",":",number_format($totalvoid)));
 
     		    $this->printer->feed();
     		    $this->printer->text("--------------------------------\n");
@@ -2813,7 +2913,12 @@ class Kasir extends BaseController
 							if ($symb == "%") {
 								$percentega = str_replace("%", "", $dc->value);
 								$ptotal = ($percentega/100) * $total;
-								list($harga,$belakangkoma) = explode(".", $ptotal);
+								// list($harga,$belakangkoma) = explode(".", $ptotal);
+								if (is_numeric($ptotal)) {
+								    $harga = $ptotal;
+								} else {
+								    list($harga,$belakangkoma) = explode(".", $ptotal);
+								}
 								$nilaidiskon = "(".$harga.")";
 								$afterdc = $total - $harga;
 								$subtotal = $subtotal + $afterdc;
@@ -2853,17 +2958,17 @@ class Kasir extends BaseController
 				// $servicex = $amt_before_discount * 0.05;
 				// list($service,$belakangkoma) = explode(".", $servicex);
 				$servicex = $amt_before_discount * 0.05;
-				if (strpos($servicex,'.') == TRUE) {
-					list($service,$belakangkomas) = explode(".", $servicex);
-				} else {
+				if (is_numeric($servicex)) {
 					$service = $servicex;
+				} else {
+					list($service,$belakangkomas) = explode(".", $servicex);
 				}
 
 				$taxx = ($amt_before_discount + $service) * 0.10;
-				if (strpos($taxx,'.') == TRUE) {
-					list($tax,$belakangkoma) = explode(".", $taxx);
-				} else {
+				if (is_numeric($taxx)) {
 					$tax = $taxx;
+				} else {
+					list($tax,$belakangkoma) = explode(".", $taxx);
 				}
 
 				$grandtotal = $subtotal + $tax + $service;
@@ -2988,7 +3093,12 @@ class Kasir extends BaseController
 							if ($symb == "%") {
 								$percentega = str_replace("%", "", $dc->value);
 								$ptotal = ($percentega/100) * $total;
-								list($harga,$belakangkoma) = explode(".", $ptotal);
+								// list($harga,$belakangkoma) = explode(".", $ptotal);
+								if (is_numeric($ptotal)) {
+								    $harga = $ptotal;
+								} else {
+								    list($harga,$belakangkoma) = explode(".", $ptotal);
+								}
 								$nilaidiskon = "(".$harga.")";
 								$afterdc = $total - $harga;
 								$subtotal = $subtotal + $afterdc;
@@ -3027,18 +3137,29 @@ class Kasir extends BaseController
 
 
 			    $servicex = $amt_before_discount * 0.05;
-				if (strpos($servicex,'.') == TRUE) {
-					list($service,$belakangkomas) = explode(".", $servicex);
-				} else {
+				// if (strpos($servicex,'.') == TRUE) {
+				// 	list($service,$belakangkomas) = explode(".", $servicex);
+				// } else {
+				// 	$service = $servicex;
+				// }
+
+				if (is_numeric($servicex)) {
 					$service = $servicex;
+				} else {
+					list($service,$belakangkomas) = explode(".", $servicex);
 				}
 
 				$taxx = ($amt_before_discount + $service) * 0.10;
-				if (strpos($taxx,'.') == TRUE) {
-					list($tax,$belakangkoma) = explode(".", $taxx);
-				} else {
+				if (is_numeric($taxx)) {
 					$tax = $taxx;
+				} else {
+					list($tax,$belakangkomas) = explode(".", $taxx);
 				}
+				// if (strpos($taxx,'.') == TRUE) {
+				// 	list($tax,$belakangkoma) = explode(".", $taxx);
+				// } else {
+				// 	$tax = $taxx;
+				// }
 
 				$grandtotal = $subtotal + $tax + $service;
 				$jmlbulat = $this->pembulatanratusan($grandtotal);
@@ -3051,7 +3172,9 @@ class Kasir extends BaseController
 					$ttlpaid = $jmlbulat;
 					$ttl_paid = $ttlpaid;
 				}
+				
 				$kembalian = $ttl_paid - $jmlbulat;
+				
 
 			    $this->printer->setEmphasis(false);
 				$this->printer->text($this->buatBaris4Kolom("Subtotal","",number_format($subtotal))); 

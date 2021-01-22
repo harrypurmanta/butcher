@@ -311,14 +311,23 @@ class Billingmodel extends Model
 
     public function getReport($kasir_status_id) {
         return $this->db->table('billing')
-                        ->select('SUM(amt_before_discount) as amt_before_discount, SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount, SUM(tax) AS totaltax, SUM(service) AS totalservice')
+                        ->select('SUM(amt_before_discount) as amt_before_discount, SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount, SUM(tax) AS totaltax, SUM(service) AS totalservice, SUM(rounding) AS ttlrounding')
                         ->where('status_cd','finish')
                         ->where('kasir_status_id',$kasir_status_id)
                         ->get();
     }
 
     public function getVoid($kasir_status_id) {
-        return $this->db->query("SELECT billing_id as bill_id, (SELECT SUM(price) FROM billing_item WHERE billing_id=bill_id AND status_cd='cancel') AS totalvoid FROM billing WHERE status_cd = 'cancel' AND kasir_status_id='$kasir_status_id'");
+        return $this->db->table('billing a')
+                        ->select('SUM(b.price) AS totalvoid, SUM(b.qty) AS ttlqtyvoid')
+                        ->join('billing_item b', 'b.billing_id=a.billing_id', 'left')
+                        ->where('a.kasir_status_id',$kasir_status_id)
+                        ->where('b.status_cd', 'cancel')
+                        ->where('b.print_status', 'printed')
+                        ->get();
+
+
+        // return $this->db->query("SELECT billing_id as bill_id, (SELECT SUM(price) FROM billing_item WHERE billing_id=bill_id AND status_cd='cancel') AS totalvoid FROM billing WHERE status_cd = 'cancel' AND kasir_status_id='$kasir_status_id'");
     }
 
     public function getTopitem($kasir_status_id) {

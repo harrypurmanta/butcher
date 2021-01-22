@@ -77,6 +77,32 @@ $(document).ready(function($){
 // $('.selectpicker').selectpicker();
 });
 
+
+function listmejakasir() {
+  $.ajax({
+       url : "<?= base_url('kasir/cardbodymeja') ?>",
+       beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+       },
+       success:function(data){
+        $('#cardbodymeja').html(data);
+        $('#cardbody').empty();
+        $("#loader-wrapper").addClass("d-none");
+      },
+      error:function(){
+          Swal.fire({
+              title:"Gagal!",
+              text:"Data gagal disimpan!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+      }
+    });
+}
+
+
 function openkasir() {
   $.ajax({
     url : "<?= base_url('kasir/openkasir') ?>",
@@ -251,29 +277,7 @@ function simpanclosekasir(){
        })
 }
 
-function listmejakasir() {
-  $.ajax({
-       url : "<?= base_url('kasir/cardbodymeja') ?>",
-       beforeSend: function () { 
-          $("#loader-wrapper").removeClass("d-none")
-       },
-       success:function(data){
-        $('#cardbodymeja').html(data);
-        $('#cardbody').empty();
-        $("#loader-wrapper").addClass("d-none");
-      },
-      error:function(){
-          Swal.fire({
-              title:"Gagal!",
-              text:"Data gagal disimpan!",
-              type:"warning",
-              showCancelButton:!0,
-              confirmButtonColor:"#556ee6",
-              cancelButtonColor:"#f46a6a"
-          })
-      }
-    });
-}
+
 
 
 

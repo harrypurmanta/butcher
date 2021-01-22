@@ -6,7 +6,7 @@
         <!-- ============================================================== -->
         <!-- Page wrapper  -->
         <!-- ============================================================== -->
-        <div class="page-wrapper">
+        <div class="page-wrapper" style="margin-top: 35px;">
             
             <!-- ============================================================== -->
             <!-- Container fluid  -->
@@ -15,11 +15,7 @@
             <!-- ============================================================== -->
             <!-- Bread crumb and right sidebar toggle -->
             <!-- ============================================================== -->
-            <div class="row page-titles">
-                <div class="">
-                    <button class="right-side-toggle waves-effect waves-light btn-inverse btn btn-circle btn-sm pull-right m-l-10"><i class="ti-settings text-white"></i></button>
-                </div>
-            </div>
+            
             <!-- ============================================================== -->
             <!-- End Bread crumb and right sidebar toggle -->
             <!-- ============================================================== -->
@@ -27,56 +23,7 @@
                 <!-- ============================================================== -->
                 <!-- Stats box -->
                 <!-- ============================================================== -->
-                <div class="row">
-                    <div class="col-lg-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="m-r-20 align-self-center"><img src="../../assets/images/icon/income.png" alt="Income" /></div>
-                                    <div class="align-self-center">
-                                        <h6 class="text-muted m-t-10 m-b-0">Total Income</h6>
-                                        <h2 class="m-t-0">953,000</h2></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="m-r-20 align-self-center"><img src="../../assets/images/icon/expense.png" alt="Income" /></div>
-                                    <div class="align-self-center">
-                                        <h6 class="text-muted m-t-10 m-b-0">Total Expense</h6>
-                                        <h2 class="m-t-0">236,000</h2></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="m-r-20 align-self-center"><img src="../../assets/images/icon/assets.png" alt="Income" /></div>
-                                    <div class="align-self-center">
-                                        <h6 class="text-muted m-t-10 m-b-0">Total Assets</h6>
-                                        <h2 class="m-t-0">987,563</h2></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="m-r-20 align-self-center"><img src="../../assets/images/icon/staff.png" alt="Income" /></div>
-                                    <div class="align-self-center">
-                                        <h6 class="text-muted m-t-10 m-b-0">Total Staff</h6>
-                                        <h2 class="m-t-0">987,563</h2></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
                 <!-- ============================================================== -->
                 <!-- Sales overview chart -->
                 <!-- ============================================================== -->
@@ -97,29 +44,8 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div id="sales-overview2" class="p-relative" style="height:360px;"></div>
-                                <div class="stats-bar">
-                                    <div class="row text-center">
-                                        <div class="col-lg-4 col-md-4">
-                                            <div class="p-20">
-                                                <h6 class="m-b-0">Total Sales</h6>
-                                                <h3 class="m-b-0">$10,345</h3>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4">
-                                            <div class="p-20">
-                                                <h6 class="m-b-0">This Month</h6>
-                                                <h3 class="m-b-0">$7,589</h3>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4">
-                                            <div class="p-20">
-                                                <h6 class="m-b-0">This Week</h6>
-                                                <h3 class="m-b-0">$1,476</h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                               
                             </div>
                         </div>
                     </div>
@@ -128,6 +54,67 @@
                 
               
             </div>
+            <?php
+ 
+$dataPoints = array(
+    array("label"=> "WordPress", "y"=> 60.0),
+    array("label"=> "Joomla", "y"=> 6.5),
+    array("label"=> "Drupal", "y"=> 4.6),
+    array("label"=> "Magento", "y"=> 2.4),
+    array("label"=> "Blogger", "y"=> 1.9),
+    array("label"=> "Shopify", "y"=> 1.8),
+    array("label"=> "Bitrix", "y"=> 1.5),
+    array("label"=> "Squarespace", "y"=> 1.5),
+    array("label"=> "PrestaShop", "y"=> 1.3),
+    array("label"=> "Wix", "y"=> 0.9),
+    array("label"=> "OpenCart", "y"=> 0.8)
+);
+    
+
+    // echo json_encode($dataPoints);
+?>
+            <script src="<?=base_url() ?>/assets/js/canvas.min.js"></script>
+            <script>
+                window.onload = function () {
+                    var dataCustomer = null;
+                    $.ajax({
+                        url: "<?= base_url('laporan/chartCustomer') ?>",
+                        type: 'POST',
+                        dataType: 'json',
+                        // data: {
+                        //     start: start.unix(),
+                        //     end: end.unix()
+                        // },
+                        success: function(data) {
+                            dataCustomer = data;
+                            // alert(dataCustomer);
+
+                            var chart = new CanvasJS.Chart("chartContainer", {
+                                animationEnabled: true,
+                                theme: "light2",
+                            
+                                axisY: {
+                                    scaleBreaks: {
+                                        autoCalculate: true
+                                    }
+                                },
+                                data: [{
+                                    type: "column",
+                                    yValueFormatString: "#,##0",
+                                    indexLabel: "{y}",
+                                    indexLabelPlacement: "inside",
+                                    indexLabelFontColor: "white",
+                                    dataPoints: dataCustomer,
+                                }]
+                            });
+                            chart.render();
+                        }
+                    });
+                 
+                
+                 
+                }
+                </script>
             <!-- ============================================================== -->
             <!-- End Container fluid  -->
             <!-- ============================================================== -->

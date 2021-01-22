@@ -22,15 +22,14 @@ class Laporanmodel extends Model
     public function getTopitem($status_cd,$start_dttm,$end_dttm) {
         return $this->db->query("SELECT b.produk_id, SUM(b.qty) AS totalqty, SUM(b.price) as totalprice, c.produk_nm
                                 FROM billing a 
-                                INNER JOIN billing_item b ON b.billing_id=a.billing_id 
-                                INNER JOIN produk c ON c.produk_id=b.produk_id
+                                LEFT JOIN billing_item b ON b.billing_id=a.billing_id 
+                                LEFT JOIN produk c ON c.produk_id=b.produk_id
                                 WHERE a.status_cd = 'closed'
                                 AND b.status_cd = 'normal'
                                 AND a.created_dttm >= '$start_dttm 00:00:00' 
                                 AND a.created_dttm <= '$end_dttm 23:59:59'
                                 GROUP BY produk_id 
-                                ORDER BY SUM(b.qty) DESC
-                                LIMIT 10");
+                                ORDER BY SUM(b.qty) DESC");
     }
 
     public function getLattestitem($status_cd,$start_dttm,$end_dttm) {
@@ -69,5 +68,14 @@ class Laporanmodel extends Model
                                 AND a.created_dttm <= '$end_dttm 23:59:59'
                                 GROUP BY a.payplan_id 
                                 ORDER BY SUM(a.ttl_amount) DESC");
+    }
+
+    public function getCustomerbyrange($start_dttm,$end_dttm) {
+        return $this->db->table('billing')
+                        ->select('hour(created_dttm) as label, COUNT(jumlah_customer) as y')
+                        ->where('created_dttm >=', '2020-12-1 00:00:00')
+                        ->where('created_dttm <=', '2020-12-1 23:59:59')
+                        ->groupby('hour(created_dttm)')
+                        ->get();
     }
 }
