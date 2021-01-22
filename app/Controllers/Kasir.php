@@ -63,6 +63,7 @@ class Kasir extends BaseController
 		$samping = "";
 		$atas = "";
 		$takeaway = "";
+		$ret = "";
 		$kasirstatus = $this->billingmodel->getStatuskasir()->getResult();
 		if (count($kasirstatus)>0) {
 			if ($kasirstatus[0]->status_cd == "open") {
