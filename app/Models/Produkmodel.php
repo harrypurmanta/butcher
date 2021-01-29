@@ -50,4 +50,9 @@ class Produkmodel extends Model
                         ->get();
     }
 
+    public function simpan($data) {
+        return $this->db->table('produk')
+                        ->insert($data);
+    }
+
 }

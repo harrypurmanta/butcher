@@ -1148,6 +1148,10 @@ class Kasir extends BaseController
 	            . "<label class='control-label'>Nama Menu</label>"
 	            . "<input type='text' class='form-control' id='produk_nm'>"
 	            . "</div>"
+	             . "<div class='form-group'>"
+	            . "<label class='control-label'>Harga</label>"
+	            . "<input type='number' class='form-control' id='produk_harga'>"
+	            . "</div>"
 	            . "</form>"
 	            . "</div>"
 	            . "<div class='modal-footer'>"
@@ -2156,14 +2160,16 @@ class Kasir extends BaseController
 	public function simpanmenu() {
 		$kategorimenu = $this->request->getPost('kategorimenu');
 		$produk_nm 	  = $this->request->getPost('produk_nm');
+		$produk_harga 	  = $this->request->getPost('produk_harga');
 
-		$getBynm = $this->mejamodel->getbyKatnm($meja_nm)->getResult();
+		$getBynm = $this->produkmodel->getbyKatnm($produk_nm)->getResult();
 		if (count($getBynm)>0) {
 			return "already";
 		} else {
 			$data = [
-				'kategori_meja_id' => $kategorimenu,
-				'meja_nm' => $produk_nm,
+				'kategori_id' => $kategorimenu,
+				'produk_nm' => $produk_nm,
+				'produk_harga' => $produk_harga,
 				'status_cd' => 'normal',
 				'created_user' => $this->session->user_id,
 				'created_dttm' => date('Y-m-d H:i:s')

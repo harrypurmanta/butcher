@@ -850,6 +850,7 @@ function simpanmeja() {
 function simpanmenu() {
   var kategorimenu = $('#kategorimenu').val();
   var produk_nm = $('#produk_nm').val();
+  var produk_harga = $('#produk_harga').val();
 
   if (kategorimenu == 0) {
     Swal.fire({
@@ -862,7 +863,16 @@ function simpanmenu() {
     })
   } else if (produk_nm == "") {
     Swal.fire({
-        title:"Nama MEJA harus diisi !!",
+        title:"Nama Menu harus diisi !!",
+        text:"GAGAL!",
+        type:"warning",
+        showCancelButton:0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else if (produk_harga == "") {
+    Swal.fire({
+        title:"Harga Menu harus diisi !!",
         text:"GAGAL!",
         type:"warning",
         showCancelButton:0,
@@ -873,14 +883,14 @@ function simpanmenu() {
       $.ajax({
       url : "<?= base_url('kasir/simpanmenu') ?>",
       type: "post",
-      data : {'kategorimenu':kategorimenu,'produk_nm':produk_nm},
+      data : {'kategorimenu':kategorimenu,'produk_nm':produk_nm,'produk_harga':produk_harga},
       beforeSend: function () { 
           $("#loader-wrapper").removeClass("d-none")
       },
       success:function(_data){
         if (_data=='already') {
           Swal.fire({
-              title:"Nama discount sudah ada!!",
+              title:"Nama Produk sudah ada!!",
               text:"GAGAL!",
               type:"warning",
               showCancelButton:!0,

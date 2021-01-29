@@ -85,7 +85,7 @@ class Laporan extends BaseController
     			$ttlvoid = $ttlvoid + $void->totalvoid;
     		}
     	}
-    	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+    	// $netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
 		$ret = "";
 		$no = 1;
 		$nopayplan = 1;
@@ -102,15 +102,16 @@ class Laporan extends BaseController
 				 . "<table style='font-size:18px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 	$ret .= "<tr>"
+						 . "<td width='150'>Net Sales</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
+						 . "</tr>"
+
+
+				 		 . "<tr>"
 						 . "<td width='150'>Discounts</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttldiscount)."</td>"
-						 . "</tr>"
-
-						 . "<tr>"
-						 . "<td width='150'>Net Sales</td>"
-						 . "<td width='20'>:</td>"
-						 . "<td align='right'>Rp. ".number_format($netsales)."</td>"
 						 . "</tr>"
 
 						 . "<tr>"
@@ -123,6 +124,12 @@ class Laporan extends BaseController
 						 . "<td width='150'>Tax</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->totaltax)."</td>"
+						 . "</tr>"
+
+						 . "<tr>"
+						 . "<td width='150'>Rounding</td>"
+						 . "<td width='20'>:</td>"
+						 . "<td align='right'>Rp. ".number_format($getReport[0]->ttlrounding)."</td>"
 						 . "</tr>"
 
 						 . "<tr>"
