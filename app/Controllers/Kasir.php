@@ -10,6 +10,7 @@ use App\Models\Membermodel;
 use App\Models\Payplanmodel;
 use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
+use App\Models\Kategorimejamodel;
 require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
 // require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 use Mike42\Escpos\Printer;
@@ -33,6 +34,7 @@ class Kasir extends BaseController
 	protected $profile;
 	protected $printer;
 	protected $session;
+	protected $kategorimejamodel;
 	public function __construct(){
 		
 		
@@ -43,6 +45,7 @@ class Kasir extends BaseController
 		$this->payplanmodel = new Payplanmodel();
 		$this->kategorimodel = new Kategorimodel();
 		$this->produkmodel = new Produkmodel();
+		$this->kategorimejamodel = new Kategorimejamodel();
 	}
 	
 	public function index() {
@@ -1083,6 +1086,80 @@ class Kasir extends BaseController
 	    return $ret;
 	}
 
+	public function formtambahmeja() {
+		$katopt = "";
+		$kategori = $this->kategorimejamodel->getKatbynormal()->getResult();
+		
+		$ret = "<div class='modal-dialog'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>Tambah Diskon</h4>"
+	             . "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+	            . "<form>"
+	            . "<div class='form-group'>"
+	            . "<label for='kategorimeja' class='control-label'>Kategori Meja</label>"
+	            . "<select class='form-control' id='kategorimeja'>"
+	            . "<option value='0'> -- Pilih Kategori -- </option>";
+	            foreach ($kategori as $key) {
+					$ret .= "<option value='$key->kategori_meja_id'>$key->kategori_meja_nm</option>";
+				}
+	       $ret .= "</select>"
+	            . "</div>"
+	            . "<div class='form-group'>"
+	            . "<label class='control-label'>Nama Meja</label>"
+	            . "<input type='text' class='form-control' id='meja_nm'>"
+	            . "</div>"
+	            . "</form>"
+	            . "</div>"
+	            . "<div class='modal-footer'>"
+	            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
+	            . "<button onclick='simpanmeja()' type='button' class='btn btn-danger waves-effect waves-light'>Simpan</button>"
+	            . "</div>"
+	            . "</div>"
+	            . "</div>";
+
+	    return $ret;
+	}
+
+	public function formtambahmenu() {
+		$katopt = "";
+		$kategori = $this->kategorimodel->getbyNormal()->getResult();
+		
+		$ret = "<div class='modal-dialog'>"
+	            . "<div class='modal-content'>"
+	            . "<div class='modal-header'>"
+	            . "<h4 class='modal-title'>Tambah Diskon</h4>"
+	             . "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>"
+	            . "</div>"
+	            . "<div class='modal-body'>"
+	            . "<form>"
+	            . "<div class='form-group'>"
+	            . "<label for='kategorimenu' class='control-label'>Kategori Menu</label>"
+	            . "<select class='form-control' id='kategorimenu'>"
+	            . "<option> -- Pilih Kategori -- </option>";
+	            foreach ($kategori as $key) {
+					$ret .= "<option value='$key->kategori_id'>$key->kategori_nm</option>";
+				}
+	       $ret .= "</select>"
+	            . "</div>"
+	            . "<div class='form-group'>"
+	            . "<label class='control-label'>Nama Menu</label>"
+	            . "<input type='text' class='form-control' id='produk_nm'>"
+	            . "</div>"
+	            . "</form>"
+	            . "</div>"
+	            . "<div class='modal-footer'>"
+	            . "<button type='button' class='btn btn-default waves-effect' data-dismiss='modal'>Close</button>"
+	            . "<button onclick='simpanmenu()' type='button' class='btn btn-danger waves-effect waves-light'>Simpan</button>"
+	            . "</div>"
+	            . "</div>"
+	            . "</div>";
+
+	    return $ret;
+	}
+
 	public function showcheckout(){
 		$id = $this->request->getPost('id');
 		$gt = $this->request->getPost('gt');
@@ -1711,7 +1788,7 @@ class Kasir extends BaseController
     	// 		$ttlvoid = $ttlvoid + $void->totalvoid;
     	// 	}
     	// }
-    	$netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
+    	// $netsales = $getReport[0]->grosssales - $getReport[0]->ttldiscount;
 
 		$ret = "";
 		$no = 1;
@@ -1727,7 +1804,7 @@ class Kasir extends BaseController
 				 . "<table style='font-size:22px;' width='100%'  data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
 				 	$pesan .= "<tr>"
-						 . "<td width='150'>Gross Sales</td>"
+						 . "<td width='150'>Net Sales</td>"
 						 . "<td width='20'>:</td>"
 						 . "<td align='right'>Rp. ".number_format($getReport[0]->grosssales)."</td>"
 						 . "</tr>"
@@ -2049,6 +2126,56 @@ class Kasir extends BaseController
 				return 'false';
 			}
         }
+	}
+
+	public function simpanmeja() {
+		$kategorimeja = $this->request->getPost('kategorimeja');
+		$meja_nm 	  = $this->request->getPost('meja_nm');
+
+		$getBynm = $this->mejamodel->getbyKatnm($meja_nm)->getResult();
+		if (count($getBynm)>0) {
+			return "already";
+		} else {
+			$data = [
+				'kategori_meja_id' => $kategorimeja,
+				'meja_nm' => $meja_nm,
+				'status_cd' => 'normal',
+				'created_user' => $this->session->user_id,
+				'created_dttm' => date('Y-m-d H:i:s')
+			];
+
+			$insert = $this->mejamodel->simpan($data);
+			if ($insert != "") {
+				return 'true';
+			} else {
+				return 'false';
+			}
+		}
+	}
+
+	public function simpanmenu() {
+		$kategorimenu = $this->request->getPost('kategorimenu');
+		$produk_nm 	  = $this->request->getPost('produk_nm');
+
+		$getBynm = $this->mejamodel->getbyKatnm($meja_nm)->getResult();
+		if (count($getBynm)>0) {
+			return "already";
+		} else {
+			$data = [
+				'kategori_meja_id' => $kategorimenu,
+				'meja_nm' => $produk_nm,
+				'status_cd' => 'normal',
+				'created_user' => $this->session->user_id,
+				'created_dttm' => date('Y-m-d H:i:s')
+			];
+
+			$insert = $this->produkmodel->simpan($data);
+			if ($insert != "") {
+				return 'true';
+			} else {
+				return 'false';
+			}
+		}
 	}
 
 	public function addmembertobill() {

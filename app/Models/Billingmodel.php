@@ -348,7 +348,7 @@ class Billingmodel extends Model
                                 FROM billing a 
                                 LEFT JOIN payplan b ON a.payplan_id=b.payplan_id 
                                 WHERE a.kasir_status_id = '$kasir_status_id'
-                                -- AND b.type = 'edc'
+                                AND b.type = 'edc'
                                 AND a.status_cd = 'finish'
                                 GROUP BY a.payplan_id 
                                 ORDER BY SUM(a.ttl_amount) DESC");

@@ -36,6 +36,8 @@
                                     <button type="button" onclick="closekasir()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-file-archive"></i> Closing</button>
                                     <button type="button" onclick="billinghistoryfinish()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-check"></i> History</button>
                                     <button type="button" onclick="billinghistoryverified()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-list"></i> Activity</button>
+                                    <button type="button" onclick="tambahmeja()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-plus"></i> Meja</button>
+                                    <button type="button" onclick="tambahmenu()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-plus"></i>Tambah Menu</button>
                                   </div>
                                 </div>
                               </div>
@@ -641,6 +643,81 @@ function showdetailhistory(meja_id,billing_id,btn) {
   });
 }
 
+function tambahmeja() {
+  $.ajax({
+     url : "<?= base_url('kasir/formtambahmeja') ?>",
+     type: "post",
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+      },
+     success:function(data){
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function tambahmenu() {
+  $.ajax({
+     url : "<?= base_url('kasir/formtambahmenu') ?>",
+     type: "post",
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+      },
+     success:function(data){
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
+function tambahkategorimenu() {
+  $.ajax({
+     url : "<?= base_url('kasir/formtambahkategorimenu') ?>",
+     type: "post",
+     beforeSend: function () { 
+        $("#loader-wrapper").removeClass("d-none")
+      },
+     success:function(data){
+      $('#modaltambahmember').html(data);
+      $('#modaltambahmember').modal('show');
+      $("#loader-wrapper").addClass("d-none");
+    },
+    error:function(){
+        Swal.fire({
+            title:"Gagal!",
+            text:"Data gagal disimpan!",
+            type:"warning",
+            showCancelButton:!0,
+            confirmButtonColor:"#556ee6",
+            cancelButtonColor:"#f46a6a"
+        })
+    }
+  });
+}
+
 function formtambahmember() {
   $.ajax({
      url : "<?= base_url('kasir/formtambahmember') ?>",
@@ -690,6 +767,162 @@ function formtambahdiskon() {
         })
     }
   });
+}
+
+function simpanmeja() {
+  var kategorimeja = $('#kategorimeja').val();
+  var meja_nm = $('#meja_nm').val();
+
+  if (kategorimeja == 0) {
+    Swal.fire({
+        title:"Kategori harus dipilih !!",
+        text:"GAGAL!",
+        type:"warning",
+        showCancelButton:0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else if (meja_nm == "") {
+    Swal.fire({
+        title:"Nama MEJA harus diisi !!",
+        text:"GAGAL!",
+        type:"warning",
+        showCancelButton:0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else {
+      $.ajax({
+      url : "<?= base_url('kasir/simpanmeja') ?>",
+      type: "post",
+      data : {'kategorimeja':kategorimeja,'meja_nm':meja_nm},
+      beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
+      success:function(_data){
+        if (_data=='already') {
+          Swal.fire({
+              title:"Nama discount sudah ada!!",
+              text:"GAGAL!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+        } else if (_data == 'true') {
+          Swal.fire({
+              title:"Berhasil!",
+              text:"Data berhasil disimpan!",
+              type:"success",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+          $('#modaltambahmember').modal('hide');
+        } else {
+          Swal.fire({
+              title:"GAGAL !",
+              text:"Data berhasil disimpan!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+          $('#modaltambahmember').modal('hide');
+        }
+        $("#loader-wrapper").addClass("d-none");
+        listmejakasir();
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+        }
+      });
+  }
+}
+
+function simpanmenu() {
+  var kategorimenu = $('#kategorimenu').val();
+  var produk_nm = $('#produk_nm').val();
+
+  if (kategorimenu == 0) {
+    Swal.fire({
+        title:"Kategori harus dipilih !!",
+        text:"GAGAL!",
+        type:"warning",
+        showCancelButton:0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else if (produk_nm == "") {
+    Swal.fire({
+        title:"Nama MEJA harus diisi !!",
+        text:"GAGAL!",
+        type:"warning",
+        showCancelButton:0,
+        confirmButtonColor:"#556ee6",
+        cancelButtonColor:"#f46a6a"
+    })
+  } else {
+      $.ajax({
+      url : "<?= base_url('kasir/simpanmenu') ?>",
+      type: "post",
+      data : {'kategorimenu':kategorimenu,'produk_nm':produk_nm},
+      beforeSend: function () { 
+          $("#loader-wrapper").removeClass("d-none")
+      },
+      success:function(_data){
+        if (_data=='already') {
+          Swal.fire({
+              title:"Nama discount sudah ada!!",
+              text:"GAGAL!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+        } else if (_data == 'true') {
+          Swal.fire({
+              title:"Berhasil!",
+              text:"Data berhasil disimpan!",
+              type:"success",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+          $('#modaltambahmember').modal('hide');
+        } else {
+          Swal.fire({
+              title:"GAGAL !",
+              text:"Data berhasil disimpan!",
+              type:"warning",
+              showCancelButton:!0,
+              confirmButtonColor:"#556ee6",
+              cancelButtonColor:"#f46a6a"
+          })
+          $('#modaltambahmember').modal('hide');
+        }
+        $("#loader-wrapper").addClass("d-none");
+        listmejakasir();
+        },
+        error:function(){
+            Swal.fire({
+                title:"Gagal!",
+                text:"Data gagal disimpan!",
+                type:"warning",
+                showCancelButton:!0,
+                confirmButtonColor:"#556ee6",
+                cancelButtonColor:"#f46a6a"
+            })
+        }
+      });
+  }
 }
 
 function simpan() {

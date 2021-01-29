@@ -12,8 +12,8 @@ use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
 use App\Models\Laporanmodel;
 
-// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 
 class Laporan extends BaseController
 {
