@@ -38,10 +38,14 @@
                                     <button type="button" onclick="billinghistoryverified()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-clipboard-list"></i> Activity</button>
                                     <button type="button" onclick="tambahmeja()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-plus"></i> Meja</button>
                                     <button type="button" onclick="tambahmenu()" class="btn btn-outline-info waves-effect waves-light"><i class="fas fa-plus"></i>Tambah Menu</button>
+                                    
+
                                   </div>
+
                                 </div>
                               </div>
                             </div>
+                            <a href='<?=base_url()?>/login/logout'><button type="button" onclick="tambahmenu()" class="btn btn-outline-danger waves-effect waves-light"><i class="fas fa-plus"></i>Logout</button></a>
                         </div>
                         <div class="col-md-6">
                             <div class="card">

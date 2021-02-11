@@ -12,8 +12,8 @@ use App\Models\Kategorimodel;
 use App\Models\Produkmodel;
 use App\Models\Laporanmodel;
 
-require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
-// require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
+// require  '/home/u1102684/public_html/butcher/app/Libraries/vendor/autoload.php';
+require  '/var/www/html/lavitabella/app/Libraries/vendor/autoload.php';
 
 class Laporan extends BaseController
 {
@@ -228,7 +228,14 @@ class Laporan extends BaseController
     	$data = array();
     	// $data = ;
 
-    	echo json_encode($res);
+    	foreach ($res as $key) {
+    		$label = $key->label;
+    		$y = (int)$key->y;
+    		$data[] = array("label" => $label,"y" => $y);
+    	}
+
+
+    	echo json_encode($data);
     }
 
 }

@@ -2112,7 +2112,12 @@ class Kasir extends BaseController
 		$id = $this->request->getPost('id');
 		$di = $this->request->getPost('di');
         $bi = $this->request->getPost('bi');
-        $cek = $this->billingmodel->getbybilldiscid($bi,$di)->getResult();
+        if ($di == 1 || $di == 2) {
+        	$cek = $this->billingmodel->getbybilldiscidpersen($bi,$di)->getResult();
+        } else {
+        	$cek = $this->billingmodel->getbybilldiscid($bi,$di)->getResult();
+        }
+        
         if (count($cek)>0) {
         	return 'already';
         } else {
@@ -2293,7 +2298,7 @@ class Kasir extends BaseController
     		    	$this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
-    		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($member_nm." [ ".$data[0]->collected_nm." ]\n");
     		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
@@ -2353,7 +2358,7 @@ class Kasir extends BaseController
     		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
-    		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($member_nm." [ ".$data[0]->collected_nm." ]\n");
     		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
@@ -2413,7 +2418,7 @@ class Kasir extends BaseController
     		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
-    		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($member_nm." [ ".$data[0]->collected_nm." ]\n");
     		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
@@ -2470,7 +2475,7 @@ class Kasir extends BaseController
     		    $this->printer->setJustification(Printer::JUSTIFY_RIGHT);
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
-    		    $this->printer->text($member_nm."\n");
+    		    $this->printer->text($member_nm." [ ".$data[0]->collected_nm." ]\n");
     		    $this->printer->text($data[0]->billing_cd."\n");
     		    $this->printer->setTextSize(1, 2);
     		    $this->printer->text("--------------------------------\n");
@@ -2709,8 +2714,8 @@ class Kasir extends BaseController
     		    $this->printer->text("VOID \n");
     		    $this->printer->text($date."\n");
     		    $this->printer->setJustification(Printer::JUSTIFY_LEFT);
-    		    $this->printer->text($meja_nm."\n");
-    		    $this->printer->text($data[0]->billing_cd."\n");
+    		    $this->printer->text($meja_nm." [ ".$data[0]->collected_nm." ]\n");
+    		    $this->printer->text($data[0]->billing_cd. "\n");
     		    $this->printer->text("--------------------------------\n");
     		    foreach ($data as $item) {
     		    	$this->printer->setEmphasis(true);

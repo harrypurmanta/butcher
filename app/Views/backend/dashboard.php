@@ -44,7 +44,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                                <div id="chartContainer" style="height: 400px; width: 100%;"></div>
                                
                             </div>
                         </div>
@@ -56,19 +56,7 @@
             </div>
             <?php
  
-$dataPoints = array(
-    array("label"=> "WordPress", "y"=> 60.0),
-    array("label"=> "Joomla", "y"=> 6.5),
-    array("label"=> "Drupal", "y"=> 4.6),
-    array("label"=> "Magento", "y"=> 2.4),
-    array("label"=> "Blogger", "y"=> 1.9),
-    array("label"=> "Shopify", "y"=> 1.8),
-    array("label"=> "Bitrix", "y"=> 1.5),
-    array("label"=> "Squarespace", "y"=> 1.5),
-    array("label"=> "PrestaShop", "y"=> 1.3),
-    array("label"=> "Wix", "y"=> 0.9),
-    array("label"=> "OpenCart", "y"=> 0.8)
-);
+
     
 
     // echo json_encode($dataPoints);
