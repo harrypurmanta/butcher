@@ -16,10 +16,10 @@ class Mejamodel extends Model
     }
 
     public function getbyNormal() {
-        return $this->db->table('meja a')
+        return $this->db->table('meja')
                     ->select('*')
-                    ->join('imagemeja b','b.meja_id=a.meja_id','left')
-                    ->where('a.status_cd','normal')
+                    // ->join('imagemeja b','b.meja_id=a.meja_id','left')
+                    ->where('status_cd','normal')
                     ->get();
     }
 
