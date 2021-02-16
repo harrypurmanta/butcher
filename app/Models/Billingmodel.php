@@ -158,6 +158,7 @@ class Billingmodel extends Model
                         ->join('produk c','c.produk_id=b.produk_id','left')
                         ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
                         ->join('meja f','f.meja_id=a.meja_id','left')
+                        ->join('person g','g.person_id=a.collected_user','left')
                         ->where('a.status_cd','verified')
                         ->where('b.status_cd','normal')
                         ->whereIn('d.kategori_id',[1,2,3,4,5,6,12,13,14,15,16,17])
