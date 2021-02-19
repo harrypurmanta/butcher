@@ -95,7 +95,7 @@ class Billingmodel extends Model
 
     public function getdrinkmenu($id) {
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id, a.collected_user as collected_nm,a.member_id,f.meja_nm,g.person_nm as collected_nm,b.description');
+        $query->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id, g.person_nm as collected_nm,a.member_id,f.meja_nm,g.person_nm as collected_nm,b.description');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -113,7 +113,7 @@ class Billingmodel extends Model
 
     public function getfoodmenu($id) {
         $query = $this->db->table('billing a');
-        $query->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.collected_user as collected_nm,f.meja_nm,g.person_nm as collected_nm,b.description');
+        $query->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,g.person_nm as collected_nm,f.meja_nm,g.person_nm as collected_nm,b.description');
         $query->join('billing_item b','b.billing_id=a.billing_id','left');
         $query->join('produk c','c.produk_id=b.produk_id','left');
         $query->join('kategori_produk d','d.kategori_id=c.kategori_id','left');
@@ -138,7 +138,7 @@ class Billingmodel extends Model
 
     public function cetakulangdrinks($billing_id) {
         return $this->db->table('billing a')
-                        ->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.collected_user as collected_nm,a.member_id,f.meja_nm,b.description,g.person_nm as collected_nm')
+                        ->select('a.billing_id,a.billing_cd,a.created_dttm,a.status_cd as statusbilling,b.qty,c.produk_id,c.produk_nm,c.produk_harga,b.status_cd,b.billing_item_id,a.member_id,f.meja_nm,b.description,g.person_nm as collected_nm')
                         ->join('billing_item b','b.billing_id=a.billing_id','left')
                         ->join('produk c','c.produk_id=b.produk_id','left')
                         ->join('kategori_produk d','d.kategori_id=c.kategori_id','left')
