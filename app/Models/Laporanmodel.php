@@ -8,7 +8,7 @@ class Laporanmodel extends Model
 
     public function getByfilter($status_cd,$start_dttm,$end_dttm) {
     	return $this->db->table('billing')
-                        ->select('SUM(amt_before_discount) as amt_before_discount, SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount, SUM(tax) AS totaltax, SUM(service) AS totalservice')
+                        ->select('SUM(amt_before_discount) as amt_before_discount, SUM(ttl_amount) as grosssales,SUM(ttl_discount) as ttldiscount, SUM(tax) AS totaltax, SUM(service) AS totalservice, SUM(rounding) AS ttlrounding')
                         ->where('status_cd','closed')
                         ->where('created_dttm >=',$start_dttm.' 00:00:00')
                         ->where('created_dttm <=',$end_dttm.' 23:59:59')
