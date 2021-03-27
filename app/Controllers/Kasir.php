@@ -3320,7 +3320,7 @@ class Kasir extends BaseController
 				}
 				
 				$kembalian = $ttl_paid - $jmlbulat;
-				log_message("INFO","UBAAAA12",$jmlbulat);
+				// log_message("INFO","UBAAAA12",$jmlbulat);
 				
 
 			    $this->printer->setEmphasis(false);
