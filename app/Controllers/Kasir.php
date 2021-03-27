@@ -1884,6 +1884,8 @@ class Kasir extends BaseController
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
+
+				 $total_edc = 0;
 				 foreach ($edc as $kedc) {
 					 	$pesan .= "<tr>"
 							 . "<td width='20'>".$nopayplan++.".</td>"
@@ -1891,6 +1893,8 @@ class Kasir extends BaseController
 							 . "<td>$kedc->totalpayplan</td>"
 							 . "<td align='right'>Rp. ".number_format($kedc->ttlamount)."</td>"
 							 . "</tr>";
+
+							 $total_edc = $kedc->ttlamount;
 					}
 				 
 
@@ -1901,12 +1905,15 @@ class Kasir extends BaseController
 				 . "<hr style='border: solid 1px red'/>"
 				 . "<table style='font-size:22px;' width='100%' data-toggle='table' data-mobile-responsive='true' class='table-striped'>"
 				 . "<tbody>";
+
+				 $total_tunai = 0;
 				 foreach ($tunai as $ktunai) {
 					 	$pesan .= "<tr>"
 							 . "<td width='50%'>$ktunai->payplan_nm</td>"
 							 . "<td>$ktunai->totalpayplan</td>"
 							 . "<td align='right'>Rp. ".number_format($ktunai->ttlamount)."</td>"
 							 . "</tr>";
+							 $total_tunai = $ktunai->ttlamount;
 					}
 				 
 
@@ -1918,7 +1925,7 @@ class Kasir extends BaseController
 				 . "<tr>"
 				 . "<td width='50%' style='font-weight:bold; border-top: 1px solid #000;'>TOTAL CASH COLLECTED</td>"
 				 . "<td align='right'> : </td>"
-				 . "<td align='right' style='font-weight:bold; border-top: 1px solid #000;'>Rp. ".number_format($kasir_status[0]->modal + $ktunai->ttlamount)."</td>"
+				 . "<td align='right' style='font-weight:bold; border-top: 1px solid #000;'>Rp. ".number_format($kasir_status[0]->modal + $total_tunai)."</td>"
 				 . "</tr>"
 				 . "</tbody>"
 				 . "</table>"
@@ -3313,6 +3320,7 @@ class Kasir extends BaseController
 				}
 				
 				$kembalian = $ttl_paid - $jmlbulat;
+				log_message("INFO","UBAAAA12",$jmlbulat);
 				
 
 			    $this->printer->setEmphasis(false);
